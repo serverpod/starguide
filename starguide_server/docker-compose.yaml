@@ -1,0 +1,44 @@
+services:
+  # Development services
+  postgres:
+    image: pgvector/pgvector:pg16
+    ports:
+      - "8090:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_DB: starguide
+      POSTGRES_PASSWORD: "KG3uoH8yvl2TBJGZWYA6Pw5ToPV0FwRP"
+    volumes:
+      - starguide_data:/var/lib/postgresql/data
+
+  redis:
+    image: redis:6.2.6
+    ports:
+      - "8091:6379"
+    command: redis-server --requirepass "cv62dn4dCyCL8NZEWjJYZNDjOKXQzQqH"
+    environment:
+      - REDIS_REPLICATION_MODE=master
+
+  # Test services
+  postgres_test:
+    image: postgres:16.3
+    ports:
+      - "9090:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_DB: starguide_test
+      POSTGRES_PASSWORD: "9mPvLeV-d_p6P8DsoZDhiPB_l_BlvGeq"
+    volumes:
+      - starguide_test_data:/var/lib/postgresql/data
+
+  redis_test:
+    image: redis:6.2.6
+    ports:
+      - "9091:6379"
+    command: redis-server --requirepass "xDbf-Z9dVvEZo2iMx2tDMLRbZDsq-Wdq"
+    environment:
+      - REDIS_REPLICATION_MODE=master
+
+volumes:
+  starguide_data:
+  starguide_test_data:

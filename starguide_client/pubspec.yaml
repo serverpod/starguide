@@ -1,0 +1,15 @@
+name: starguide_client
+description: Starting point for a Serverpod client.
+
+environment:
+  sdk: '>=3.3.0 <4.0.0'
+
+dependencies:
+  serverpod_client:
+    path: ../vendor/serverpod/packages/serverpod_client
+
+dependency_overrides:
+  serverpod_serialization:
+    path: ../vendor/serverpod/packages/serverpod_serialization
+  serverpod_shared:
+    path: ../vendor/serverpod/packages/serverpod_shared

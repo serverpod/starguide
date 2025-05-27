@@ -1,0 +1,110 @@
+{
+  "actions": [
+    {
+      "type": "deleteTable",
+      "deleteTable": "rag_document"
+    },
+    {
+      "type": "createTable",
+      "createTable": {
+        "name": "rag_document",
+        "dartName": "RAGDocument",
+        "module": "starguide",
+        "schema": "public",
+        "columns": [
+          {
+            "name": "id",
+            "columnType": 6,
+            "isNullable": false,
+            "columnDefault": "nextval('rag_document_id_seq'::regclass)",
+            "dartType": "int?"
+          },
+          {
+            "name": "embedding",
+            "columnType": 10,
+            "isNullable": false,
+            "dartType": "Vector(1536)",
+            "vectorDimension": 1536
+          },
+          {
+            "name": "fetchTime",
+            "columnType": 4,
+            "isNullable": false,
+            "dartType": "DateTime"
+          },
+          {
+            "name": "sourceUrl",
+            "columnType": 0,
+            "isNullable": false,
+            "dartType": "Uri"
+          },
+          {
+            "name": "content",
+            "columnType": 0,
+            "isNullable": false,
+            "dartType": "String"
+          },
+          {
+            "name": "summary",
+            "columnType": 0,
+            "isNullable": false,
+            "dartType": "String"
+          }
+        ],
+        "foreignKeys": [],
+        "indexes": [
+          {
+            "indexName": "rag_document_pkey",
+            "elements": [
+              {
+                "type": 0,
+                "definition": "id"
+              }
+            ],
+            "type": "btree",
+            "isUnique": true,
+            "isPrimary": true
+          },
+          {
+            "indexName": "rag_docuement_sourceUrl",
+            "elements": [
+              {
+                "type": 0,
+                "definition": "sourceUrl"
+              }
+            ],
+            "type": "btree",
+            "isUnique": true,
+            "isPrimary": false
+          },
+          {
+            "indexName": "rag_document_vector",
+            "elements": [
+              {
+                "type": 0,
+                "definition": "embedding"
+              }
+            ],
+            "type": "hnsw",
+            "isUnique": false,
+            "isPrimary": false,
+            "vectorDistanceFunction": "cosine"
+          }
+        ],
+        "managed": true
+      }
+    }
+  ],
+  "warnings": [
+    {
+      "type": "tableDropped",
+      "message": "One or more columns are added to table \"rag_document\" which cannot be added in a table migration. The complete table will be deleted and recreated.",
+      "table": "rag_document",
+      "columns": [
+        "embedding"
+      ],
+      "destrucive": true
+    }
+  ],
+  "migrationApiVersion": 1
+}

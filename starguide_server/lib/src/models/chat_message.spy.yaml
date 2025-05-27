@@ -1,0 +1,6 @@
+class: ChatMessage
+table: chat_message
+fields:
+  chatSessionId: int
+  message: String
+  type: ChatMessageType
