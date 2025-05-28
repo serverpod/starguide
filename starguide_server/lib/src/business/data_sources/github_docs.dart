@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:http/http.dart' as http;
 import 'package:serverpod/serverpod.dart';
+import 'package:starguide_server/src/business/data_fetcher.dart';
 import 'package:starguide_server/src/business/data_source.dart';
 
 class GithubDocsDataSource implements DataSource {
@@ -23,7 +24,11 @@ class GithubDocsDataSource implements DataSource {
   }
 
   @override
-  Stream<RawRAGDocuement> fetch({String? path, Uri? referenceUrl}) async* {
+  Stream<RawRAGDocuement> fetch(
+    DataFetcher fetcher, {
+    String? path,
+    Uri? referenceUrl,
+  }) async* {
     path ??= basePath;
     referenceUrl ??= this.referenceUrl;
 
@@ -58,7 +63,11 @@ class GithubDocsDataSource implements DataSource {
       );
 
       if (file['type'] == 'dir') {
-        final listing = fetch(path: '$path/$fileName', referenceUrl: url);
+        final listing = fetch(
+          fetcher,
+          path: '$path/$fileName',
+          referenceUrl: url,
+        );
 
         await for (var doc in listing) {
           yield doc;

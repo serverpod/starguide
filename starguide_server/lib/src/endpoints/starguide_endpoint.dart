@@ -1,5 +1,5 @@
 import 'package:serverpod/serverpod.dart';
-import 'package:starguide_server/src/business/generative_ai.dart';
+import 'package:starguide_server/src/generative_ai/generative_ai.dart';
 import 'package:starguide_server/src/business/random_string.dart';
 import 'package:starguide_server/src/generated/protocol.dart';
 
