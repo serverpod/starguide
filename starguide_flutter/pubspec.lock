@@ -449,28 +449,32 @@ packages:
     source: hosted
     version: "1.26.0"
   serverpod_client:
-    dependency: transitive
+    dependency: "direct overridden"
     description:
-      name: serverpod_client
-      sha256: "31486fedef0e18f18e7537c46cea2a0ed844407fc7a262e21010c917f276b393"
-      url: "https://pub.dev"
-    source: hosted
+      path: "../vendor/serverpod/packages/serverpod_client"
+      relative: true
+    source: path
     version: "2.7.0"
   serverpod_flutter:
     dependency: "direct main"
     description:
-      name: serverpod_flutter
-      sha256: "363bb23519a7a416dab9a8c4ce1029e963ce38d7b9ec8889f35aad754098b009"
-      url: "https://pub.dev"
-    source: hosted
+      path: "../vendor/serverpod/packages/serverpod_flutter"
+      relative: true
+    source: path
     version: "2.7.0"
   serverpod_serialization:
-    dependency: transitive
+    dependency: "direct overridden"
     description:
-      name: serverpod_serialization
-      sha256: "4f8881a527df8b931b5093bd31aeb0d1d13d1a0a72a3f0ccc0b24ebc77ada1fa"
-      url: "https://pub.dev"
-    source: hosted
+      path: "../vendor/serverpod/packages/serverpod_serialization"
+      relative: true
+    source: path
+    version: "2.7.0"
+  serverpod_shared:
+    dependency: "direct overridden"
+    description:
+      path: "../vendor/serverpod/packages/serverpod_shared"
+      relative: true
+    source: path
     version: "2.7.0"
   sky_engine:
     dependency: transitive
@@ -524,6 +528,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.4.1"
+  super_string:
+    dependency: transitive
+    description:
+      name: super_string
+      sha256: ba41acf9fbb318b3fc0d57c9235779100394d85d83f45ab533615df1f3146ea7
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.3"
   term_glyph:
     dependency: transitive
     description:

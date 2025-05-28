@@ -39,3 +39,8 @@ redis:
   enabled: false
   host: localhost
   port: 8091
+
+sessionLogs:
+  persistentEnabled: true
+  consoleEnabled: true
+  consoleLogFormat: text

@@ -1,7 +1,8 @@
+import 'package:serverpod/serverpod.dart';
 import 'package:starguide_server/src/business/data_fetcher.dart';
 
 abstract class DataSource {
-  Stream<RawRAGDocuement> fetch(DataFetcher fetcher);
+  Stream<RawRAGDocuement> fetch(Session session, DataFetcher fetcher);
 }
 
 enum DataSourceType {

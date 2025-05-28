@@ -2,6 +2,7 @@ import 'package:serverpod/serverpod.dart';
 import 'package:starguide_server/src/generative_ai/generative_ai.dart';
 import 'package:starguide_server/src/business/random_string.dart';
 import 'package:starguide_server/src/generated/protocol.dart';
+import 'package:starguide_server/src/generative_ai/prompts.dart';
 
 class StarguideEndpoint extends Endpoint {
   Future<ChatSession> createChatSession(Session session) async {
@@ -39,9 +40,32 @@ class StarguideEndpoint extends Endpoint {
       orderBy: (chatMessage) => chatMessage.id,
     );
 
-    // Generate the answer
     final genAi = GenerativeAi();
-    final answerStream = genAi.generateAnswer(question, conversation);
+
+    var documents = <RAGDocument>[];
+
+    if (conversation.isEmpty) {
+      // Transform the question to a question to what it like looks like in the
+      // RAG database.
+      final transformedQuestion = await genAi.generateSimpleAnswer(
+        Prompts.instance.get('transform_question')! + question,
+      );
+      question = transformedQuestion;
+
+      // Create an embedding for the question.
+      final embedding = await genAi.generateEmbedding(question);
+
+      // Find the most similar question in the RAG database.
+      documents = await RAGDocument.db.find(
+        session,
+        orderBy: (rag) => rag.embedding.distanceCosine(embedding),
+        limit: 5,
+      );
+    }
+
+    // Generate the answer
+    final answerStream =
+        genAi.generateConversationalAnswer(question, documents, conversation);
     var answer = '';
     await for (var chunk in answerStream) {
       answer += chunk;

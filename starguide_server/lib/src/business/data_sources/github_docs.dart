@@ -25,6 +25,7 @@ class GithubDocsDataSource implements DataSource {
 
   @override
   Stream<RawRAGDocuement> fetch(
+    Session session,
     DataFetcher fetcher, {
     String? path,
     Uri? referenceUrl,
@@ -64,6 +65,7 @@ class GithubDocsDataSource implements DataSource {
 
       if (file['type'] == 'dir') {
         final listing = fetch(
+          session,
           fetcher,
           path: '$path/$fileName',
           referenceUrl: url,
@@ -74,14 +76,16 @@ class GithubDocsDataSource implements DataSource {
         }
       } else if (file['type'] == 'file' &&
           (fileName.endsWith('.md') || fileName.endsWith('.mdx'))) {
-        final fileUrl = Uri.parse(file['download_url']);
-        final fileResponse = await http.get(fileUrl);
-        if (fileResponse.statusCode == 200) {
-          yield RawRAGDocuement(
-            sourceUrl: url,
-            document: fileResponse.body,
-            type: DataSourceType.markdown,
-          );
+        if (await fetcher.shouldFetchUrl(session, url)) {
+          final fileUrl = Uri.parse(file['download_url']);
+          final fileResponse = await http.get(fileUrl);
+          if (fileResponse.statusCode == 200) {
+            yield RawRAGDocuement(
+              sourceUrl: url,
+              document: fileResponse.body,
+              type: DataSourceType.markdown,
+            );
+          }
         }
       }
     }

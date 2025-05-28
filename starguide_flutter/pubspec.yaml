@@ -44,6 +44,14 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
 
+dependency_overrides:
+  serverpod_serialization:
+    path: ../vendor/serverpod/packages/serverpod_serialization
+  serverpod_shared:
+    path: ../vendor/serverpod/packages/serverpod_shared
+  serverpod_client:
+    path: ../vendor/serverpod/packages/serverpod_client
+
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
 

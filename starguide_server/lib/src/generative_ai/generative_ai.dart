@@ -4,6 +4,8 @@ import 'package:google_generative_ai/google_generative_ai.dart';
 import 'package:serverpod/serverpod.dart';
 import 'package:starguide_server/src/extensions/chat_message_to_role.dart';
 import 'package:starguide_server/src/generated/chat_message.dart';
+import 'package:starguide_server/src/generated/protocol.dart';
+import 'package:starguide_server/src/generative_ai/prompts.dart';
 
 // final model = GenerativeModel(
 //   model: 'gemini-2.0-flash-latest',
@@ -23,7 +25,7 @@ class GenerativeAi {
   GenerativeAi() {
     geminiAPIKey = Serverpod.instance.getPassword('geminiAPIKey')!;
     model = GenerativeModel(
-      model: 'gemini-2.0-flash-latest',
+      model: 'gemini-1.5-flash-latest',
       apiKey: geminiAPIKey,
     );
     embeddingModel = GenerativeModel(
@@ -32,10 +34,13 @@ class GenerativeAi {
     );
   }
 
-  Stream<String> generateAnswer(
-      String question, List<ChatMessage> conversation) {
-    final systemInstructionsStr =
-        File('system_prompt_2.txt').readAsStringSync();
+  Stream<String> generateConversationalAnswer(
+    String question,
+    List<RAGDocument> documents,
+    List<ChatMessage> conversation,
+  ) {
+    final systemInstructionsStr = Prompts.instance.get('final_answer')! +
+        documents.map((e) => _formatDocument(e)).join('\n');
 
     final prompt = conversation.map(
       (chatMessage) {
@@ -55,11 +60,23 @@ class GenerativeAi {
         .map<String>((response) => response.text ?? '');
   }
 
-  Future<void> findEmbedding(String document) async {
+  Future<String> generateSimpleAnswer(String question) async {
+    final prompt = [
+      Content.text(question),
+    ];
+
+    return (await model.generateContent(prompt)).text ?? '';
+  }
+
+  Future<Vector> generateEmbedding(String document) async {
     var response = await embeddingModel.embedContent(
       Content.text(document),
       outputDimensionality: 1536,
     );
-    print('embedding length: ${response.embedding.values.length}');
+    return Vector(response.embedding.values);
+  }
+
+  String _formatDocument(RAGDocument document) {
+    return '<doc href="${document.sourceUrl}">\n${document.content}\n</doc>';
   }
 }
