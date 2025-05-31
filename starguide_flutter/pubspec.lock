@@ -69,10 +69,10 @@ packages:
     dependency: transitive
     description:
       name: cross_cache
-      sha256: "4d82e3fe05b4189867477df173518d38e136722d5fccc3869d4e84194c123b2b"
+      sha256: "007d0340c19d4d201192a3335c4034f4b79eae5ea53f90b69eeb5d239d9fbd1d"
       url: "https://pub.dev"
     source: hosted
-    version: "0.0.9"
+    version: "1.0.2"
   cross_file:
     dependency: transitive
     description:
@@ -162,18 +162,18 @@ packages:
     dependency: "direct main"
     description:
       name: flutter_chat_core
-      sha256: f71c4ed421c49c3513a1067c29ff97871215c669e95e244fb7f68d053c1da4d2
+      sha256: "08c6c57c3dd916984d0225261df4852628c7b3cc31b5fd29101d90034edd0b1b"
       url: "https://pub.dev"
     source: hosted
-    version: "0.0.9"
+    version: "2.4.0"
   flutter_chat_ui:
     dependency: "direct main"
     description:
       name: flutter_chat_ui
-      sha256: "11e0f6cbeec13164b22204f4139e79e345f652bb7d98d892d52b380c5f64a71f"
+      sha256: "30ad830f7eafe48d494c3eb71e15297479ba752e56b9ec466588260678268a31"
       url: "https://pub.dev"
     source: hosted
-    version: "2.0.0-dev.8"
+    version: "2.3.1"
   flutter_lints:
     dependency: "direct dev"
     description:
@@ -208,38 +208,30 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
-  flyer_chat_system_message:
-    dependency: "direct main"
-    description:
-      name: flyer_chat_system_message
-      sha256: d0dfdff8e1cc7be4a2b5b27b477d6808a85fb358bc8d365d92ac3705af8c6558
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.0.9"
   flyer_chat_text_message:
     dependency: "direct main"
     description:
       name: flyer_chat_text_message
-      sha256: cf7ff9efed62e6950723cbaa4e3b222b1a9a1d740d960519739d28648b974a83
+      sha256: "581a78c03656c6eb62cd960f33431fe5bf38d5cc62a8b3e00d42e999a96aa58d"
       url: "https://pub.dev"
     source: hosted
-    version: "0.0.9"
+    version: "2.2.1"
   freezed_annotation:
     dependency: transitive
     description:
       name: freezed_annotation
-      sha256: c2e2d632dd9b8a2b7751117abcfc2b4888ecfe181bd9fca7170d9ef02e595fe2
+      sha256: c87ff004c8aa6af2d531668b46a4ea379f7191dc6dfa066acd53d506da6e044b
       url: "https://pub.dev"
     source: hosted
-    version: "2.4.4"
+    version: "3.0.0"
   gpt_markdown:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: gpt_markdown
-      sha256: "98dbf7cd95d4ebe678ead0718761af5ed7358165b10a1c1bfe295dd367763b7e"
+      sha256: "80f45e45c4c5636c040a64910aa543a4697442f7224391f0aeced3d2ed3a8c06"
       url: "https://pub.dev"
     source: hosted
-    version: "1.0.16"
+    version: "1.0.19"
   http:
     dependency: transitive
     description:
@@ -256,6 +248,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "4.1.2"
+  idb_shim:
+    dependency: transitive
+    description:
+      name: idb_shim
+      sha256: "109ce57e7ae8a758e806c24669bf7809f0e4c0bc390159589819061ec2ca75c0"
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.6.6+2"
   intl:
     dependency: transitive
     description:
@@ -448,6 +448,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.26.0"
+  sembast:
+    dependency: transitive
+    description:
+      name: sembast
+      sha256: "7119cf6f79bd1d48c8ec7943f4facd96c15ab26823021ed0792a487c7cd34441"
+      url: "https://pub.dev"
+    source: hosted
+    version: "3.8.5+1"
   serverpod_client:
     dependency: "direct overridden"
     description:
@@ -536,6 +544,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.0.3"
+  synchronized:
+    dependency: transitive
+    description:
+      name: synchronized
+      sha256: "0669c70faae6270521ee4f05bffd2919892d42d1276e6c495be80174b6bc0ef6"
+      url: "https://pub.dev"
+    source: hosted
+    version: "3.3.1"
   term_glyph:
     dependency: transitive
     description:

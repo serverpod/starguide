@@ -43,7 +43,7 @@ class MyHomePage extends StatefulWidget {
 
 class MyHomePageState extends State<MyHomePage> {
   final _uuid = Uuid();
-  final _chatController = InMemoryChatController();
+  final ChatController _chatController = InMemoryChatController();
   final _scrollController = ScrollController();
 
   static const _userId = 'user';
@@ -76,12 +76,12 @@ class MyHomePageState extends State<MyHomePage> {
       createdAt: DateTime.now().toUtc(),
       text: '...',
     );
-    await _chatController.insert(_currentResponse!);
+    await _chatController.insertMessage(_currentResponse!);
 
     await for (final chunk in responseStream) {
       accumulatedText += chunk;
       final newMessage = _currentResponse!.copyWith(text: accumulatedText);
-      await _chatController.update(_currentResponse!, newMessage);
+      await _chatController.updateMessage(_currentResponse!, newMessage);
       _currentResponse = newMessage;
 
       if (!hasReachedTargetScroll && initialMaxScrollExtent > 0) {
@@ -122,13 +122,12 @@ class MyHomePageState extends State<MyHomePage> {
   }
 
   void _handleMessageSend(String text) async {
-    await _chatController.insert(
+    await _chatController.insertMessage(
       TextMessage(
         id: _uuid.v4(),
         authorId: _user.id,
         createdAt: DateTime.now().toUtc(),
         text: text,
-        isOnlyEmoji: isOnlyEmoji(text),
       ),
     );
 

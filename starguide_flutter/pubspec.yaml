@@ -24,10 +24,10 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  flutter_chat_core: ^0.0.9
-  flutter_chat_ui: ^2.0.0-dev.8
-  flyer_chat_system_message: ^0.0.9
-  flyer_chat_text_message: ^0.0.9
+  flutter_chat_core: ^2.3.1
+  flutter_chat_ui: ^2.3.1
+  flyer_chat_text_message: ^2.2.1
+  gpt_markdown: ^1.0.19
   serverpod_flutter:
     path: ../vendor/serverpod/packages/serverpod_flutter
   starguide_client:
