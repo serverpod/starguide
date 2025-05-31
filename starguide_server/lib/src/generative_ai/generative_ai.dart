@@ -1,21 +1,7 @@
-import 'dart:io';
-
 import 'package:google_generative_ai/google_generative_ai.dart';
 import 'package:serverpod/serverpod.dart';
 import 'package:starguide_server/src/extensions/chat_message_to_role.dart';
-import 'package:starguide_server/src/generated/chat_message.dart';
 import 'package:starguide_server/src/generated/protocol.dart';
-import 'package:starguide_server/src/generative_ai/prompts.dart';
-
-// final model = GenerativeModel(
-//   model: 'gemini-2.0-flash-latest',
-//   apiKey: 'AIzaSyD8shlq0fh996iMLA47n5O7NN6cBPiMzVo',
-// );
-
-// final embeddingModel = GenerativeModel(
-//   model: 'gemini-embedding-exp-03-07',
-//   apiKey: 'AIzaSyD8shlq0fh996iMLA47n5O7NN6cBPiMzVo',
-// );
 
 class GenerativeAi {
   late final String geminiAPIKey;
@@ -34,14 +20,12 @@ class GenerativeAi {
     );
   }
 
-  Stream<String> generateConversationalAnswer(
-    String question,
-    List<RAGDocument> documents,
-    List<ChatMessage> conversation,
-  ) {
-    final systemInstructionsStr = Prompts.instance.get('final_answer')! +
-        documents.map((e) => _formatDocument(e)).join('\n');
-
+  Stream<String> generateConversationalAnswer({
+    required String question,
+    required String systemPrompt,
+    List<RAGDocument> documents = const [],
+    List<ChatMessage> conversation = const [],
+  }) {
     final prompt = conversation.map(
       (chatMessage) {
         return Content(
@@ -53,7 +37,12 @@ class GenerativeAi {
 
     prompt.add(Content.text(question));
 
-    prompt.insert(0, Content.text(systemInstructionsStr));
+    prompt.insert(
+      0,
+      Content.text(
+        systemPrompt + documents.map((e) => _formatDocument(e)).join('\n'),
+      ),
+    );
 
     return model
         .generateContentStream(prompt)

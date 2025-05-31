@@ -18,7 +18,7 @@ class StarguideEndpoint extends Endpoint {
   Stream<String> ask(
     Session session,
     ChatSession chatSession,
-    String question,
+    final String question,
   ) async* {
     // Verify that the session is valid.
     try {
@@ -44,28 +44,47 @@ class StarguideEndpoint extends Endpoint {
 
     var documents = <RAGDocument>[];
 
+    String transformedQuestion;
+
+    // Transform the question to a question to what it like looks like in the
+    // RAG database.
     if (conversation.isEmpty) {
-      // Transform the question to a question to what it like looks like in the
-      // RAG database.
-      final transformedQuestion = await genAi.generateSimpleAnswer(
-        Prompts.instance.get('transform_question')! + question,
+      transformedQuestion = await genAi.generateSimpleAnswer(
+        Prompts.instance.get('transform_first_question')! + question,
       );
-      question = transformedQuestion;
-
-      // Create an embedding for the question.
-      final embedding = await genAi.generateEmbedding(question);
-
-      // Find the most similar question in the RAG database.
-      documents = await RAGDocument.db.find(
-        session,
-        orderBy: (rag) => rag.embedding.distanceCosine(embedding),
-        limit: 5,
+    } else {
+      final answerStream = genAi.generateConversationalAnswer(
+        systemPrompt: Prompts.instance.get('transform_followup_question')!,
+        question: question,
+        documents: [],
+        conversation: conversation,
       );
+
+      // Concatenate the answer stream.
+      var answer = '';
+      await for (var chunk in answerStream) {
+        answer += chunk;
+      }
+      transformedQuestion = answer;
     }
 
+    // Create an embedding for the question.
+    final embedding = await genAi.generateEmbedding(transformedQuestion);
+
+    // Find the most similar question in the RAG database.
+    documents = await RAGDocument.db.find(
+      session,
+      orderBy: (rag) => rag.embedding.distanceCosine(embedding),
+      limit: 5,
+    );
+
     // Generate the answer
-    final answerStream =
-        genAi.generateConversationalAnswer(question, documents, conversation);
+    final answerStream = genAi.generateConversationalAnswer(
+      systemPrompt: Prompts.instance.get('final_answer')!,
+      question: question,
+      documents: documents,
+      conversation: conversation,
+    );
     var answer = '';
     await for (var chunk in answerStream) {
       answer += chunk;

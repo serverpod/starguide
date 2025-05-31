@@ -1,0 +1,3 @@
+Serverpod is an open source backend framework for Flutter developers written in Dart. Please rewrite the last question in the following conversation in a way that a summarized Serverpod manual page would likely phrase it, focusing on key terms, make sure to include the terms Serverpod and Flutter. The summary should be at least a couple of sentences. Do not mention references to the documentation.
+This is the conversation:
+
