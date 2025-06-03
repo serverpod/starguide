@@ -1,12 +1,13 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_chat_core/flutter_chat_core.dart';
 import 'package:flutter_chat_ui/flutter_chat_ui.dart';
-import 'package:flyer_chat_text_message/flyer_chat_text_message.dart';
 import 'package:g_recaptcha_v3/g_recaptcha_v3.dart';
 import 'package:starguide_client/starguide_client.dart';
 import 'package:flutter/material.dart';
 import 'package:serverpod_flutter/serverpod_flutter.dart';
 import 'package:starguide_flutter/chat/starguide_chat_input.dart';
+import 'package:starguide_flutter/chat/starguide_text_message.dart';
+import 'package:syntax_highlight/syntax_highlight.dart';
 
 // Sets up a singleton client object that can be used to talk to the server from
 // anywhere in our app. The client is generated from your server code.
@@ -16,10 +17,31 @@ import 'package:starguide_flutter/chat/starguide_chat_input.dart';
 var client = Client('http://$localhost:8080/')
   ..connectivityMonitor = FlutterConnectivityMonitor();
 
+late final Highlighter highlighterDart;
+late final Highlighter highlighterYaml;
+late final Highlighter highlighterSql;
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await GRecaptchaV3.hideBadge();
+
+  // Initialize the highlighter.
+  await Highlighter.initialize(['dart', 'yaml', 'sql']);
+  var theme = await HighlighterTheme.loadDarkTheme();
+  highlighterDart = Highlighter(
+    language: 'dart',
+    theme: theme,
+  );
+  highlighterYaml = Highlighter(
+    language: 'yaml',
+    theme: theme,
+  );
+  highlighterSql = Highlighter(
+    language: 'sql',
+    theme: theme,
+  );
+
   if (kIsWeb) {
+    await GRecaptchaV3.hideBadge();
     await GRecaptchaV3.ready(
       '6LcWhFMrAAAAAHvRY6kr9oc9B_KPeOT0T2SxFGJE',
     );
@@ -32,11 +54,30 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = ColorScheme.fromSeed(seedColor: Colors.blue).copyWith(
+      surface: Colors.white,
+      primary: Colors.blueAccent,
+    );
+
     return MaterialApp(
       title: 'Serverpod Demo',
       theme: ThemeData(
         primarySwatch: Colors.blue,
         scaffoldBackgroundColor: Colors.white,
+        dividerColor: Colors.grey.shade400,
+      ).copyWith(
+        colorScheme: colorScheme,
+        outlinedButtonTheme: OutlinedButtonThemeData(
+          style: OutlinedButton.styleFrom(
+            padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
+            backgroundColor: Colors.white,
+            foregroundColor: Colors.black,
+            side: BorderSide(color: Colors.grey.shade400),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+          ),
+        ),
       ),
       home: const MyHomePage(title: 'Serverpod Example'),
     );
@@ -74,7 +115,7 @@ class MyHomePageState extends State<MyHomePage> {
   void _sendMessage(String text) async {
     // Set up a new chat session, if we haven't started one already.
     _chatSession ??= await client.starguide.createChatSession(
-      (await GRecaptchaV3.execute('create_chat_session'))!,
+      kIsWeb ? (await GRecaptchaV3.execute('create_chat_session'))! : '',
     );
 
     final responseStream = client.starguide.ask(_chatSession!, text);
@@ -87,7 +128,7 @@ class MyHomePageState extends State<MyHomePage> {
       id: _uuid.v4(),
       authorId: _model.id,
       createdAt: DateTime.now().toUtc(),
-      text: '...',
+      text: '',
     );
     await _chatController.insertMessage(_currentResponse!);
 
@@ -151,11 +192,32 @@ class MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
+    final ChatTheme chatTheme = ChatTheme.light().copyWith(
+      colors: ChatColors(
+        primary: theme.colorScheme.primary,
+        onPrimary: theme.colorScheme.onPrimary,
+        surface: theme.colorScheme.surface,
+        onSurface: theme.colorScheme.onSurface,
+        surfaceContainer: theme.colorScheme.surfaceContainer,
+        surfaceContainerHigh: theme.colorScheme.surfaceContainerHigh,
+        surfaceContainerLow: theme.colorScheme.surfaceContainerLow,
+      ),
+      typography: ChatTypography(
+        bodySmall: theme.textTheme.bodyLarge!,
+        bodyMedium: theme.textTheme.bodyLarge!,
+        bodyLarge: theme.textTheme.bodyLarge!,
+        labelSmall: theme.textTheme.labelSmall!,
+        labelMedium: theme.textTheme.labelMedium!,
+        labelLarge: theme.textTheme.labelLarge!,
+      ),
+    );
+
     return Scaffold(
       body: Column(
         children: [
           Expanded(
             child: Chat(
+              theme: chatTheme,
               currentUserId: _userId,
               chatController: _chatController,
               builders: Builders(
@@ -174,7 +236,7 @@ class MyHomePageState extends State<MyHomePage> {
                   child: SizedBox(),
                 ),
                 textMessageBuilder: (context, message, index) {
-                  return FlyerChatTextMessage(message: message, index: index);
+                  return StarguideTextMessage(message: message, index: index);
                 },
               ),
               resolveUser: (id) => Future.value(switch (id) {
@@ -196,7 +258,7 @@ class MyHomePageState extends State<MyHomePage> {
             child: Row(
               children: [
                 Text(
-                  'Hosted on Serverpod Cloud',
+                  'Built with Serverpod',
                   style: theme.textTheme.bodySmall?.copyWith(
                     color: theme.disabledColor,
                   ),
