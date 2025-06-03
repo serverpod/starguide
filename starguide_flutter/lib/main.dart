@@ -78,6 +78,15 @@ class MyApp extends StatelessWidget {
             ),
           ),
         ),
+        textButtonTheme: TextButtonThemeData(
+          style: TextButton.styleFrom(
+            padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
+            foregroundColor: Colors.grey.shade700,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+          ),
+        ),
       ),
       home: const MyHomePage(title: 'Serverpod Example'),
     );
@@ -244,6 +253,38 @@ class MyHomePageState extends State<MyHomePage> {
                 _modelId => _model,
                 _ => null,
               }),
+            ),
+          ),
+          Divider(
+            color: theme.dividerColor,
+            height: 1,
+          ),
+          Padding(
+            padding: const EdgeInsets.only(
+              left: 16,
+              right: 16,
+              top: 8,
+            ),
+            child: Row(
+              spacing: 8,
+              children: [
+                TextButton.icon(
+                  onPressed: () {},
+                  label: Text('Clear Chat'),
+                  icon: Icon(Icons.autorenew),
+                ),
+                Spacer(),
+                TextButton.icon(
+                  onPressed: null,
+                  label: Text('Good Answer'),
+                  icon: Icon(Icons.thumb_up_outlined),
+                ),
+                TextButton.icon(
+                  onPressed: null,
+                  label: Text('Bad Answer'),
+                  icon: Icon(Icons.thumb_down_outlined),
+                ),
+              ],
             ),
           ),
           StarguideChatInput(

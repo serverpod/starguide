@@ -76,7 +76,12 @@ class _StarguideCodeFieldState extends State<StarguideCodeField> {
               const Spacer(),
               TextButton.icon(
                 style: TextButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 4,
+                  ),
                   foregroundColor: labelColor,
+                  backgroundColor: Colors.transparent,
                   textStyle: theme.textTheme.labelSmall?.copyWith(
                     color: labelColor,
                   ),

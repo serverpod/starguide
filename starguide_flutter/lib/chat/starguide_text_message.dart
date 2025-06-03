@@ -123,6 +123,7 @@ class StarguideTextMessage extends StatelessWidget {
 
       content = Column(
         children: [
+          if (!isSentByMe) const SizedBox(width: double.infinity),
           GptMarkdown(
             gptResponse.text,
             style: _isOnlyEmoji
@@ -399,7 +400,7 @@ class LinkPreviewList extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        const SizedBox(height: 16),
+        const SizedBox(height: 24),
         Text(
           'Answer based on the following sources:',
           style: theme.textTheme.labelLarge,
@@ -439,7 +440,7 @@ class LinkPreview extends StatelessWidget {
     String domain = link.url.host;
 
     return SizedBox(
-      width: 200,
+      width: 220,
       child: OutlinedButton(
         onPressed: () {
           print('Pressed');
@@ -452,7 +453,8 @@ class LinkPreview extends StatelessWidget {
               Text(
                 link.title,
                 maxLines: 1,
-                overflow: TextOverflow.clip,
+                overflow: TextOverflow.ellipsis,
+                softWrap: false,
               ),
               Text(
                 domain,
@@ -460,6 +462,7 @@ class LinkPreview extends StatelessWidget {
                     ?.copyWith(color: theme.disabledColor),
                 maxLines: 1,
                 overflow: TextOverflow.clip,
+                softWrap: false,
               ),
             ],
           ),
