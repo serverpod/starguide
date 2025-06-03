@@ -1,9 +1,14 @@
+import 'package:el_tooltip/el_tooltip.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_chat_core/flutter_chat_core.dart';
 import 'package:flutter_chat_ui/flutter_chat_ui.dart';
 import 'package:flyer_chat_text_message/flyer_chat_text_message.dart';
+import 'package:g_recaptcha_v3/g_recaptcha_v3.dart';
+import 'package:made_with_serverpod/made_with_serverpod.dart';
 import 'package:starguide_client/starguide_client.dart';
 import 'package:flutter/material.dart';
 import 'package:serverpod_flutter/serverpod_flutter.dart';
+import 'package:starguide_flutter/chat/starguide_chat_input.dart';
 
 // Sets up a singleton client object that can be used to talk to the server from
 // anywhere in our app. The client is generated from your server code.
@@ -13,7 +18,15 @@ import 'package:serverpod_flutter/serverpod_flutter.dart';
 var client = Client('http://$localhost:8080/')
   ..connectivityMonitor = FlutterConnectivityMonitor();
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await GRecaptchaV3.hideBadge();
+  if (kIsWeb) {
+    bool ready = await GRecaptchaV3.ready(
+      '6LcWhFMrAAAAAHvRY6kr9oc9B_KPeOT0T2SxFGJE',
+    );
+    print("Is Recaptcha ready? $ready");
+  }
   runApp(const MyApp());
 }
 
@@ -26,6 +39,7 @@ class MyApp extends StatelessWidget {
       title: 'Serverpod Demo',
       theme: ThemeData(
         primarySwatch: Colors.blue,
+        scaffoldBackgroundColor: Colors.white,
       ),
       home: const MyHomePage(title: 'Serverpod Example'),
     );
@@ -62,7 +76,9 @@ class MyHomePageState extends State<MyHomePage> {
 
   void _sendMessage(String text) async {
     // Set up a new chat session, if we haven't started one already.
-    _chatSession ??= await client.starguide.createChatSession();
+    _chatSession ??= await client.starguide.createChatSession(
+      (await GRecaptchaV3.execute('create_chat_session'))!,
+    );
 
     final responseStream = client.starguide.ask(_chatSession!, text);
 
@@ -136,28 +152,69 @@ class MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return Scaffold(
-      body: Chat(
-        currentUserId: _userId,
-        chatController: _chatController,
-        builders: Builders(
-          chatAnimatedListBuilder: (context, itemBuilder) {
-            return ChatAnimatedList(
-              scrollController: _scrollController,
-              itemBuilder: itemBuilder,
-              shouldScrollToEndWhenAtBottom: false,
-            );
-          },
-          textMessageBuilder: (context, message, index) {
-            return FlyerChatTextMessage(message: message, index: index);
-          },
-        ),
-        resolveUser: (id) => Future.value(switch (id) {
-          _userId => _user,
-          _modelId => _model,
-          _ => null,
-        }),
-        onMessageSend: _handleMessageSend,
+      body: Column(
+        children: [
+          Expanded(
+            child: Chat(
+              currentUserId: _userId,
+              chatController: _chatController,
+              builders: Builders(
+                chatAnimatedListBuilder: (context, itemBuilder) {
+                  return ChatAnimatedList(
+                    scrollController: _scrollController,
+                    itemBuilder: itemBuilder,
+                    shouldScrollToEndWhenAtBottom: false,
+                  );
+                },
+                composerBuilder: (context) => Positioned(
+                  width: 0,
+                  height: 0,
+                  top: 0,
+                  left: 0,
+                  child: SizedBox(),
+                ),
+                textMessageBuilder: (context, message, index) {
+                  return FlyerChatTextMessage(message: message, index: index);
+                },
+              ),
+              resolveUser: (id) => Future.value(switch (id) {
+                _userId => _user,
+                _modelId => _model,
+                _ => null,
+              }),
+            ),
+          ),
+          StarguideChatInput(
+            onSend: _handleMessageSend,
+          ),
+          Padding(
+            padding: const EdgeInsets.only(
+              left: 16.0,
+              right: 16.0,
+              bottom: 16.0,
+            ),
+            child: Row(
+              children: [
+                Text(
+                  'Hosted on Serverpod Cloud',
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: theme.disabledColor,
+                  ),
+                ),
+                Spacer(),
+                Text(
+                  'Protected by reCAPTCHA',
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: theme.disabledColor,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }

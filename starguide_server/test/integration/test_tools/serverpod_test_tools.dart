@@ -128,7 +128,9 @@ class _StarguideEndpoint {
   final _i2.SerializationManager _serializationManager;
 
   _i3.Future<_i4.ChatSession> createChatSession(
-      _i1.TestSessionBuilder sessionBuilder) async {
+    _i1.TestSessionBuilder sessionBuilder,
+    String reCaptchaToken,
+  ) async {
     return _i1.callAwaitableFunctionAndHandleExceptions(() async {
       var _localUniqueSession =
           (sessionBuilder as _i1.InternalTestSessionBuilder).internalBuild(
@@ -140,7 +142,7 @@ class _StarguideEndpoint {
           createSessionCallback: (_) => _localUniqueSession,
           endpointPath: 'starguide',
           methodName: 'createChatSession',
-          parameters: _i1.testObjectToJson({}),
+          parameters: _i1.testObjectToJson({'reCaptchaToken': reCaptchaToken}),
           serializationManager: _serializationManager,
         );
         var _localReturnValue = await (_localCallContext.method.call(

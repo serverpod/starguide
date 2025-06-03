@@ -15,10 +15,12 @@ import 'chat_message.dart' as _i3;
 import 'chat_message_type.dart' as _i4;
 import 'chat_session.dart' as _i5;
 import 'rag_document.dart' as _i6;
+import 'recaptcha/recaptcha_exception.dart' as _i7;
 export 'chat_message.dart';
 export 'chat_message_type.dart';
 export 'chat_session.dart';
 export 'rag_document.dart';
+export 'recaptcha/recaptcha_exception.dart';
 
 class Protocol extends _i1.SerializationManagerServer {
   Protocol._();
@@ -233,6 +235,9 @@ class Protocol extends _i1.SerializationManagerServer {
     if (t == _i6.RAGDocument) {
       return _i6.RAGDocument.fromJson(data) as T;
     }
+    if (t == _i7.RecaptchaException) {
+      return _i7.RecaptchaException.fromJson(data) as T;
+    }
     if (t == _i1.getType<_i3.ChatMessage?>()) {
       return (data != null ? _i3.ChatMessage.fromJson(data) : null) as T;
     }
@@ -244,6 +249,9 @@ class Protocol extends _i1.SerializationManagerServer {
     }
     if (t == _i1.getType<_i6.RAGDocument?>()) {
       return (data != null ? _i6.RAGDocument.fromJson(data) : null) as T;
+    }
+    if (t == _i1.getType<_i7.RecaptchaException?>()) {
+      return (data != null ? _i7.RecaptchaException.fromJson(data) : null) as T;
     }
     try {
       return _i2.Protocol().deserialize<T>(data, t);
@@ -266,6 +274,9 @@ class Protocol extends _i1.SerializationManagerServer {
     }
     if (data is _i6.RAGDocument) {
       return 'RAGDocument';
+    }
+    if (data is _i7.RecaptchaException) {
+      return 'RecaptchaException';
     }
     className = _i2.Protocol().getClassNameForObject(data);
     if (className != null) {
@@ -291,6 +302,9 @@ class Protocol extends _i1.SerializationManagerServer {
     }
     if (dataClassName == 'RAGDocument') {
       return deserialize<_i6.RAGDocument>(data['data']);
+    }
+    if (dataClassName == 'RecaptchaException') {
+      return deserialize<_i7.RecaptchaException>(data['data']);
     }
     if (dataClassName.startsWith('serverpod.')) {
       data['className'] = dataClassName.substring(10);

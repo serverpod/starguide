@@ -30,13 +30,22 @@ class Endpoints extends _i1.EndpointDispatch {
       methodConnectors: {
         'createChatSession': _i1.MethodConnector(
           name: 'createChatSession',
-          params: {},
+          params: {
+            'reCaptchaToken': _i1.ParameterDescription(
+              name: 'reCaptchaToken',
+              type: _i1.getType<String>(),
+              nullable: false,
+            )
+          },
           call: (
             _i1.Session session,
             Map<String, dynamic> params,
           ) async =>
               (endpoints['starguide'] as _i2.StarguideEndpoint)
-                  .createChatSession(session),
+                  .createChatSession(
+            session,
+            params['reCaptchaToken'],
+          ),
         ),
         'ask': _i1.MethodStreamConnector(
           name: 'ask',

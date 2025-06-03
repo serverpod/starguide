@@ -21,11 +21,11 @@ class EndpointStarguide extends _i1.EndpointRef {
   @override
   String get name => 'starguide';
 
-  _i2.Future<_i3.ChatSession> createChatSession() =>
+  _i2.Future<_i3.ChatSession> createChatSession(String reCaptchaToken) =>
       caller.callServerEndpoint<_i3.ChatSession>(
         'starguide',
         'createChatSession',
-        {},
+        {'reCaptchaToken': reCaptchaToken},
       );
 
   _i2.Stream<String> ask(
