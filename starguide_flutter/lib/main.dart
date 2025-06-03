@@ -1,10 +1,8 @@
-import 'package:el_tooltip/el_tooltip.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_chat_core/flutter_chat_core.dart';
 import 'package:flutter_chat_ui/flutter_chat_ui.dart';
 import 'package:flyer_chat_text_message/flyer_chat_text_message.dart';
 import 'package:g_recaptcha_v3/g_recaptcha_v3.dart';
-import 'package:made_with_serverpod/made_with_serverpod.dart';
 import 'package:starguide_client/starguide_client.dart';
 import 'package:flutter/material.dart';
 import 'package:serverpod_flutter/serverpod_flutter.dart';
@@ -22,10 +20,9 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await GRecaptchaV3.hideBadge();
   if (kIsWeb) {
-    bool ready = await GRecaptchaV3.ready(
+    await GRecaptchaV3.ready(
       '6LcWhFMrAAAAAHvRY6kr9oc9B_KPeOT0T2SxFGJE',
     );
-    print("Is Recaptcha ready? $ready");
   }
   runApp(const MyApp());
 }
