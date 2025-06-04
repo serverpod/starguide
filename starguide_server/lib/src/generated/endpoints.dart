@@ -47,6 +47,30 @@ class Endpoints extends _i1.EndpointDispatch {
             params['reCaptchaToken'],
           ),
         ),
+        'vote': _i1.MethodConnector(
+          name: 'vote',
+          params: {
+            'chatSession': _i1.ParameterDescription(
+              name: 'chatSession',
+              type: _i1.getType<_i3.ChatSession>(),
+              nullable: false,
+            ),
+            'goodAnswer': _i1.ParameterDescription(
+              name: 'goodAnswer',
+              type: _i1.getType<bool>(),
+              nullable: false,
+            ),
+          },
+          call: (
+            _i1.Session session,
+            Map<String, dynamic> params,
+          ) async =>
+              (endpoints['starguide'] as _i2.StarguideEndpoint).vote(
+            session,
+            params['chatSession'],
+            params['goodAnswer'],
+          ),
+        ),
         'ask': _i1.MethodStreamConnector(
           name: 'ask',
           params: {

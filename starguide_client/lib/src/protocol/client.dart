@@ -41,6 +41,19 @@ class EndpointStarguide extends _i1.EndpointRef {
         },
         {},
       );
+
+  _i2.Future<void> vote(
+    _i3.ChatSession chatSession,
+    bool goodAnswer,
+  ) =>
+      caller.callServerEndpoint<void>(
+        'starguide',
+        'vote',
+        {
+          'chatSession': chatSession,
+          'goodAnswer': goodAnswer,
+        },
+      );
 }
 
 class Client extends _i1.ServerpodClientShared {

@@ -16,12 +16,14 @@ abstract class ChatSession implements _i1.SerializableModel {
     this.id,
     this.userId,
     required this.keyToken,
+    this.goodAnswer,
   });
 
   factory ChatSession({
     int? id,
     int? userId,
     required String keyToken,
+    bool? goodAnswer,
   }) = _ChatSessionImpl;
 
   factory ChatSession.fromJson(Map<String, dynamic> jsonSerialization) {
@@ -29,6 +31,7 @@ abstract class ChatSession implements _i1.SerializableModel {
       id: jsonSerialization['id'] as int?,
       userId: jsonSerialization['userId'] as int?,
       keyToken: jsonSerialization['keyToken'] as String,
+      goodAnswer: jsonSerialization['goodAnswer'] as bool?,
     );
   }
 
@@ -41,6 +44,8 @@ abstract class ChatSession implements _i1.SerializableModel {
 
   String keyToken;
 
+  bool? goodAnswer;
+
   /// Returns a shallow copy of this [ChatSession]
   /// with some or all fields replaced by the given arguments.
   @_i1.useResult
@@ -48,6 +53,7 @@ abstract class ChatSession implements _i1.SerializableModel {
     int? id,
     int? userId,
     String? keyToken,
+    bool? goodAnswer,
   });
   @override
   Map<String, dynamic> toJson() {
@@ -55,6 +61,7 @@ abstract class ChatSession implements _i1.SerializableModel {
       if (id != null) 'id': id,
       if (userId != null) 'userId': userId,
       'keyToken': keyToken,
+      if (goodAnswer != null) 'goodAnswer': goodAnswer,
     };
   }
 
@@ -71,10 +78,12 @@ class _ChatSessionImpl extends ChatSession {
     int? id,
     int? userId,
     required String keyToken,
+    bool? goodAnswer,
   }) : super._(
           id: id,
           userId: userId,
           keyToken: keyToken,
+          goodAnswer: goodAnswer,
         );
 
   /// Returns a shallow copy of this [ChatSession]
@@ -85,11 +94,13 @@ class _ChatSessionImpl extends ChatSession {
     Object? id = _Undefined,
     Object? userId = _Undefined,
     String? keyToken,
+    Object? goodAnswer = _Undefined,
   }) {
     return ChatSession(
       id: id is int? ? id : this.id,
       userId: userId is int? ? userId : this.userId,
       keyToken: keyToken ?? this.keyToken,
+      goodAnswer: goodAnswer is bool? ? goodAnswer : this.goodAnswer,
     );
   }
 }

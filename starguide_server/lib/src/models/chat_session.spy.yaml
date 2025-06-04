@@ -3,4 +3,5 @@ table: chat_session
 fields:
   userId: int?
   keyToken: String
+  goodAnswer: bool?
   

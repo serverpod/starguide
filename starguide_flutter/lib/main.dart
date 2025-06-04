@@ -152,7 +152,7 @@ class StarguideChatPageState extends State<StarguideChatPage> {
     _sendMessage(text);
   }
 
-  void _clearChat() {
+  void _handleClearChat() {
     setState(() {
       _chatController.setMessages([]);
       _chatSession = null;
@@ -162,11 +162,11 @@ class StarguideChatPageState extends State<StarguideChatPage> {
   }
 
   void _handleUpvote() {
-    // TODO: Implement upvote.
+    client.starguide.vote(_chatSession!, true);
   }
 
   void _handleDownvote() {
-    // TODO: Implement downvote.
+    client.starguide.vote(_chatSession!, false);
   }
 
   @override
@@ -243,19 +243,19 @@ class StarguideChatPageState extends State<StarguideChatPage> {
                     spacing: 8,
                     children: [
                       TextButton.icon(
-                        onPressed: _clearChat,
+                        onPressed: _handleClearChat,
                         label: Text('Clear Chat'),
                         icon: Icon(Icons.autorenew),
                       ),
                       Spacer(),
                       TextButton.icon(
-                        onPressed: _numChatRequests > 0 ? _handleUpvote : null,
+                        onPressed: _chatSession != null ? _handleUpvote : null,
                         label: Text('Got Help'),
                         icon: Icon(Icons.thumb_up_outlined),
                       ),
                       TextButton.icon(
                         onPressed:
-                            _numChatRequests > 0 ? _handleDownvote : null,
+                            _chatSession != null ? _handleDownvote : null,
                         label: Text('Poor Answer'),
                         icon: Icon(Icons.thumb_down_outlined),
                       ),

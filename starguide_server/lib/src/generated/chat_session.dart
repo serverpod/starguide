@@ -17,12 +17,14 @@ abstract class ChatSession
     this.id,
     this.userId,
     required this.keyToken,
+    this.goodAnswer,
   });
 
   factory ChatSession({
     int? id,
     int? userId,
     required String keyToken,
+    bool? goodAnswer,
   }) = _ChatSessionImpl;
 
   factory ChatSession.fromJson(Map<String, dynamic> jsonSerialization) {
@@ -30,6 +32,7 @@ abstract class ChatSession
       id: jsonSerialization['id'] as int?,
       userId: jsonSerialization['userId'] as int?,
       keyToken: jsonSerialization['keyToken'] as String,
+      goodAnswer: jsonSerialization['goodAnswer'] as bool?,
     );
   }
 
@@ -44,6 +47,8 @@ abstract class ChatSession
 
   String keyToken;
 
+  bool? goodAnswer;
+
   @override
   _i1.Table<int?> get table => t;
 
@@ -54,6 +59,7 @@ abstract class ChatSession
     int? id,
     int? userId,
     String? keyToken,
+    bool? goodAnswer,
   });
   @override
   Map<String, dynamic> toJson() {
@@ -61,6 +67,7 @@ abstract class ChatSession
       if (id != null) 'id': id,
       if (userId != null) 'userId': userId,
       'keyToken': keyToken,
+      if (goodAnswer != null) 'goodAnswer': goodAnswer,
     };
   }
 
@@ -70,6 +77,7 @@ abstract class ChatSession
       if (id != null) 'id': id,
       if (userId != null) 'userId': userId,
       'keyToken': keyToken,
+      if (goodAnswer != null) 'goodAnswer': goodAnswer,
     };
   }
 
@@ -110,10 +118,12 @@ class _ChatSessionImpl extends ChatSession {
     int? id,
     int? userId,
     required String keyToken,
+    bool? goodAnswer,
   }) : super._(
           id: id,
           userId: userId,
           keyToken: keyToken,
+          goodAnswer: goodAnswer,
         );
 
   /// Returns a shallow copy of this [ChatSession]
@@ -124,11 +134,13 @@ class _ChatSessionImpl extends ChatSession {
     Object? id = _Undefined,
     Object? userId = _Undefined,
     String? keyToken,
+    Object? goodAnswer = _Undefined,
   }) {
     return ChatSession(
       id: id is int? ? id : this.id,
       userId: userId is int? ? userId : this.userId,
       keyToken: keyToken ?? this.keyToken,
+      goodAnswer: goodAnswer is bool? ? goodAnswer : this.goodAnswer,
     );
   }
 }
@@ -143,17 +155,24 @@ class ChatSessionTable extends _i1.Table<int?> {
       'keyToken',
       this,
     );
+    goodAnswer = _i1.ColumnBool(
+      'goodAnswer',
+      this,
+    );
   }
 
   late final _i1.ColumnInt userId;
 
   late final _i1.ColumnString keyToken;
 
+  late final _i1.ColumnBool goodAnswer;
+
   @override
   List<_i1.Column> get columns => [
         id,
         userId,
         keyToken,
+        goodAnswer,
       ];
 }
 

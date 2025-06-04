@@ -37,17 +37,7 @@ class StarguideEndpoint extends Endpoint {
     final String question,
   ) async* {
     // Verify that the session is valid.
-    try {
-      final storedChatSession = await ChatSession.db.findById(
-        session,
-        chatSession.id!,
-      );
-      if (storedChatSession!.keyToken != chatSession.keyToken) {
-        throw Exception('Invalid key token.');
-      }
-    } catch (e) {
-      throw Exception('Invalid chat session.');
-    }
+    await _verifyChatSession(session, chatSession);
 
     // Find earlier conversation.
     final conversation = await ChatMessage.db.find(
@@ -123,5 +113,35 @@ class StarguideEndpoint extends Endpoint {
         ),
       ],
     );
+  }
+
+  Future<void> vote(
+    Session session,
+    ChatSession chatSession,
+    bool goodAnswer,
+  ) async {
+    // Verify that the chat session is valid.
+    await _verifyChatSession(session, chatSession);
+
+    // Update the chat session with the vote.
+    chatSession.goodAnswer = goodAnswer;
+    await ChatSession.db.updateRow(session, chatSession);
+  }
+
+  Future<void> _verifyChatSession(
+    Session session,
+    ChatSession chatSession,
+  ) async {
+    try {
+      final storedChatSession = await ChatSession.db.findById(
+        session,
+        chatSession.id!,
+      );
+      if (storedChatSession!.keyToken != chatSession.keyToken) {
+        throw Exception('Invalid key token.');
+      }
+    } catch (e) {
+      throw Exception('Invalid chat session.');
+    }
   }
 }
