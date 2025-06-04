@@ -6,6 +6,7 @@ import 'package:starguide_client/starguide_client.dart';
 import 'package:flutter/material.dart';
 import 'package:serverpod_flutter/serverpod_flutter.dart';
 import 'package:starguide_flutter/chat/starguide_chat_input.dart';
+import 'package:starguide_flutter/chat/starguide_empty_chat.dart';
 import 'package:starguide_flutter/chat/starguide_text_message.dart';
 import 'package:starguide_flutter/config/chat_theme.dart';
 import 'package:starguide_flutter/config/constants.dart';
@@ -203,6 +204,7 @@ class StarguideChatPageState extends State<StarguideChatPage> {
                 textMessageBuilder: (context, message, index) {
                   return StarguideTextMessage(message: message, index: index);
                 },
+                emptyChatListBuilder: (context) => StarguideEmptyChat(),
               ),
               resolveUser: (id) => Future.value(switch (id) {
                 _userId => _user,

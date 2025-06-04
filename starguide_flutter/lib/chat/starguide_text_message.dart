@@ -105,19 +105,7 @@ class StarguideTextMessage extends StatelessWidget {
 
     Widget content;
     if (message.text.isEmpty) {
-      content = Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const LinearProgressIndicator(),
-          const SizedBox(height: 16),
-          Text(
-            'Generating response...',
-            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: Theme.of(context).disabledColor,
-                ),
-          ),
-        ],
-      );
+      content = StarguideProgressIndicator();
     } else {
       final gptResponse = GptResponse(message.text);
 
@@ -470,6 +458,49 @@ class LinkPreview extends StatelessWidget {
             ],
           ),
         ),
+      ),
+    );
+  }
+}
+
+class StarguideProgressIndicator extends StatelessWidget {
+  const StarguideProgressIndicator({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(8),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surfaceContainer,
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Row(
+        spacing: 16,
+        children: [
+          SizedBox(
+            width: 48,
+            height: 48,
+            child: Image.asset('assets/icon.webp'),
+          ),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const LinearProgressIndicator(
+                  borderRadius: BorderRadius.all(Radius.circular(2)),
+                  minHeight: 6,
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  'Generating response...',
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: Theme.of(context).disabledColor,
+                      ),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
