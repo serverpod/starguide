@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:serverpod_flutter/serverpod_flutter.dart';
 import 'package:starguide_flutter/chat/starguide_chat_input.dart';
 import 'package:starguide_flutter/chat/starguide_text_message.dart';
+import 'package:starguide_flutter/config/chat_theme.dart';
 import 'package:starguide_flutter/config/constants.dart';
 import 'package:starguide_flutter/config/theme.dart';
 import 'package:syntax_highlight/syntax_highlight.dart';
@@ -155,45 +156,33 @@ class StarguideChatPageState extends State<StarguideChatPage> {
       _chatController.setMessages([]);
       _chatSession = null;
       _currentResponse = null;
+      _numChatRequests = 0;
     });
+  }
+
+  void _handleUpvote() {
+    // TODO: Implement upvote.
+  }
+
+  void _handleDownvote() {
+    // TODO: Implement downvote.
   }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    final ChatTheme chatTheme = ChatTheme.light().copyWith(
-      colors: ChatColors(
-        primary: theme.colorScheme.primary,
-        onPrimary: theme.colorScheme.onPrimary,
-        surface: theme.colorScheme.surface,
-        onSurface: theme.colorScheme.onSurface,
-        surfaceContainer: theme.colorScheme.surfaceContainer,
-        surfaceContainerHigh: theme.colorScheme.surfaceContainerHigh,
-        surfaceContainerLow: theme.colorScheme.surfaceContainerLow,
-      ),
-      typography: ChatTypography(
-        bodySmall: theme.textTheme.bodyMedium!,
-        bodyMedium: theme.textTheme.bodyMedium!,
-        bodyLarge: theme.textTheme.bodyMedium!,
-        labelSmall: theme.textTheme.labelSmall!,
-        labelMedium: theme.textTheme.labelMedium!,
-        labelLarge: theme.textTheme.labelLarge!,
-      ),
-    );
-
     return Scaffold(
       body: Column(
         children: [
           Expanded(
             child: Chat(
-              theme: chatTheme,
+              theme: createChatTheme(context),
               currentUserId: _userId,
               chatController: _chatController,
               builders: Builders(
                 chatAnimatedListBuilder: (context, itemBuilder) {
                   return ChatAnimatedList(
-                    // scrollController: _scrollController,
                     itemBuilder: itemBuilder,
                     shouldScrollToEndWhenAtBottom: true,
                     shouldScrollToEndWhenSendingMessage: true,
@@ -258,12 +247,13 @@ class StarguideChatPageState extends State<StarguideChatPage> {
                       ),
                       Spacer(),
                       TextButton.icon(
-                        onPressed: null,
+                        onPressed: _numChatRequests > 0 ? _handleUpvote : null,
                         label: Text('Got Help'),
                         icon: Icon(Icons.thumb_up_outlined),
                       ),
                       TextButton.icon(
-                        onPressed: null,
+                        onPressed:
+                            _numChatRequests > 0 ? _handleDownvote : null,
                         label: Text('Poor Answer'),
                         icon: Icon(Icons.thumb_down_outlined),
                       ),

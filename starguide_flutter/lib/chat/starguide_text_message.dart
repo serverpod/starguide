@@ -166,36 +166,37 @@ class StarguideTextMessage extends StatelessWidget {
             )
         : null;
 
-    return ClipRRect(
-      borderRadius: borderRadius ?? theme.shape,
-      child: Container(
-        constraints: constraints,
-        decoration: _isOnlyEmoji ? null : BoxDecoration(color: backgroundColor),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            if (linkPreviewWidget != null &&
-                linkPreviewPosition == LinkPreviewPosition.top)
-              linkPreviewWidget,
-            Container(
-              padding: _isOnlyEmoji
-                  ? EdgeInsets.symmetric(
-                      horizontal: (padding?.horizontal ?? 0) / 2,
-                      vertical: 0,
-                    )
-                  : padding,
-              child: _buildContentBasedOnPosition(
-                context: context,
-                textContent: content,
-                timeAndStatus: timeAndStatus,
-                paragraphStyle: paragraphStyle,
+    return Container(
+      margin: EdgeInsets.symmetric(horizontal: 8),
+      child: ClipRRect(
+        borderRadius: isSentByMe
+            ? (borderRadius ?? theme.shape)
+            : BorderRadius.all(Radius.zero),
+        child: Container(
+          constraints: constraints,
+          decoration: isSentByMe ? BoxDecoration(color: backgroundColor) : null,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              if (linkPreviewWidget != null &&
+                  linkPreviewPosition == LinkPreviewPosition.top)
+                linkPreviewWidget,
+              Container(
+                padding:
+                    isSentByMe ? padding : EdgeInsets.symmetric(vertical: 16),
+                child: _buildContentBasedOnPosition(
+                  context: context,
+                  textContent: content,
+                  timeAndStatus: timeAndStatus,
+                  paragraphStyle: paragraphStyle,
+                ),
               ),
-            ),
-            if (linkPreviewWidget != null &&
-                linkPreviewPosition == LinkPreviewPosition.bottom)
-              linkPreviewWidget,
-          ],
+              if (linkPreviewWidget != null &&
+                  linkPreviewPosition == LinkPreviewPosition.bottom)
+                linkPreviewWidget,
+            ],
+          ),
         ),
       ),
     );

@@ -15,12 +15,12 @@ ThemeData createTheme() {
     colorScheme: colorScheme,
     outlinedButtonTheme: OutlinedButtonThemeData(
       style: OutlinedButton.styleFrom(
-        padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
+        padding: const EdgeInsets.symmetric(horizontal: 2, vertical: 2),
         backgroundColor: Colors.white,
         foregroundColor: Colors.black,
-        side: BorderSide(color: Colors.grey.shade400),
+        side: BorderSide(color: Colors.grey.shade300),
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(4),
         ),
       ),
     ),
@@ -29,7 +29,7 @@ ThemeData createTheme() {
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
         foregroundColor: Colors.grey.shade700,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(4),
         ),
       ),
     ),

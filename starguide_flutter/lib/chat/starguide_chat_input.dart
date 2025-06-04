@@ -44,6 +44,7 @@ class _StarguideChatInputState extends State<StarguideChatInput> {
             children: [
               Expanded(
                 child: TextField(
+                  autofocus: true,
                   enabled: widget.numChatRequests < kMaxChatRequests,
                   buildCounter: (
                     context, {
