@@ -404,7 +404,7 @@ class LinkPreviewList extends StatelessWidget {
       children: [
         const SizedBox(height: 24),
         Text(
-          'Answer from the following references:',
+          'Answered based on the following references:',
           style: theme.textTheme.labelLarge,
         ),
         const SizedBox(height: 8),

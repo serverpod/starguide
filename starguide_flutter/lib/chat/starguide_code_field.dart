@@ -50,6 +50,7 @@ class _StarguideCodeFieldState extends State<StarguideCodeField> {
         fontFamily: 'JetBrainsMono',
         color: Colors.white,
         height: 1.5,
+        fontSize: 13,
       ),
     );
 

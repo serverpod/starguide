@@ -7,13 +7,10 @@ import 'package:flutter/material.dart';
 import 'package:serverpod_flutter/serverpod_flutter.dart';
 import 'package:starguide_flutter/chat/starguide_chat_input.dart';
 import 'package:starguide_flutter/chat/starguide_text_message.dart';
+import 'package:starguide_flutter/config/constants.dart';
+import 'package:starguide_flutter/config/theme.dart';
 import 'package:syntax_highlight/syntax_highlight.dart';
 
-// Sets up a singleton client object that can be used to talk to the server from
-// anywhere in our app. The client is generated from your server code.
-// The client is set up to connect to a Serverpod running on a local server on
-// the default port. You will need to modify this to connect to staging or
-// production servers.
 var client = Client('http://$localhost:8080/')
   ..connectivityMonitor = FlutterConnectivityMonitor();
 
@@ -46,64 +43,32 @@ void main() async {
       '6LcWhFMrAAAAAHvRY6kr9oc9B_KPeOT0T2SxFGJE',
     );
   }
-  runApp(const MyApp());
+  runApp(const StarguideApp());
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class StarguideApp extends StatelessWidget {
+  const StarguideApp({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = ColorScheme.fromSeed(seedColor: Colors.blue).copyWith(
-      surface: Colors.white,
-      primary: Colors.blueAccent,
-      surfaceContainerLow: Colors.blueGrey.shade50,
-    );
-
     return MaterialApp(
-      title: 'Serverpod Demo',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-        scaffoldBackgroundColor: Colors.white,
-        dividerColor: Colors.grey.shade400,
-      ).copyWith(
-        colorScheme: colorScheme,
-        outlinedButtonTheme: OutlinedButtonThemeData(
-          style: OutlinedButton.styleFrom(
-            padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
-            backgroundColor: Colors.white,
-            foregroundColor: Colors.black,
-            side: BorderSide(color: Colors.grey.shade400),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(8),
-            ),
-          ),
-        ),
-        textButtonTheme: TextButtonThemeData(
-          style: TextButton.styleFrom(
-            padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
-            foregroundColor: Colors.grey.shade700,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(8),
-            ),
-          ),
-        ),
-      ),
-      home: const MyHomePage(title: 'Serverpod Example'),
+      title: 'Serverpod Starguide',
+      theme: createTheme(),
+      home: const StarguideChatPage(),
     );
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
-
-  final String title;
+class StarguideChatPage extends StatefulWidget {
+  const StarguideChatPage({
+    super.key,
+  });
 
   @override
-  MyHomePageState createState() => MyHomePageState();
+  StarguideChatPageState createState() => StarguideChatPageState();
 }
 
-class MyHomePageState extends State<MyHomePage> {
+class StarguideChatPageState extends State<StarguideChatPage> {
   final _uuid = Uuid();
   final ChatController _chatController = InMemoryChatController();
 
@@ -118,10 +83,30 @@ class MyHomePageState extends State<MyHomePage> {
   );
 
   ChatSession? _chatSession;
-
   TextMessage? _currentResponse;
+  bool _hasInputText = false;
+  bool _isGeneratingResponse = false;
+  int _numChatRequests = 0;
+
+  final _inputTextController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+
+    _inputTextController.addListener(() {
+      setState(() {
+        _hasInputText = _inputTextController.text.isNotEmpty;
+      });
+    });
+  }
 
   void _sendMessage(String text) async {
+    setState(() {
+      _isGeneratingResponse = true;
+      _numChatRequests += 1;
+    });
+
     // Set up a new chat session, if we haven't started one already.
     _chatSession ??= await client.starguide.createChatSession(
       kIsWeb ? (await GRecaptchaV3.execute('create_chat_session'))! : '',
@@ -145,6 +130,11 @@ class MyHomePageState extends State<MyHomePage> {
       await _chatController.updateMessage(_currentResponse!, newMessage);
       _currentResponse = newMessage;
     }
+
+    _currentResponse = null;
+    setState(() {
+      _isGeneratingResponse = false;
+    });
   }
 
   void _handleMessageSend(String text) async {
@@ -270,7 +260,13 @@ class MyHomePageState extends State<MyHomePage> {
                   ),
                 ),
                 StarguideChatInput(
+                  textController: _inputTextController,
                   onSend: _handleMessageSend,
+                  enabled: _hasInputText &&
+                      !_isGeneratingResponse &&
+                      _numChatRequests < kMaxChatRequests,
+                  isGeneratingResponse: _isGeneratingResponse,
+                  numChatRequests: _numChatRequests,
                 ),
                 Padding(
                   padding: const EdgeInsets.only(
