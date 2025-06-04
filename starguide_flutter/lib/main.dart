@@ -57,6 +57,7 @@ class MyApp extends StatelessWidget {
     final colorScheme = ColorScheme.fromSeed(seedColor: Colors.blue).copyWith(
       surface: Colors.white,
       primary: Colors.blueAccent,
+      surfaceContainerLow: Colors.blueGrey.shade50,
     );
 
     return MaterialApp(
@@ -105,7 +106,6 @@ class MyHomePage extends StatefulWidget {
 class MyHomePageState extends State<MyHomePage> {
   final _uuid = Uuid();
   final ChatController _chatController = InMemoryChatController();
-  final _scrollController = ScrollController();
 
   static const _userId = 'user';
   static const _modelId = 'model';
@@ -130,8 +130,6 @@ class MyHomePageState extends State<MyHomePage> {
     final responseStream = client.starguide.ask(_chatSession!, text);
 
     var accumulatedText = '';
-    final initialMaxScrollExtent = _scrollController.position.maxScrollExtent;
-    var hasReachedTargetScroll = false;
 
     _currentResponse = TextMessage(
       id: _uuid.v4(),
@@ -146,41 +144,6 @@ class MyHomePageState extends State<MyHomePage> {
       final newMessage = _currentResponse!.copyWith(text: accumulatedText);
       await _chatController.updateMessage(_currentResponse!, newMessage);
       _currentResponse = newMessage;
-
-      if (!hasReachedTargetScroll && initialMaxScrollExtent > 0) {
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          if (!_scrollController.hasClients || !mounted) return;
-
-          // Calculate target scroll position:
-          // Start with the initial scroll position
-          // Add viewport height to get to top of visible area
-          // Subtract bottom safe area
-          // Subtract input height since it is absolute positioned (104)
-          // Subtract some padding for visual buffer (20)
-          final targetScroll = (initialMaxScrollExtent) +
-              _scrollController.position.viewportDimension -
-              MediaQuery.of(context).padding.bottom -
-              104 -
-              20;
-
-          if (_scrollController.position.maxScrollExtent > targetScroll) {
-            _scrollController.animateTo(
-              targetScroll,
-              duration: const Duration(milliseconds: 250),
-              curve: Curves.linearToEaseOut,
-            );
-            // Once we've scrolled to target position, don't try to scroll again
-            hasReachedTargetScroll = true;
-          } else {
-            // If we haven't reached target position yet, scroll to bottom
-            _scrollController.animateTo(
-              _scrollController.position.maxScrollExtent,
-              duration: const Duration(milliseconds: 250),
-              curve: Curves.linearToEaseOut,
-            );
-          }
-        });
-      }
     }
   }
 
@@ -195,6 +158,14 @@ class MyHomePageState extends State<MyHomePage> {
     );
 
     _sendMessage(text);
+  }
+
+  void _clearChat() {
+    setState(() {
+      _chatController.setMessages([]);
+      _chatSession = null;
+      _currentResponse = null;
+    });
   }
 
   @override
@@ -212,9 +183,9 @@ class MyHomePageState extends State<MyHomePage> {
         surfaceContainerLow: theme.colorScheme.surfaceContainerLow,
       ),
       typography: ChatTypography(
-        bodySmall: theme.textTheme.bodyLarge!,
-        bodyMedium: theme.textTheme.bodyLarge!,
-        bodyLarge: theme.textTheme.bodyLarge!,
+        bodySmall: theme.textTheme.bodyMedium!,
+        bodyMedium: theme.textTheme.bodyMedium!,
+        bodyLarge: theme.textTheme.bodyMedium!,
         labelSmall: theme.textTheme.labelSmall!,
         labelMedium: theme.textTheme.labelMedium!,
         labelLarge: theme.textTheme.labelLarge!,
@@ -232,9 +203,15 @@ class MyHomePageState extends State<MyHomePage> {
               builders: Builders(
                 chatAnimatedListBuilder: (context, itemBuilder) {
                   return ChatAnimatedList(
-                    scrollController: _scrollController,
+                    // scrollController: _scrollController,
                     itemBuilder: itemBuilder,
-                    shouldScrollToEndWhenAtBottom: false,
+                    shouldScrollToEndWhenAtBottom: true,
+                    shouldScrollToEndWhenSendingMessage: true,
+                    bottomPadding: 16,
+                    topPadding: 16,
+                    removeAnimationDuration: Duration.zero,
+                    handleSafeArea: false,
+                    reversed: true,
                   );
                 },
                 composerBuilder: (context) => Positioned(
@@ -259,56 +236,64 @@ class MyHomePageState extends State<MyHomePage> {
             color: theme.dividerColor,
             height: 1,
           ),
-          Padding(
-            padding: const EdgeInsets.only(
-              left: 16,
-              right: 16,
-              top: 8,
-            ),
-            child: Row(
-              spacing: 8,
+          Container(
+            color: theme.colorScheme.surfaceContainerLow,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                TextButton.icon(
-                  onPressed: () {},
-                  label: Text('Clear Chat'),
-                  icon: Icon(Icons.autorenew),
-                ),
-                Spacer(),
-                TextButton.icon(
-                  onPressed: null,
-                  label: Text('Good Answer'),
-                  icon: Icon(Icons.thumb_up_outlined),
-                ),
-                TextButton.icon(
-                  onPressed: null,
-                  label: Text('Bad Answer'),
-                  icon: Icon(Icons.thumb_down_outlined),
-                ),
-              ],
-            ),
-          ),
-          StarguideChatInput(
-            onSend: _handleMessageSend,
-          ),
-          Padding(
-            padding: const EdgeInsets.only(
-              left: 16.0,
-              right: 16.0,
-              bottom: 16.0,
-            ),
-            child: Row(
-              children: [
-                Text(
-                  'Built with Serverpod',
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    color: theme.disabledColor,
+                Padding(
+                  padding: const EdgeInsets.only(
+                    left: 16,
+                    right: 16,
+                    top: 8,
+                  ),
+                  child: Row(
+                    spacing: 8,
+                    children: [
+                      TextButton.icon(
+                        onPressed: _clearChat,
+                        label: Text('Clear Chat'),
+                        icon: Icon(Icons.autorenew),
+                      ),
+                      Spacer(),
+                      TextButton.icon(
+                        onPressed: null,
+                        label: Text('Got Help'),
+                        icon: Icon(Icons.thumb_up_outlined),
+                      ),
+                      TextButton.icon(
+                        onPressed: null,
+                        label: Text('Poor Answer'),
+                        icon: Icon(Icons.thumb_down_outlined),
+                      ),
+                    ],
                   ),
                 ),
-                Spacer(),
-                Text(
-                  'Protected by reCAPTCHA',
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    color: theme.disabledColor,
+                StarguideChatInput(
+                  onSend: _handleMessageSend,
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(
+                    left: 16.0,
+                    right: 16.0,
+                    bottom: 16.0,
+                  ),
+                  child: Row(
+                    children: [
+                      Text(
+                        'Built with Serverpod',
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: theme.disabledColor,
+                        ),
+                      ),
+                      Spacer(),
+                      Text(
+                        'Protected by reCAPTCHA',
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: theme.disabledColor,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ],

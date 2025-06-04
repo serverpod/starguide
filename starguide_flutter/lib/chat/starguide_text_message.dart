@@ -122,6 +122,8 @@ class StarguideTextMessage extends StatelessWidget {
       final gptResponse = GptResponse(message.text);
 
       content = Column(
+        crossAxisAlignment:
+            isSentByMe ? CrossAxisAlignment.center : CrossAxisAlignment.stretch,
         children: [
           if (!isSentByMe) const SizedBox(width: double.infinity),
           GptMarkdown(
@@ -402,7 +404,7 @@ class LinkPreviewList extends StatelessWidget {
       children: [
         const SizedBox(height: 24),
         Text(
-          'Answer based on the following sources:',
+          'Answer from the following references:',
           style: theme.textTheme.labelLarge,
         ),
         const SizedBox(height: 8),
