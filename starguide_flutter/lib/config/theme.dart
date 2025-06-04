@@ -26,7 +26,7 @@ ThemeData createTheme() {
     ),
     textButtonTheme: TextButtonThemeData(
       style: TextButton.styleFrom(
-        padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
         foregroundColor: Colors.grey.shade700,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(8),

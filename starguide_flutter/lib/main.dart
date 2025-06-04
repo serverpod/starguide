@@ -222,21 +222,32 @@ class StarguideChatPageState extends State<StarguideChatPage> {
               }),
             ),
           ),
-          Divider(
-            color: theme.dividerColor,
-            height: 1,
-          ),
           Container(
-            color: theme.colorScheme.surfaceContainerLow,
+            margin: const EdgeInsets.only(
+              left: 16,
+              right: 16,
+              bottom: 16,
+            ),
+            decoration: BoxDecoration(
+              color: theme.colorScheme.surface,
+              border: Border.all(
+                color: theme.dividerColor,
+                width: 1,
+              ),
+              borderRadius: BorderRadius.circular(8),
+            ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                Padding(
-                  padding: const EdgeInsets.only(
-                    left: 16,
-                    right: 16,
-                    top: 8,
+                Container(
+                  decoration: BoxDecoration(
+                    color: theme.colorScheme.surfaceContainer,
+                    borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(7),
+                      topRight: Radius.circular(7),
+                    ),
                   ),
+                  padding: const EdgeInsets.all(4),
                   child: Row(
                     spacing: 8,
                     children: [
@@ -259,6 +270,10 @@ class StarguideChatPageState extends State<StarguideChatPage> {
                     ],
                   ),
                 ),
+                Divider(
+                  height: 1,
+                  color: theme.dividerColor,
+                ),
                 StarguideChatInput(
                   textController: _inputTextController,
                   onSend: _handleMessageSend,
@@ -268,28 +283,28 @@ class StarguideChatPageState extends State<StarguideChatPage> {
                   isGeneratingResponse: _isGeneratingResponse,
                   numChatRequests: _numChatRequests,
                 ),
-                Padding(
-                  padding: const EdgeInsets.only(
-                    left: 16.0,
-                    right: 16.0,
-                    bottom: 16.0,
+              ],
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.only(
+              left: 18.0,
+              right: 18.0,
+              bottom: 16.0,
+            ),
+            child: Row(
+              children: [
+                Text(
+                  'Built with Serverpod',
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: theme.disabledColor,
                   ),
-                  child: Row(
-                    children: [
-                      Text(
-                        'Built with Serverpod',
-                        style: theme.textTheme.bodySmall?.copyWith(
-                          color: theme.disabledColor,
-                        ),
-                      ),
-                      Spacer(),
-                      Text(
-                        'Protected by reCAPTCHA',
-                        style: theme.textTheme.bodySmall?.copyWith(
-                          color: theme.disabledColor,
-                        ),
-                      ),
-                    ],
+                ),
+                Spacer(),
+                Text(
+                  'Protected by reCAPTCHA',
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: theme.disabledColor,
                   ),
                 ),
               ],

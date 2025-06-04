@@ -38,14 +38,6 @@ class _StarguideChatInputState extends State<StarguideChatInput> {
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 4.0),
-      margin: const EdgeInsets.all(16.0),
-      decoration: BoxDecoration(
-        border: Border.all(
-          color: theme.dividerColor,
-        ),
-        borderRadius: BorderRadius.circular(8),
-        color: theme.scaffoldBackgroundColor,
-      ),
       child: Column(
         children: [
           Row(
