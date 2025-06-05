@@ -9,6 +9,7 @@ class StarguideChatInput extends StatefulWidget {
     required this.enabled,
     required this.isGeneratingResponse,
     required this.numChatRequests,
+    required this.focusNode,
   });
 
   final void Function(String message) onSend;
@@ -16,6 +17,7 @@ class StarguideChatInput extends StatefulWidget {
   final bool enabled;
   final bool isGeneratingResponse;
   final int numChatRequests;
+  final FocusNode focusNode;
 
   @override
   State<StarguideChatInput> createState() => _StarguideChatInputState();
@@ -44,6 +46,7 @@ class _StarguideChatInputState extends State<StarguideChatInput> {
             children: [
               Expanded(
                 child: TextField(
+                  focusNode: widget.focusNode,
                   autofocus: true,
                   enabled: widget.numChatRequests < kMaxChatRequests,
                   buildCounter: (
@@ -64,6 +67,7 @@ class _StarguideChatInputState extends State<StarguideChatInput> {
                   onSubmitted: (value) {
                     widget.onSend(widget.textController.text);
                     widget.textController.clear();
+                    widget.focusNode.requestFocus();
                   },
                 ),
               ),

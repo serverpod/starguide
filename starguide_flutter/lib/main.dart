@@ -91,6 +91,9 @@ class StarguideChatPageState extends State<StarguideChatPage> {
   int _numChatRequests = 0;
 
   final _inputTextController = TextEditingController();
+  final _inputFocusNode = FocusNode();
+
+  bool _isInputFocused = false;
 
   @override
   void initState() {
@@ -101,6 +104,19 @@ class StarguideChatPageState extends State<StarguideChatPage> {
         _hasInputText = _inputTextController.text.isNotEmpty;
       });
     });
+
+    _inputFocusNode.addListener(() {
+      setState(() {
+        _isInputFocused = _inputFocusNode.hasFocus;
+      });
+    });
+  }
+
+  @override
+  void dispose() {
+    _inputTextController.dispose();
+    _inputFocusNode.dispose();
+    super.dispose();
   }
 
   void _sendMessage(String text) async {
@@ -222,7 +238,9 @@ class StarguideChatPageState extends State<StarguideChatPage> {
             decoration: BoxDecoration(
               color: theme.colorScheme.surface,
               border: Border.all(
-                color: theme.dividerColor,
+                color: _isInputFocused
+                    ? theme.colorScheme.outline
+                    : theme.dividerColor,
                 width: 1,
               ),
               borderRadius: BorderRadius.circular(8),
@@ -264,10 +282,13 @@ class StarguideChatPageState extends State<StarguideChatPage> {
                 ),
                 Divider(
                   height: 1,
-                  color: theme.dividerColor,
+                  color: _isInputFocused
+                      ? theme.colorScheme.outline
+                      : theme.dividerColor,
                 ),
                 StarguideChatInput(
                   textController: _inputTextController,
+                  focusNode: _inputFocusNode,
                   onSend: _handleMessageSend,
                   enabled: _hasInputText &&
                       !_isGeneratingResponse &&
