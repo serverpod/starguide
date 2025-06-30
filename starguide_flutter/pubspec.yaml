@@ -29,8 +29,7 @@ dependencies:
   flyer_chat_text_message: ^2.2.1
   gpt_markdown: ^1.0.19
   made_with_serverpod: ^1.1.0
-  serverpod_flutter:
-    path: ../vendor/serverpod/packages/serverpod_flutter
+  serverpod_flutter: 2.9.0
   starguide_client:
     path: ../starguide_client
   syntax_highlight: ^0.4.0
@@ -47,14 +46,6 @@ dev_dependencies:
   flutter_lints: '>=3.0.0 <6.0.0'
   flutter_test:
     sdk: flutter
-
-dependency_overrides:
-  serverpod_serialization:
-    path: ../vendor/serverpod/packages/serverpod_serialization
-  serverpod_shared:
-    path: ../vendor/serverpod/packages/serverpod_shared
-  serverpod_client:
-    path: ../vendor/serverpod/packages/serverpod_client
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

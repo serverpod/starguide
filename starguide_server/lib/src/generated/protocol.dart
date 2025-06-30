@@ -216,6 +216,7 @@ class Protocol extends _i1.SerializationManagerServer {
           isUnique: false,
           isPrimary: false,
           vectorDistanceFunction: _i2.VectorDistanceFunction.cosine,
+          vectorColumnType: _i2.ColumnType.vector,
         ),
       ],
       managed: true,

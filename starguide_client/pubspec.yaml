@@ -5,11 +5,5 @@ environment:
   sdk: '>=3.3.0 <4.0.0'
 
 dependencies:
-  serverpod_client:
-    path: ../vendor/serverpod/packages/serverpod_client
+  serverpod_client: 2.9.0
 
-dependency_overrides:
-  serverpod_serialization:
-    path: ../vendor/serverpod/packages/serverpod_serialization
-  serverpod_shared:
-    path: ../vendor/serverpod/packages/serverpod_shared

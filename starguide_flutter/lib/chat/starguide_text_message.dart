@@ -54,7 +54,7 @@ class StarguideTextMessage extends StatelessWidget {
   final EdgeInsetsGeometry? timeAndStatusPositionInlineInsets;
 
   /// The callback function to handle link clicks.
-  final void Function(String url, String title)? onLinkTab;
+  final void Function(String url, String title)? onLinkTap;
 
   /// The position of the link preview widget relative to the text.
   /// If set to [LinkPreviewPosition.none], the link preview widget will not be displayed.
@@ -79,7 +79,7 @@ class StarguideTextMessage extends StatelessWidget {
     this.showStatus = false,
     this.timeAndStatusPosition = TimeAndStatusPosition.end,
     this.timeAndStatusPositionInlineInsets = const EdgeInsets.only(bottom: 2),
-    this.onLinkTab,
+    this.onLinkTap,
     this.linkPreviewPosition = LinkPreviewPosition.bottom,
   });
 
@@ -95,7 +95,7 @@ class StarguideTextMessage extends StatelessWidget {
 
     final timeAndStatus = showTime || (isSentByMe && showStatus)
         ? TimeAndStatus(
-            time: message.time,
+            time: message.createdAt,
             status: message.status,
             showTime: showTime,
             showStatus: isSentByMe && showStatus,
@@ -119,7 +119,7 @@ class StarguideTextMessage extends StatelessWidget {
             style: _isOnlyEmoji
                 ? paragraphStyle?.copyWith(fontSize: onlyEmojiFontSize)
                 : paragraphStyle,
-            onLinkTab: onLinkTab,
+            onLinkTap: onLinkTap,
             codeBuilder: (context, name, codes, closed) => StarguideCodeField(
               name: name,
               codes: codes,

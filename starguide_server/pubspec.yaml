@@ -9,21 +9,10 @@ environment:
 dependencies:
   http: ^1.3.0
   google_generative_ai: ^0.4.6
-  serverpod:
-    path: ../vendor/serverpod/packages/serverpod
+  serverpod: 2.9.0
 
 dev_dependencies:
   lints: '>=3.0.0 <6.0.0'
   test: '^1.24.2'
-  serverpod_test:
-    path: ../vendor/serverpod/packages/serverpod_test
+  serverpod_test: 2.9.0
 
-dependency_overrides:
-  serverpod:
-    path: ../vendor/serverpod/packages/serverpod
-  serverpod_test:
-    path: ../vendor/serverpod/packages/serverpod_test
-  serverpod_serialization:
-    path: ../vendor/serverpod/packages/serverpod_serialization
-  serverpod_shared:
-    path: ../vendor/serverpod/packages/serverpod_shared
