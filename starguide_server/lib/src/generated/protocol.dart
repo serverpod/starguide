@@ -191,7 +191,7 @@ class Protocol extends _i1.SerializationManagerServer {
           isPrimary: true,
         ),
         _i2.IndexDefinition(
-          indexName: 'rag_docuement_sourceUrl',
+          indexName: 'rag_document_sourceUrl',
           tableSpace: null,
           elements: [
             _i2.IndexElementDefinition(

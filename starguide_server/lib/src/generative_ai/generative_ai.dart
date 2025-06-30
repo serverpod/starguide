@@ -58,7 +58,7 @@ class GenerativeAi {
   }
 
   Future<Vector> generateEmbedding(String document) async {
-    var response = await embeddingModel.embedContent(
+    final response = await embeddingModel.embedContent(
       Content.text(document),
       outputDimensionality: 1536,
     );

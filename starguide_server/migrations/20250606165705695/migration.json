@@ -1,0 +1,56 @@
+{
+  "actions": [
+    {
+      "type": "alterTable",
+      "alterTable": {
+        "name": "rag_document",
+        "schema": "public",
+        "addColumns": [],
+        "deleteColumns": [],
+        "modifyColumns": [],
+        "addIndexes": [
+          {
+            "indexName": "rag_document_sourceUrl",
+            "elements": [
+              {
+                "type": 0,
+                "definition": "sourceUrl"
+              }
+            ],
+            "type": "btree",
+            "isUnique": true,
+            "isPrimary": false
+          }
+        ],
+        "deleteIndexes": [
+          "rag_docuement_sourceUrl"
+        ],
+        "addForeignKeys": [],
+        "deleteForeignKeys": [],
+        "warnings": [
+          {
+            "type": "uniqueIndexCreated",
+            "message": "Unique index \"rag_document_sourceUrl\" is added to table \"rag_document\". If there are existing rows with duplicate values, this migration will fail.",
+            "table": "rag_document",
+            "columns": [
+              "sourceUrl"
+            ],
+            "destrucive": false
+          }
+        ]
+      }
+    }
+  ],
+  "warnings": [
+    {
+      "type": "uniqueIndexCreated",
+      "message": "Unique index \"rag_document_sourceUrl\" is added to table \"rag_document\". If there are existing rows with duplicate values, this migration will fail.",
+      "table": "rag_document",
+      "columns": [
+        "sourceUrl"
+      ],
+      "destrucive": false
+    }
+  ],
+  "migrationApiVersion": 1
+}

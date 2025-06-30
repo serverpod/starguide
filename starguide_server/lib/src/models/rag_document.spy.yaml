@@ -9,7 +9,7 @@ fields:
   summary: String
 
 indexes:
-  rag_docuement_sourceUrl:
+  rag_document_sourceUrl:
     fields: sourceUrl
     unique: true
   rag_document_vector:
