@@ -4,16 +4,44 @@ import 'package:starguide_server/src/generated/protocol.dart';
 import 'package:starguide_server/src/generative_ai/generative_ai.dart';
 import 'package:starguide_server/src/generative_ai/prompts.dart';
 
+const _futureCallBaseName = 'fetchData';
+
 class DataFetcher {
+  static DataFetcher? _instance;
+
   final List<DataSource> dataSources;
   final Duration cacheDuration;
 
-  DataFetcher({
+  static void configure(
+    List<DataSource> dataSources, {
+    Duration cacheDuration = const Duration(days: 1),
+  }) {
+    _instance ??= DataFetcher._(
+      dataSources: dataSources,
+      cacheDuration: cacheDuration,
+    );
+  }
+
+  static DataFetcher get instance => _instance!;
+
+  DataFetcher._({
     required this.dataSources,
     this.cacheDuration = const Duration(days: 1),
   });
 
-  Future<void> fetchAndOrganize(Session session) async {
+  void registerFutureCalls(Serverpod pod) {
+    pod.registerFutureCall(FetchDataFutureCall(), _futureCallBaseName);
+  }
+
+  void startFetching(Serverpod pod) {
+    pod.futureCallWithDelay(
+      _futureCallBaseName,
+      null,
+      const Duration(),
+    );
+  }
+
+  Future<void> _fetchAndOrganize(Session session) async {
     // Setup Generative AI.
 
     // Start fetching data.
@@ -90,5 +118,13 @@ class DataFetcher {
           (t.fetchTime > (DateTime.now().subtract(cacheDuration))),
     );
     return document == null;
+  }
+}
+
+class FetchDataFutureCall extends FutureCall {
+  @override
+  Future<void> invoke(Session session, SerializableModel? object) async {
+    print('FETCH DATA FUTURE CALL');
+    await DataFetcher.instance._fetchAndOrganize(session);
   }
 }
