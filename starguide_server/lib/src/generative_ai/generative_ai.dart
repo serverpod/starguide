@@ -1,23 +1,15 @@
-import 'package:google_generative_ai/google_generative_ai.dart';
+import 'package:dartantic_ai/dartantic_ai.dart';
 import 'package:serverpod/serverpod.dart';
 import 'package:starguide_server/src/extensions/chat_message_to_role.dart';
 import 'package:starguide_server/src/generated/protocol.dart';
 
 class GenerativeAi {
-  late final String geminiAPIKey;
-  late GenerativeModel model;
-  late GenerativeModel embeddingModel;
+  final String _geminiAPIKey;
+  late Agent _agent;
 
-  GenerativeAi() {
-    geminiAPIKey = Serverpod.instance.getPassword('geminiAPIKey')!;
-    model = GenerativeModel(
-      model: 'gemini-1.5-flash-latest',
-      apiKey: geminiAPIKey,
-    );
-    embeddingModel = GenerativeModel(
-      model: 'gemini-embedding-exp-03-07',
-      apiKey: geminiAPIKey,
-    );
+  GenerativeAi()
+      : _geminiAPIKey = Serverpod.instance.getPassword('geminiAPIKey')! {
+    _agent = _getAgent();
   }
 
   Stream<String> generateConversationalAnswer({
@@ -25,47 +17,54 @@ class GenerativeAi {
     required String systemPrompt,
     List<RAGDocument> documents = const [],
     List<ChatMessage> conversation = const [],
-  }) {
-    final prompt = conversation.map(
-      (chatMessage) {
-        return Content(
-          chatMessage.type.aiRole,
-          [TextPart(chatMessage.message)],
-        );
-      },
-    ).toList();
+  }) async* {
+    final messages = <Message>[];
 
-    prompt.add(Content.text(question));
+    // Add conversation history
+    for (final chatMessage in conversation) {
+      messages.add(
+        Message(
+          role: chatMessage.type.aiRole == 'user'
+              ? MessageRole.user
+              : MessageRole.model,
+          content: [TextPart(chatMessage.message)],
+        ),
+      );
+    }
 
-    prompt.insert(
-      0,
-      Content.text(
-        systemPrompt + documents.map((e) => _formatDocument(e)).join('\n'),
-      ),
+    final agentWithSystem = _getAgent(
+      systemPrompt + documents.map((e) => _formatDocument(e)).join('\n'),
     );
-
-    return model
-        .generateContentStream(prompt)
-        .map<String>((response) => response.text ?? '');
+    final response = agentWithSystem.runStream(question, messages: messages);
+    await for (final chunk in response) {
+      yield chunk.output;
+    }
   }
 
   Future<String> generateSimpleAnswer(String question) async {
-    final prompt = [
-      Content.text(question),
-    ];
-
-    return (await model.generateContent(prompt)).text ?? '';
+    final response = await _agent.run(question);
+    return response.output;
   }
 
   Future<Vector> generateEmbedding(String document) async {
-    final response = await embeddingModel.embedContent(
-      Content.text(document),
-      outputDimensionality: 1536,
-    );
-    return Vector(response.embedding.values);
+    final embedding = await _agent.createEmbedding(document);
+    return Vector(embedding.toList());
   }
 
   String _formatDocument(RAGDocument document) {
     return '<doc href="${document.sourceUrl}">\n${document.content}\n</doc>';
   }
+
+  Agent _getAgent([String? systemPrompt]) => Agent.provider(
+        // pick a specific provider and embedding model -- embeddings aren't
+        // compatible between providers and not guaranteed to be compatible between
+        // models. picking a specific model name isn't as important -- those can
+        // change over time w/o affecting the embeddings.
+        GeminiProvider(
+          apiKey: _geminiAPIKey,
+          modelName: 'gemini-2.0-flash',
+          embeddingModelName: 'text-embedding-004',
+        ),
+        systemPrompt: systemPrompt,
+      );
 }

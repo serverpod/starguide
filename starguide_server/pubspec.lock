@@ -89,6 +89,38 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.0.6"
+  dartantic_ai:
+    dependency: "direct main"
+    description:
+      name: dartantic_ai
+      sha256: ce7bc1158fd21b19217b739cc7d6d1d99139753993f95dd69b12c551b2d835be
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.7.0"
+  dotprompt_dart:
+    dependency: transitive
+    description:
+      name: dotprompt_dart
+      sha256: "3fcb28f65e5248e4fe8ef057c92d496562ece69df1d5016284a2e3d3ef01fb50"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.2.0"
+  fetch_api:
+    dependency: transitive
+    description:
+      name: fetch_api
+      sha256: "24cbd5616f3d4008c335c197bb90bfa0eb43b9e55c6de5c60d1f805092636034"
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.3.1"
+  fetch_client:
+    dependency: transitive
+    description:
+      name: fetch_client
+      sha256: "375253f4efe64303c793fb17fe90771c591320b2ae11fb29cb5b406cc8533c00"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.1.4"
   file:
     dependency: transitive
     description:
@@ -113,6 +145,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "5.0.0"
+  freezed_annotation:
+    dependency: transitive
+    description:
+      name: freezed_annotation
+      sha256: c2e2d632dd9b8a2b7751117abcfc2b4888ecfe181bd9fca7170d9ef02e595fe2
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.4.4"
   frontend_server_client:
     dependency: transitive
     description:
@@ -130,13 +170,13 @@ packages:
     source: hosted
     version: "2.1.3"
   google_generative_ai:
-    dependency: "direct main"
+    dependency: transitive
     description:
       name: google_generative_ai
-      sha256: "81dae159c89e4d9bdc46955b6f4ee5ae0a291f9e8f990d76f43944e0d6041d4f"
+      sha256: "71f613d0247968992ad87a0eb21650a566869757442ba55a31a81be6746e0d1f"
       url: "https://pub.dev"
     source: hosted
-    version: "0.4.6"
+    version: "0.4.7"
   http:
     dependency: "direct main"
     description:
@@ -177,6 +217,22 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.7.2"
+  json_annotation:
+    dependency: transitive
+    description:
+      name: json_annotation
+      sha256: "1ce844379ca14835a50d2f019a3099f419082cfdd231cd86a142af94dd5c6bb1"
+      url: "https://pub.dev"
+    source: hosted
+    version: "4.9.0"
+  json_schema:
+    dependency: transitive
+    description:
+      name: json_schema
+      sha256: fc8c3e280c7647ed8e94f2565ba107ef4aff94b096764b8460a7e1ae39f20382
+      url: "https://pub.dev"
+    source: hosted
+    version: "5.2.1"
   lints:
     dependency: "direct dev"
     description:
@@ -201,6 +257,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.12.17"
+  mcp_dart:
+    dependency: transitive
+    description:
+      name: mcp_dart
+      sha256: e05f00d6f438806b275b045ead72b580f7e9f43bff9ccacdbd95a4f20ae33702
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.5.2"
   meta:
     dependency: transitive
     description:
@@ -233,6 +297,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.0.2"
+  openai_dart:
+    dependency: transitive
+    description:
+      name: openai_dart
+      sha256: "1cc5ed0915fa7572b943de01cfa7a3e5cfe1e6a7f4d0d9a9374d046518e84575"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.4.5"
   package_config:
     dependency: transitive
     description:
@@ -273,6 +345,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.2.0"
+  quiver:
+    dependency: transitive
+    description:
+      name: quiver
+      sha256: ea0b925899e64ecdfbf9c7becb60d5b50e706ade44a85b2363be2a22d88117d2
+      url: "https://pub.dev"
+    source: hosted
+    version: "3.2.2"
   redis:
     dependency: transitive
     description:
@@ -289,6 +369,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.1.2"
+  rfc_6901:
+    dependency: transitive
+    description:
+      name: rfc_6901
+      sha256: df1bbfa3d023009598f19636d6114c6ac1e0b7bb7bf6a260f0e6e6ce91416820
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.2.0"
   sasl_scram:
     dependency: transitive
     description:
@@ -505,6 +593,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.3.0"
+  uri:
+    dependency: transitive
+    description:
+      name: uri
+      sha256: "889eea21e953187c6099802b7b4cf5219ba8f3518f604a1033064d45b1b8268a"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.0"
   uuid:
     dependency: transitive
     description:
@@ -570,4 +666,4 @@ packages:
     source: hosted
     version: "3.1.3"
 sdks:
-  dart: ">=3.7.0 <4.0.0"
+  dart: ">=3.7.2 <4.0.0"
