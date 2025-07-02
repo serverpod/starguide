@@ -7,7 +7,6 @@ import 'package:starguide_server/src/generative_ai/prompts.dart';
 const _futureCallName = 'DataFetcher';
 const _futureCallIdentifier = 'DataFetcher';
 
-const _fetchFrequency = Duration(days: 1);
 const _fetchRetryDelay = Duration(minutes: 1);
 
 class DataFetcher {
@@ -15,14 +14,17 @@ class DataFetcher {
 
   final List<DataSource> dataSources;
   final Duration cacheDuration;
+  final Duration removeOldDataAfter;
 
   static void configure(
     List<DataSource> dataSources, {
     Duration cacheDuration = const Duration(days: 1),
+    Duration removeOldDataAfter = const Duration(days: 3),
   }) {
     _instance ??= DataFetcher._(
       dataSources: dataSources,
       cacheDuration: cacheDuration,
+      removeOldDataAfter: removeOldDataAfter,
     );
   }
 
@@ -31,6 +33,7 @@ class DataFetcher {
   DataFetcher._({
     required this.dataSources,
     this.cacheDuration = const Duration(days: 1),
+    this.removeOldDataAfter = const Duration(days: 3),
   });
 
   void register(Serverpod pod) {
@@ -124,6 +127,13 @@ class DataFetcher {
     );
     return document == null;
   }
+
+  Future<void> _cleanUp(Session session) async {
+    await RAGDocument.db.deleteWhere(
+      session,
+      where: (t) => t.fetchTime < DateTime.now().subtract(removeOldDataAfter),
+    );
+  }
 }
 
 class _FetchDataFutureCall extends FutureCall<DataFetcherTask> {
@@ -186,7 +196,7 @@ class _FetchDataFutureCall extends FutureCall<DataFetcherTask> {
             type: DataFetcherTaskType.dataSource,
             name: dataSource.name,
           ),
-          _fetchFrequency,
+          dataFetcher.cacheDuration,
           identifier: _futureCallIdentifier,
         );
       } else {
@@ -204,6 +214,34 @@ class _FetchDataFutureCall extends FutureCall<DataFetcherTask> {
     } else if (task.type == DataFetcherTaskType.cleanUp) {
       // Remove old data.
       session.log('Cleaning up data.');
+      bool success = false;
+      try {
+        await dataFetcher._cleanUp(session);
+        success = true;
+      } catch (e, stackTrace) {
+        session.log(
+          'Error cleaning up data: $e',
+          exception: e,
+          stackTrace: stackTrace,
+        );
+        success = false;
+      }
+
+      if (success) {
+        session.serverpod.futureCallWithDelay(
+          _futureCallName,
+          DataFetcherTask(type: DataFetcherTaskType.cleanUp),
+          dataFetcher.cacheDuration,
+          identifier: _futureCallIdentifier,
+        );
+      } else {
+        session.serverpod.futureCallWithDelay(
+          _futureCallName,
+          DataFetcherTask(type: DataFetcherTaskType.cleanUp),
+          _fetchRetryDelay,
+          identifier: _futureCallIdentifier,
+        );
+      }
     }
   }
 }
