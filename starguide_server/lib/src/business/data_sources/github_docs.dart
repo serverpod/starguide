@@ -24,6 +24,9 @@ class GithubDocsDataSource implements DataSource {
   }
 
   @override
+  String get name => 'GithubDocs';
+
+  @override
   Stream<RawRAGDocuement> fetch(
     Session session,
     DataFetcher fetcher, {

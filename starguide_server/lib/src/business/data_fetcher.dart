@@ -4,7 +4,10 @@ import 'package:starguide_server/src/generated/protocol.dart';
 import 'package:starguide_server/src/generative_ai/generative_ai.dart';
 import 'package:starguide_server/src/generative_ai/prompts.dart';
 
-const _futureCallBaseName = 'fetchData';
+const _futureCallName = 'DataFetcher';
+
+const _fetchFrequency = Duration(days: 1);
+const _fetchRetryDelay = Duration(minutes: 1);
 
 class DataFetcher {
   static DataFetcher? _instance;
@@ -29,35 +32,30 @@ class DataFetcher {
     this.cacheDuration = const Duration(days: 1),
   });
 
-  void registerFutureCalls(Serverpod pod) {
-    pod.registerFutureCall(FetchDataFutureCall(), _futureCallBaseName);
+  void register(Serverpod pod) {
+    pod.registerFutureCall(_FetchDataFutureCall(), _futureCallName);
   }
 
   void startFetching(Serverpod pod) {
     pod.futureCallWithDelay(
-      _futureCallBaseName,
-      null,
+      _futureCallName,
+      DataFetcherTask(
+        type: DataFetcherTaskType.startFetching,
+      ),
       const Duration(),
     );
   }
 
-  Future<void> _fetchAndOrganize(Session session) async {
-    // Setup Generative AI.
+  Future<void> _fetchDataSource(Session session, DataSource dataSource) async {
+    await for (final rawDocument in dataSource.fetch(session, this)) {
+      session.log('Loaded document: ${rawDocument.sourceUrl}');
 
-    // Start fetching data.
-    session.log('Start fetching data.');
-    for (var dataSource in dataSources) {
-      await for (final rawDocument in dataSource.fetch(session, this)) {
-        session.log('Loaded document: ${rawDocument.sourceUrl}');
+      final ragDocument = await _createRagDocument(session, rawDocument);
+      await _saveRagDocument(session, ragDocument);
 
-        final ragDocument = await _createRagDocument(session, rawDocument);
-        await _saveRagDocument(session, ragDocument);
-
-        // Pause as to not exhuast Gemini's free tier.
-        await Future.delayed(const Duration(seconds: 10));
-      }
+      // Pause as to not exhuast Gemini's free tier.
+      await Future.delayed(const Duration(seconds: 10));
     }
-    session.log('Fetching data done.');
   }
 
   Future<RAGDocument> _createRagDocument(
@@ -121,10 +119,76 @@ class DataFetcher {
   }
 }
 
-class FetchDataFutureCall extends FutureCall {
+class _FetchDataFutureCall extends FutureCall<DataFetcherTask> {
   @override
-  Future<void> invoke(Session session, SerializableModel? object) async {
-    print('FETCH DATA FUTURE CALL');
-    await DataFetcher.instance._fetchAndOrganize(session);
+  Future<void> invoke(Session session, DataFetcherTask? task) async {
+    final dataFetcher = DataFetcher.instance;
+    task!;
+
+    if (task.type == DataFetcherTaskType.startFetching) {
+      // Spawn tasks for each data source.
+      session.log('Starting data fetcher.');
+
+      for (var dataSource in dataFetcher.dataSources) {
+        session.serverpod.futureCallWithDelay(
+          _futureCallName,
+          DataFetcherTask(
+            type: DataFetcherTaskType.dataSource,
+            name: dataSource.name,
+          ),
+          const Duration(),
+        );
+      }
+
+      // Schedule cleanup.
+      session.serverpod.futureCallWithDelay(
+        _futureCallName,
+        DataFetcherTask(
+          type: DataFetcherTaskType.cleanUp,
+        ),
+        const Duration(),
+      );
+    } else if (task.type == DataFetcherTaskType.dataSource) {
+      // Fetch data from a specific data source.
+      session.log('Fetching data from ${task.name}.');
+
+      bool success = false;
+
+      final dataSource = dataFetcher.dataSources.firstWhere(
+        (dataSource) => dataSource.name == task.name,
+      );
+      try {
+        await dataFetcher._fetchDataSource(session, dataSource);
+        success = true;
+      } catch (e) {
+        session.log('Error fetching data from $dataSource: $e');
+        success = false;
+      }
+
+      if (success) {
+        // We successfully fetched data, so we'll schedule the next fetch.
+        session.serverpod.futureCallWithDelay(
+          _futureCallName,
+          DataFetcherTask(
+            type: DataFetcherTaskType.dataSource,
+            name: dataSource.name,
+          ),
+          _fetchFrequency,
+        );
+      } else {
+        // We failed to fetch data, so we'll try again in a minute.
+        session.serverpod.futureCallWithDelay(
+          _futureCallName,
+          DataFetcherTask(
+            type: DataFetcherTaskType.dataSource,
+            name: dataSource.name,
+          ),
+          _fetchRetryDelay,
+        );
+      }
+    } else if (task.type == DataFetcherTaskType.cleanUp) {
+      // Remove old data.
+      session.log('Cleaning up data.');
+    }
   }
 }

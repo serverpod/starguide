@@ -16,7 +16,7 @@ void run(List<String> args) async {
   );
 
   configureDataFetcher();
-  DataFetcher.instance.registerFutureCalls(pod);
+  DataFetcher.instance.register(pod);
 
   // Setup a default page at the web root.
   pod.webServer.addRoute(RouteRoot(), '/');

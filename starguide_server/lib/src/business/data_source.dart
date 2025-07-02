@@ -3,6 +3,8 @@ import 'package:starguide_server/src/business/data_fetcher.dart';
 
 abstract class DataSource {
   Stream<RawRAGDocuement> fetch(Session session, DataFetcher fetcher);
+
+  String get name;
 }
 
 enum DataSourceType {

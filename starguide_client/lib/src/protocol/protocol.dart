@@ -13,11 +13,15 @@ import 'package:serverpod_client/serverpod_client.dart' as _i1;
 import 'chat_message.dart' as _i2;
 import 'chat_message_type.dart' as _i3;
 import 'chat_session.dart' as _i4;
-import 'rag_document.dart' as _i5;
-import 'recaptcha/recaptcha_exception.dart' as _i6;
+import 'data_fetcher_task.dart' as _i5;
+import 'data_fetcher_task_type.dart' as _i6;
+import 'rag_document.dart' as _i7;
+import 'recaptcha/recaptcha_exception.dart' as _i8;
 export 'chat_message.dart';
 export 'chat_message_type.dart';
 export 'chat_session.dart';
+export 'data_fetcher_task.dart';
+export 'data_fetcher_task_type.dart';
 export 'rag_document.dart';
 export 'recaptcha/recaptcha_exception.dart';
 export 'client.dart';
@@ -44,11 +48,17 @@ class Protocol extends _i1.SerializationManager {
     if (t == _i4.ChatSession) {
       return _i4.ChatSession.fromJson(data) as T;
     }
-    if (t == _i5.RAGDocument) {
-      return _i5.RAGDocument.fromJson(data) as T;
+    if (t == _i5.DataFetcherTask) {
+      return _i5.DataFetcherTask.fromJson(data) as T;
     }
-    if (t == _i6.RecaptchaException) {
-      return _i6.RecaptchaException.fromJson(data) as T;
+    if (t == _i6.DataFetcherTaskType) {
+      return _i6.DataFetcherTaskType.fromJson(data) as T;
+    }
+    if (t == _i7.RAGDocument) {
+      return _i7.RAGDocument.fromJson(data) as T;
+    }
+    if (t == _i8.RecaptchaException) {
+      return _i8.RecaptchaException.fromJson(data) as T;
     }
     if (t == _i1.getType<_i2.ChatMessage?>()) {
       return (data != null ? _i2.ChatMessage.fromJson(data) : null) as T;
@@ -59,11 +69,18 @@ class Protocol extends _i1.SerializationManager {
     if (t == _i1.getType<_i4.ChatSession?>()) {
       return (data != null ? _i4.ChatSession.fromJson(data) : null) as T;
     }
-    if (t == _i1.getType<_i5.RAGDocument?>()) {
-      return (data != null ? _i5.RAGDocument.fromJson(data) : null) as T;
+    if (t == _i1.getType<_i5.DataFetcherTask?>()) {
+      return (data != null ? _i5.DataFetcherTask.fromJson(data) : null) as T;
     }
-    if (t == _i1.getType<_i6.RecaptchaException?>()) {
-      return (data != null ? _i6.RecaptchaException.fromJson(data) : null) as T;
+    if (t == _i1.getType<_i6.DataFetcherTaskType?>()) {
+      return (data != null ? _i6.DataFetcherTaskType.fromJson(data) : null)
+          as T;
+    }
+    if (t == _i1.getType<_i7.RAGDocument?>()) {
+      return (data != null ? _i7.RAGDocument.fromJson(data) : null) as T;
+    }
+    if (t == _i1.getType<_i8.RecaptchaException?>()) {
+      return (data != null ? _i8.RecaptchaException.fromJson(data) : null) as T;
     }
     return super.deserialize<T>(data, t);
   }
@@ -81,10 +98,16 @@ class Protocol extends _i1.SerializationManager {
     if (data is _i4.ChatSession) {
       return 'ChatSession';
     }
-    if (data is _i5.RAGDocument) {
+    if (data is _i5.DataFetcherTask) {
+      return 'DataFetcherTask';
+    }
+    if (data is _i6.DataFetcherTaskType) {
+      return 'DataFetcherTaskType';
+    }
+    if (data is _i7.RAGDocument) {
       return 'RAGDocument';
     }
-    if (data is _i6.RecaptchaException) {
+    if (data is _i8.RecaptchaException) {
       return 'RecaptchaException';
     }
     return null;
@@ -105,11 +128,17 @@ class Protocol extends _i1.SerializationManager {
     if (dataClassName == 'ChatSession') {
       return deserialize<_i4.ChatSession>(data['data']);
     }
+    if (dataClassName == 'DataFetcherTask') {
+      return deserialize<_i5.DataFetcherTask>(data['data']);
+    }
+    if (dataClassName == 'DataFetcherTaskType') {
+      return deserialize<_i6.DataFetcherTaskType>(data['data']);
+    }
     if (dataClassName == 'RAGDocument') {
-      return deserialize<_i5.RAGDocument>(data['data']);
+      return deserialize<_i7.RAGDocument>(data['data']);
     }
     if (dataClassName == 'RecaptchaException') {
-      return deserialize<_i6.RecaptchaException>(data['data']);
+      return deserialize<_i8.RecaptchaException>(data['data']);
     }
     return super.deserializeByClassName(data);
   }
