@@ -27,7 +27,7 @@ class GenerativeAi {
           role: chatMessage.type.aiRole == 'user'
               ? MessageRole.user
               : MessageRole.model,
-          content: [TextPart(chatMessage.message)],
+          parts: [TextPart(chatMessage.message)],
         ),
       );
     }
@@ -47,7 +47,10 @@ class GenerativeAi {
   }
 
   Future<Vector> generateEmbedding(String document) async {
-    final embedding = await _agent.createEmbedding(document);
+    final embedding = await _agent.createEmbedding(
+      document,
+      dimensions: 1536,
+    );
     return Vector(embedding.toList());
   }
 
@@ -63,7 +66,7 @@ class GenerativeAi {
         GeminiProvider(
           apiKey: _geminiAPIKey,
           modelName: 'gemini-2.0-flash',
-          embeddingModelName: 'text-embedding-004',
+          embeddingModelName: 'gemini-embedding-exp-03-07',
         ),
         systemPrompt: systemPrompt,
       );

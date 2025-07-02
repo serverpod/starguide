@@ -176,7 +176,7 @@ class RAGDocumentTable extends _i1.Table<int?> {
     embedding = _i1.ColumnVector(
       'embedding',
       this,
-      dimension: 768,
+      dimension: 1536,
     );
     fetchTime = _i1.ColumnDateTime(
       'fetchTime',

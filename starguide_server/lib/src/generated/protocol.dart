@@ -151,8 +151,8 @@ class Protocol extends _i1.SerializationManagerServer {
           name: 'embedding',
           columnType: _i2.ColumnType.vector,
           isNullable: false,
-          dartType: 'Vector(768)',
-          vectorDimension: 768,
+          dartType: 'Vector(1536)',
+          vectorDimension: 1536,
         ),
         _i2.ColumnDefinition(
           name: 'fetchTime',
