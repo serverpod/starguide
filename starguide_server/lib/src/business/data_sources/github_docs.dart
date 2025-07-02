@@ -27,7 +27,7 @@ class GithubDocsDataSource implements DataSource {
   String get name => 'GithubDocs';
 
   @override
-  Stream<RawRAGDocuement> fetch(
+  Stream<RawRAGDocument> fetch(
     Session session,
     DataFetcher fetcher, {
     String? path,
@@ -81,9 +81,15 @@ class GithubDocsDataSource implements DataSource {
           (fileName.endsWith('.md') || fileName.endsWith('.mdx'))) {
         if (await fetcher.shouldFetchUrl(session, url)) {
           final fileUrl = Uri.parse(file['download_url']);
-          final fileResponse = await http.get(fileUrl);
+          final fileResponse = await http.get(
+            fileUrl,
+            headers: {
+              'Authorization': 'Bearer $githubToken',
+              'Accept': 'application/vnd.github.v3+json',
+            },
+          );
           if (fileResponse.statusCode == 200) {
-            yield RawRAGDocuement(
+            yield RawRAGDocument(
               sourceUrl: url,
               document: fileResponse.body,
               type: DataSourceType.markdown,
@@ -94,63 +100,6 @@ class GithubDocsDataSource implements DataSource {
     }
   }
 }
-
-// Future<void> fetchGithubDocs({
-//   required String owner,
-//   required String repo,
-//   required String basePath,
-//   required Uri referenceUrl,
-//   required String branch,
-// }) async {
-//   final apiUrl = Uri.parse(
-//     'https://api.github.com/repos/$owner/$repo/contents/$basePath?ref=$branch',
-//   );
-
-//   final response = await http.get(
-//     apiUrl,
-//     headers: {
-//       'Authorization': 'Bearer $githubToken',
-//       'Accept': 'application/vnd.github.v3+json',
-//     },
-//   );
-
-//   if (response.statusCode != 200) {
-//     throw Exception(
-//       'Failed to list contents. ${response.statusCode}\n${response.body}',
-//     );
-//   }
-
-//   final List files = json.decode(response.body);
-
-//   for (var file in files) {
-//     final fileName = file['name'];
-//     final cleanedFileName = _cleanFileName(fileName);
-//     final url = referenceUrl.replace(
-//       pathSegments: [
-//         ...referenceUrl.pathSegments,
-//         cleanedFileName,
-//       ],
-//     );
-
-//     if (file['type'] == 'dir') {
-//       fetchGithubDocs(
-//         owner: owner,
-//         repo: repo,
-//         basePath: '$basePath/$fileName',
-//         referenceUrl: url,
-//         branch: branch,
-//       );
-//     } else if (file['type'] == 'file' &&
-//         (fileName.endsWith('.md') || fileName.endsWith('.mdx'))) {
-//       // final fileUrl = Uri.parse(file['download_url']);
-//       print('DOWNLOADING: $cleanedFileName $url');
-//       // final fileResponse = await http.get(fileUrl);
-//       // if (fileResponse.statusCode == 200) {
-//       //   print('FILE:\n${fileResponse.body}');
-//       // }
-//     }
-//   }
-// }
 
 String _cleanFileName(String fileName) {
   final prefixRegex = RegExp(r'^\d+-');

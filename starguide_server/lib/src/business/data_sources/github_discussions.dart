@@ -4,6 +4,7 @@ import 'package:http/http.dart' as http;
 import 'package:serverpod/serverpod.dart';
 import 'package:starguide_server/src/business/data_fetcher.dart';
 import 'package:starguide_server/src/business/data_source.dart';
+import 'package:starguide_server/src/business/data_source_exception.dart';
 
 class GithubDiscussionsDataSource implements DataSource {
   final String owner;
@@ -20,13 +21,61 @@ class GithubDiscussionsDataSource implements DataSource {
   String get name => 'GithubDiscussions';
 
   @override
-  Stream<RawRAGDocuement> fetch(
+  Stream<RawRAGDocument> fetch(
     Session session,
     DataFetcher fetcher, {
     String? path,
     Uri? referenceUrl,
   }) async* {
-    final githubToken = Serverpod.instance.getPassword('githubToken')!;
+    final githubToken = Serverpod.instance.getPassword('githubToken');
+    if (githubToken == null) {
+      throw DataSourceException(
+        'GitHub token not configured',
+      );
+    }
+
+    // Check GitHub API quota
+    final quotaResponse = await http.post(
+      Uri.parse('https://api.github.com/graphql'),
+      headers: {
+        'Authorization': 'Bearer $githubToken',
+        'Content-Type': 'application/json',
+      },
+      body: jsonEncode({
+        'query': '''
+          query {
+            rateLimit {
+              limit
+              remaining
+              resetAt
+            }
+          }
+        ''',
+      }),
+    );
+
+    if (quotaResponse.statusCode != 200) {
+      throw DataSourceException(
+        'Failed to check GitHub API quota',
+        statusCode: quotaResponse.statusCode,
+      );
+    }
+
+    final quotaData = jsonDecode(quotaResponse.body);
+
+    if (quotaData['errors'] != null) {
+      throw DataSourceException(
+        'Failed to check GitHub API quota: ${quotaData['errors']}',
+      );
+    }
+
+    final remaining = quotaData['data']['rateLimit']['remaining'];
+    final limit = quotaData['data']['rateLimit']['limit'];
+    final resetAt = quotaData['data']['rateLimit']['resetAt'];
+
+    print(
+      'GitHub API quota - Remaining: $remaining/$limit, Resets at: $resetAt',
+    );
 
     final categoryId = await _fetchGithubDiscussionCategoryId(
       owner: owner,
@@ -35,8 +84,9 @@ class GithubDiscussionsDataSource implements DataSource {
     );
 
     if (categoryId == null) {
-      print('Category "$categoryName" not found for repository $owner/$repo');
-      return;
+      throw DataSourceException(
+        'Discussion category "$categoryName" not found for repository $owner/$repo',
+      );
     }
 
     String? cursor;
@@ -47,7 +97,7 @@ class GithubDiscussionsDataSource implements DataSource {
       final query = '''
       query(\$cursor: String) {
         repository(owner: "$owner", name: "$repo") {
-          discussions(first: 100, categoryId: "$categoryId", after: \$cursor) {
+          discussions(first: 50, categoryId: "$categoryId", after: \$cursor) {
             pageInfo {
               hasNextPage
               endCursor
@@ -82,15 +132,18 @@ class GithubDiscussionsDataSource implements DataSource {
       );
 
       if (response.statusCode != 200) {
-        print('GitHub API error: ${response.statusCode} - ${response.body}');
-        break;
+        throw DataSourceException(
+          'GitHub API request failed: ${response.body}',
+          statusCode: response.statusCode,
+        );
       }
 
       final data = jsonDecode(response.body);
 
       if (data['errors'] != null) {
-        print('GraphQL errors: ${data['errors']}');
-        break;
+        throw DataSourceException(
+          'GraphQL query failed: ${data['errors']}',
+        );
       }
 
       final discussionsData = data['data']['repository']['discussions'];
@@ -105,7 +158,19 @@ class GithubDiscussionsDataSource implements DataSource {
 
       for (var discussion in discussions) {
         if (discussion['answerChosenAt'] != null) {
-          print('${discussion['title']}: ${discussion['url']}');
+          final title = discussion['title'] ?? 'No title';
+          final url = Uri.parse(discussion['url']!);
+          final question = discussion['body'] ?? 'No question content';
+          final answer = discussion['answer']?['body'] ?? 'No answer content';
+
+          if (await fetcher.shouldFetchUrl(session, url)) {
+            yield RawRAGDocument(
+              sourceUrl: url,
+              document:
+                  'TITLE: $title\n\nQUESTION:\n$question\n\nANSWER:\n$answer',
+              type: DataSourceType.markdown,
+            );
+          }
         }
       }
 
@@ -123,7 +188,12 @@ class GithubDiscussionsDataSource implements DataSource {
     required String repo,
     required String name,
   }) async {
-    final githubToken = Serverpod.instance.getPassword('githubToken')!;
+    final githubToken = Serverpod.instance.getPassword('githubToken');
+    if (githubToken == null) {
+      throw DataSourceException(
+        'GitHub token not configured',
+      );
+    }
 
     final query = '''
     query {
@@ -147,7 +217,21 @@ class GithubDiscussionsDataSource implements DataSource {
       body: jsonEncode({'query': query}),
     );
 
+    if (response.statusCode != 200) {
+      throw DataSourceException(
+        'Failed to fetch discussion categories: ${response.body}',
+        statusCode: response.statusCode,
+      );
+    }
+
     final data = jsonDecode(response.body);
+
+    if (data['errors'] != null) {
+      throw DataSourceException(
+        'Failed to fetch discussion categories: ${data['errors']}',
+      );
+    }
+
     final categories =
         data['data']['repository']['discussionCategories']['nodes'];
 

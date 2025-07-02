@@ -31,5 +31,5 @@ void run(List<String> args) async {
   await pod.start();
 
   // Start fetching data.
-  DataFetcher.instance.startFetching(pod);
+  await DataFetcher.instance.startFetching(pod);
 }

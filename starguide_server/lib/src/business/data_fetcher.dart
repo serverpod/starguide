@@ -5,6 +5,7 @@ import 'package:starguide_server/src/generative_ai/generative_ai.dart';
 import 'package:starguide_server/src/generative_ai/prompts.dart';
 
 const _futureCallName = 'DataFetcher';
+const _futureCallIdentifier = 'DataFetcher';
 
 const _fetchFrequency = Duration(days: 1);
 const _fetchRetryDelay = Duration(minutes: 1);
@@ -36,13 +37,19 @@ class DataFetcher {
     pod.registerFutureCall(_FetchDataFutureCall(), _futureCallName);
   }
 
-  void startFetching(Serverpod pod) {
+  Future<void> startFetching(Serverpod pod) async {
+    // Cancel any existing future calls, to avoid duplicates.
+    print('Cancelling future calls.');
+    await pod.cancelFutureCall(_futureCallIdentifier);
+
+    // Kick off the data fetcher.
     pod.futureCallWithDelay(
       _futureCallName,
       DataFetcherTask(
         type: DataFetcherTaskType.startFetching,
       ),
       const Duration(),
+      identifier: _futureCallIdentifier,
     );
   }
 
@@ -60,7 +67,7 @@ class DataFetcher {
 
   Future<RAGDocument> _createRagDocument(
     Session session,
-    RawRAGDocuement rawDocument,
+    RawRAGDocument rawDocument,
   ) async {
     final genAi = GenerativeAi();
 
@@ -137,6 +144,7 @@ class _FetchDataFutureCall extends FutureCall<DataFetcherTask> {
             name: dataSource.name,
           ),
           const Duration(),
+          identifier: _futureCallIdentifier,
         );
       }
 
@@ -147,6 +155,7 @@ class _FetchDataFutureCall extends FutureCall<DataFetcherTask> {
           type: DataFetcherTaskType.cleanUp,
         ),
         const Duration(),
+        identifier: _futureCallIdentifier,
       );
     } else if (task.type == DataFetcherTaskType.dataSource) {
       // Fetch data from a specific data source.
@@ -160,8 +169,12 @@ class _FetchDataFutureCall extends FutureCall<DataFetcherTask> {
       try {
         await dataFetcher._fetchDataSource(session, dataSource);
         success = true;
-      } catch (e) {
-        session.log('Error fetching data from $dataSource: $e');
+      } catch (e, stackTrace) {
+        session.log(
+          'Error fetching data from $dataSource: $e',
+          exception: e,
+          stackTrace: stackTrace,
+        );
         success = false;
       }
 
@@ -174,6 +187,7 @@ class _FetchDataFutureCall extends FutureCall<DataFetcherTask> {
             name: dataSource.name,
           ),
           _fetchFrequency,
+          identifier: _futureCallIdentifier,
         );
       } else {
         // We failed to fetch data, so we'll try again in a minute.
@@ -184,6 +198,7 @@ class _FetchDataFutureCall extends FutureCall<DataFetcherTask> {
             name: dataSource.name,
           ),
           _fetchRetryDelay,
+          identifier: _futureCallIdentifier,
         );
       }
     } else if (task.type == DataFetcherTaskType.cleanUp) {
