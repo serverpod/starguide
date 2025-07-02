@@ -60,8 +60,8 @@ class DataFetcher {
       final ragDocument = await _createRagDocument(session, rawDocument);
       await _saveRagDocument(session, ragDocument);
 
-      // Pause as to not exhuast Gemini's free tier.
-      await Future.delayed(const Duration(seconds: 10));
+      // Pause as to not exhuast Gemini's quota
+      await Future.delayed(const Duration(milliseconds: 100));
     }
   }
 
