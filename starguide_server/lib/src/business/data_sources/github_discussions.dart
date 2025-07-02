@@ -34,42 +34,88 @@ class GithubDiscussionsDataSource implements DataSource {
       name: categoryName,
     );
 
-    final query = '''
-    query {
-      repository(owner: "$owner", name: "$repo") {
-        discussions(first: 50, categoryId: "$categoryId") {
-          nodes {
-            title
-            url
-            answerChosenAt
-            body
-            answer {
+    if (categoryId == null) {
+      print('Category "$categoryName" not found for repository $owner/$repo');
+      return;
+    }
+
+    String? cursor;
+    bool hasNextPage = true;
+    int totalFetched = 0;
+
+    while (hasNextPage) {
+      final query = '''
+      query(\$cursor: String) {
+        repository(owner: "$owner", name: "$repo") {
+          discussions(first: 100, categoryId: "$categoryId", after: \$cursor) {
+            pageInfo {
+              hasNextPage
+              endCursor
+            }
+            nodes {
+              title
+              url
+              answerChosenAt
               body
-              createdAt
+              answer {
+                body
+                createdAt
+              }
             }
           }
         }
       }
-    }
-  ''';
+    ''';
 
-    final response = await http.post(
-      Uri.parse('https://api.github.com/graphql'),
-      headers: {
-        'Authorization': 'Bearer $githubToken',
-        'Content-Type': 'application/json',
-      },
-      body: jsonEncode({'query': query}),
-    );
+      final variables = cursor != null ? {'cursor': cursor} : {};
 
-    final data = jsonDecode(response.body);
-    final discussions = data['data']['repository']['discussions']['nodes'];
+      final response = await http.post(
+        Uri.parse('https://api.github.com/graphql'),
+        headers: {
+          'Authorization': 'Bearer $githubToken',
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode({
+          'query': query,
+          'variables': variables,
+        }),
+      );
 
-    for (var discussion in discussions) {
-      if (discussion['answerChosenAt'] != null) {
-        print('${discussion['title']}: ${discussion['url']}');
+      if (response.statusCode != 200) {
+        print('GitHub API error: ${response.statusCode} - ${response.body}');
+        break;
+      }
+
+      final data = jsonDecode(response.body);
+
+      if (data['errors'] != null) {
+        print('GraphQL errors: ${data['errors']}');
+        break;
+      }
+
+      final discussionsData = data['data']['repository']['discussions'];
+      final discussions = discussionsData['nodes'];
+      final pageInfo = discussionsData['pageInfo'];
+
+      hasNextPage = pageInfo['hasNextPage'] ?? false;
+      cursor = pageInfo['endCursor'];
+
+      totalFetched += discussions.length as int;
+      print('Fetched ${discussions.length} discussions (total: $totalFetched)');
+
+      for (var discussion in discussions) {
+        if (discussion['answerChosenAt'] != null) {
+          print('${discussion['title']}: ${discussion['url']}');
+        }
+      }
+
+      // Add a small delay to avoid rate limiting
+      if (hasNextPage) {
+        await Future.delayed(Duration(seconds: 1));
       }
     }
+
+    print('Finished fetching discussions. Total fetched: $totalFetched');
   }
 
   Future<String?> _fetchGithubDiscussionCategoryId({
