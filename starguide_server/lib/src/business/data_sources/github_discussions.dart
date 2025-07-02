@@ -73,7 +73,7 @@ class GithubDiscussionsDataSource implements DataSource {
     final limit = quotaData['data']['rateLimit']['limit'];
     final resetAt = quotaData['data']['rateLimit']['resetAt'];
 
-    print(
+    session.log(
       'GitHub API quota - Remaining: $remaining/$limit, Resets at: $resetAt',
     );
 
@@ -154,7 +154,9 @@ class GithubDiscussionsDataSource implements DataSource {
       cursor = pageInfo['endCursor'];
 
       totalFetched += discussions.length as int;
-      print('Fetched ${discussions.length} discussions (total: $totalFetched)');
+      session.log(
+        'Fetched ${discussions.length} discussions (total: $totalFetched)',
+      );
 
       for (var discussion in discussions) {
         if (discussion['answerChosenAt'] != null) {
@@ -180,7 +182,7 @@ class GithubDiscussionsDataSource implements DataSource {
       }
     }
 
-    print('Finished fetching discussions. Total fetched: $totalFetched');
+    session.log('Finished fetching discussions. Total fetched: $totalFetched');
   }
 
   Future<String?> _fetchGithubDiscussionCategoryId({

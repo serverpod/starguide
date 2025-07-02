@@ -42,7 +42,6 @@ class DataFetcher {
 
   Future<void> startFetching(Serverpod pod) async {
     // Cancel any existing future calls, to avoid duplicates.
-    print('Cancelling future calls.');
     await pod.cancelFutureCall(_futureCallIdentifier);
 
     // Kick off the data fetcher.
@@ -97,7 +96,7 @@ class DataFetcher {
     Session session,
     RAGDocument ragDocument,
   ) async {
-    print('Saving rag document: ${ragDocument.sourceUrl}');
+    session.log('Saving rag document: ${ragDocument.sourceUrl}');
 
     final existingDocument = await RAGDocument.db.findFirstRow(
       session,
