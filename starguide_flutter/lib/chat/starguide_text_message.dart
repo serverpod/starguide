@@ -3,6 +3,7 @@ import 'package:flutter_chat_core/flutter_chat_core.dart';
 import 'package:gpt_markdown/gpt_markdown.dart';
 import 'package:provider/provider.dart';
 import 'package:starguide_flutter/chat/starguide_code_field.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 /// A widget that displays a regular text message.
 ///
@@ -434,7 +435,7 @@ class LinkPreview extends StatelessWidget {
       width: 220,
       child: OutlinedButton(
         onPressed: () {
-          print('Pressed');
+          launchUrl(link.url);
         },
         child: Padding(
           padding: const EdgeInsets.all(8.0),

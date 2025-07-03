@@ -12,6 +12,7 @@ import 'package:starguide_flutter/config/chat_theme.dart';
 import 'package:starguide_flutter/config/constants.dart';
 import 'package:starguide_flutter/config/theme.dart';
 import 'package:syntax_highlight/syntax_highlight.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 var client = Client('http://$localhost:8080/')
   ..connectivityMonitor = FlutterConnectivityMonitor();
@@ -89,6 +90,7 @@ class StarguideChatPageState extends State<StarguideChatPage> {
   bool _hasInputText = false;
   bool _isGeneratingResponse = false;
   int _numChatRequests = 0;
+  bool? _vote;
 
   final _inputTextController = TextEditingController();
   final _inputFocusNode = FocusNode();
@@ -174,14 +176,21 @@ class StarguideChatPageState extends State<StarguideChatPage> {
       _chatSession = null;
       _currentResponse = null;
       _numChatRequests = 0;
+      _vote = null;
     });
   }
 
   void _handleUpvote() {
+    setState(() {
+      _vote = true;
+    });
     client.starguide.vote(_chatSession!, true);
   }
 
   void _handleDownvote() {
+    setState(() {
+      _vote = false;
+    });
     client.starguide.vote(_chatSession!, false);
   }
 
@@ -224,7 +233,13 @@ class StarguideChatPageState extends State<StarguideChatPage> {
                   isSentByMe = true,
                   groupStatus,
                 }) {
-                  return StarguideTextMessage(message: message, index: index);
+                  return StarguideTextMessage(
+                    message: message,
+                    index: index,
+                    onLinkTap: (url, title) {
+                      launchUrl(Uri.parse(url));
+                    },
+                  );
                 },
                 emptyChatListBuilder: (context) => StarguideEmptyChat(),
               ),
@@ -275,13 +290,19 @@ class StarguideChatPageState extends State<StarguideChatPage> {
                       TextButton.icon(
                         onPressed: _chatSession != null ? _handleUpvote : null,
                         label: Text('Got Help'),
-                        icon: Icon(Icons.thumb_up_outlined),
+                        icon: Icon(
+                          Icons.thumb_up_outlined,
+                          color: _vote == true ? Colors.blue.shade600 : null,
+                        ),
                       ),
                       TextButton.icon(
                         onPressed:
                             _chatSession != null ? _handleDownvote : null,
                         label: Text('Poor Answer'),
-                        icon: Icon(Icons.thumb_down_outlined),
+                        icon: Icon(
+                          Icons.thumb_down_outlined,
+                          color: _vote == false ? Colors.blue.shade600 : null,
+                        ),
                       ),
                     ],
                   ),
