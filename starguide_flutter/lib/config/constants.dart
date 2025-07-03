@@ -1,2 +1,2 @@
-const kMaxChatRequests = 5;
+const kMaxChatRequests = 10;
 const kMaxChatRequestLength = 1000;
