@@ -6,6 +6,7 @@ import 'package:starguide_client/starguide_client.dart';
 import 'package:flutter/material.dart';
 import 'package:serverpod_flutter/serverpod_flutter.dart';
 import 'package:starguide_flutter/chat/starguide_chat_input.dart';
+import 'package:starguide_flutter/chat/starguide_disconnected.dart';
 import 'package:starguide_flutter/chat/starguide_empty_chat.dart';
 import 'package:starguide_flutter/chat/starguide_text_message.dart';
 import 'package:starguide_flutter/config/chat_theme.dart';
@@ -97,6 +98,8 @@ class StarguideChatPageState extends State<StarguideChatPage> {
 
   bool _isInputFocused = false;
 
+  bool _connectionError = false;
+
   @override
   void initState() {
     super.initState();
@@ -128,33 +131,40 @@ class StarguideChatPageState extends State<StarguideChatPage> {
     });
 
     // Set up a new chat session, if we haven't started one already.
-    _chatSession ??= await client.starguide.createChatSession(
-      kIsWeb ? (await GRecaptchaV3.execute('create_chat_session'))! : '',
-    );
+    try {
+      _chatSession ??= await client.starguide.createChatSession(
+        kIsWeb ? (await GRecaptchaV3.execute('create_chat_session'))! : '',
+      );
 
-    final responseStream = client.starguide.ask(_chatSession!, text);
+      final responseStream = client.starguide.ask(_chatSession!, text);
 
-    var accumulatedText = '';
+      var accumulatedText = '';
 
-    _currentResponse = TextMessage(
-      id: _uuid.v4(),
-      authorId: _model.id,
-      createdAt: DateTime.now().toUtc(),
-      text: '',
-    );
-    await _chatController.insertMessage(_currentResponse!);
+      _currentResponse = TextMessage(
+        id: _uuid.v4(),
+        authorId: _model.id,
+        createdAt: DateTime.now().toUtc(),
+        text: '',
+      );
+      await _chatController.insertMessage(_currentResponse!);
 
-    await for (final chunk in responseStream) {
-      accumulatedText += chunk;
-      final newMessage = _currentResponse!.copyWith(text: accumulatedText);
-      await _chatController.updateMessage(_currentResponse!, newMessage);
-      _currentResponse = newMessage;
+      await for (final chunk in responseStream) {
+        accumulatedText += chunk;
+        final newMessage = _currentResponse!.copyWith(text: accumulatedText);
+        await _chatController.updateMessage(_currentResponse!, newMessage);
+        _currentResponse = newMessage;
+      }
+
+      _currentResponse = null;
+      setState(() {
+        _isGeneratingResponse = false;
+      });
+    } catch (e) {
+      setState(() {
+        _connectionError = true;
+      });
+      return;
     }
-
-    _currentResponse = null;
-    setState(() {
-      _isGeneratingResponse = false;
-    });
   }
 
   void _handleMessageSend(String text) async {
@@ -177,26 +187,45 @@ class StarguideChatPageState extends State<StarguideChatPage> {
       _currentResponse = null;
       _numChatRequests = 0;
       _vote = null;
+      _isGeneratingResponse = false;
     });
   }
 
   void _handleUpvote() {
-    setState(() {
-      _vote = true;
-    });
-    client.starguide.vote(_chatSession!, true);
+    _handleVote(true);
   }
 
   void _handleDownvote() {
-    setState(() {
-      _vote = false;
-    });
-    client.starguide.vote(_chatSession!, false);
+    _handleVote(false);
+  }
+
+  void _handleVote(bool vote) async {
+    try {
+      setState(() {
+        _vote = vote;
+      });
+      await client.starguide.vote(_chatSession!, vote);
+    } catch (e) {
+      setState(() {
+        _connectionError = true;
+      });
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+
+    if (_connectionError) {
+      return StarguideDisconnected(
+        onReconnect: () {
+          _handleClearChat();
+          setState(() {
+            _connectionError = false;
+          });
+        },
+      );
+    }
 
     return Scaffold(
       body: Column(
