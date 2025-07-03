@@ -2,6 +2,9 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_chat_core/flutter_chat_core.dart';
 import 'package:flutter_chat_ui/flutter_chat_ui.dart';
 import 'package:g_recaptcha_v3/g_recaptcha_v3.dart';
+import 'package:markdown_widget/markdown_widget.dart';
+import 'package:markdown_widget/widget/markdown.dart';
+import 'package:markdown_widget/widget/markdown_block.dart';
 import 'package:starguide_client/starguide_client.dart';
 import 'package:flutter/material.dart';
 import 'package:serverpod_flutter/serverpod_flutter.dart';
@@ -383,12 +386,36 @@ class StarguideChatPageState extends State<StarguideChatPage> {
                   ),
                 ),
                 Spacer(),
-                TextButton(
-                  onPressed: () {
-                    launchUrl(Uri.parse('https://www.google.com/recaptcha'));
-                  },
+                Text(
+                  'Protected by ',
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: theme.disabledColor,
+                  ),
+                ),
+                PopupMenuButton<String>(
+                  tooltip: '',
+                  color: Colors.white,
+                  offset: const Offset(0, -8),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  itemBuilder: (context) => [
+                    PopupMenuItem<String>(
+                      enabled: false,
+                      child: Container(
+                        constraints: const BoxConstraints(maxWidth: 500),
+                        child: MarkdownBlock(
+                          config: MarkdownConfig(configs: [
+                            PConfig(textStyle: theme.textTheme.bodySmall!),
+                          ]),
+                          data:
+                              'This site is protected by reCAPTCHA and the Google [Privacy Policy](https://policies.google.com/privacy) and [Terms of Service](https://policies.google.com/terms) apply.',
+                        ),
+                      ),
+                    ),
+                  ],
                   child: Text(
-                    'Protected by reCAPTCHA',
+                    'reCAPTCHA',
                     style: theme.textTheme.bodySmall?.copyWith(
                       color: theme.disabledColor,
                     ),
