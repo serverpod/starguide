@@ -7,7 +7,7 @@ class Prompts {
   final Map<String, String> _prompts = {};
 
   Prompts._() {
-    final promptsFolder = Directory('prompts');
+    final promptsFolder = Directory('assets/prompts');
     for (var file in promptsFolder.listSync(recursive: true)) {
       if (file.path.endsWith('.txt') && file is File) {
         _prompts[file.path.split('/').last.replaceAll('.txt', '')] =
