@@ -283,7 +283,7 @@ class StarguideChatPageState extends State<StarguideChatPage> {
             margin: const EdgeInsets.only(
               left: 16,
               right: 16,
-              bottom: 16,
+              bottom: 8,
             ),
             decoration: BoxDecoration(
               color: theme.colorScheme.surface,
@@ -359,7 +359,7 @@ class StarguideChatPageState extends State<StarguideChatPage> {
             padding: const EdgeInsets.only(
               left: 18.0,
               right: 18.0,
-              bottom: 16.0,
+              bottom: 8.0,
             ),
             child: Row(
               children: [
@@ -369,11 +369,29 @@ class StarguideChatPageState extends State<StarguideChatPage> {
                     color: theme.disabledColor,
                   ),
                 ),
+                const SizedBox(width: 8),
+                TextButton(
+                  onPressed: () {
+                    launchUrl(
+                        Uri.parse('https://github.com/serverpod/starguide'));
+                  },
+                  child: Text(
+                    'View Source',
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: Colors.blue.shade600,
+                    ),
+                  ),
+                ),
                 Spacer(),
-                Text(
-                  'Protected by reCAPTCHA',
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    color: theme.disabledColor,
+                TextButton(
+                  onPressed: () {
+                    launchUrl(Uri.parse('https://www.google.com/recaptcha'));
+                  },
+                  child: Text(
+                    'Protected by reCAPTCHA',
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: theme.disabledColor,
+                    ),
                   ),
                 ),
               ],
