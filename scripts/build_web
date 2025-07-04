@@ -1,0 +1,17 @@
+#!/bin/sh
+
+# Makes sure we break the script on any error.
+set -e
+
+# Build the web app.
+cd starguide_flutter
+flutter build web --release
+cd ..
+
+# Copy the build files into the web/app diretory.
+rm -rf starguide_server/web/app
+cp -r starguide_flutter/build/web starguide_server/web/app
+
+# Move the index.html file into the templates directory.
+mkdir -p starguide_server/web/templates
+mv starguide_server/web/app/index.html starguide_server/web/templates/index.html
