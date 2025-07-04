@@ -415,7 +415,7 @@ class StarguideChatPageState extends State<StarguideChatPage> {
                   child: Text(
                     'reCAPTCHA',
                     style: theme.textTheme.bodySmall?.copyWith(
-                      color: theme.disabledColor,
+                      color: Colors.blue.shade600,
                     ),
                   ),
                 ),
