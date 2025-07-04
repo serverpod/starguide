@@ -3,8 +3,6 @@ import 'package:flutter_chat_core/flutter_chat_core.dart';
 import 'package:flutter_chat_ui/flutter_chat_ui.dart';
 import 'package:g_recaptcha_v3/g_recaptcha_v3.dart';
 import 'package:markdown_widget/markdown_widget.dart';
-import 'package:markdown_widget/widget/markdown.dart';
-import 'package:markdown_widget/widget/markdown_block.dart';
 import 'package:starguide_client/starguide_client.dart';
 import 'package:flutter/material.dart';
 import 'package:serverpod_flutter/serverpod_flutter.dart';
