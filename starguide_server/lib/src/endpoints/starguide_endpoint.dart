@@ -3,7 +3,7 @@ import 'package:starguide_server/src/generative_ai/generative_ai.dart';
 import 'package:starguide_server/src/util/random_string.dart';
 import 'package:starguide_server/src/generated/protocol.dart';
 import 'package:starguide_server/src/generative_ai/prompts.dart';
-// import 'package:starguide_server/src/recaptcha/recaptcha.dart';
+import 'package:starguide_server/src/recaptcha/recaptcha.dart';
 
 class StarguideEndpoint extends Endpoint {
   static const _maxConversationLength = 25;
@@ -13,15 +13,15 @@ class StarguideEndpoint extends Endpoint {
     String reCaptchaToken,
   ) async {
     // Verify the reCAPTCHA token.
-    // final score = await verifyRecaptchaToken(
-    //   session,
-    //   token: reCaptchaToken,
-    //   expectedAction: 'create_chat_session',
-    // );
+    final score = await verifyRecaptchaToken(
+      session,
+      token: reCaptchaToken,
+      expectedAction: 'create_chat_session',
+    );
 
-    // if (score < 0.5) {
-    //   throw RecaptchaException();
-    // }
+    if (score < 0.5) {
+      throw RecaptchaException();
+    }
 
     // Create a new chat session.
     return await ChatSession.db.insertRow(
