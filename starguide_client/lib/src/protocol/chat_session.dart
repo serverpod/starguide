@@ -17,13 +17,15 @@ abstract class ChatSession implements _i1.SerializableModel {
     this.userId,
     required this.keyToken,
     this.goodAnswer,
-  });
+    DateTime? createdAt,
+  }) : createdAt = createdAt ?? DateTime.now();
 
   factory ChatSession({
     int? id,
     int? userId,
     required String keyToken,
     bool? goodAnswer,
+    DateTime? createdAt,
   }) = _ChatSessionImpl;
 
   factory ChatSession.fromJson(Map<String, dynamic> jsonSerialization) {
@@ -32,6 +34,8 @@ abstract class ChatSession implements _i1.SerializableModel {
       userId: jsonSerialization['userId'] as int?,
       keyToken: jsonSerialization['keyToken'] as String,
       goodAnswer: jsonSerialization['goodAnswer'] as bool?,
+      createdAt:
+          _i1.DateTimeJsonExtension.fromJson(jsonSerialization['createdAt']),
     );
   }
 
@@ -46,6 +50,8 @@ abstract class ChatSession implements _i1.SerializableModel {
 
   bool? goodAnswer;
 
+  DateTime createdAt;
+
   /// Returns a shallow copy of this [ChatSession]
   /// with some or all fields replaced by the given arguments.
   @_i1.useResult
@@ -54,6 +60,7 @@ abstract class ChatSession implements _i1.SerializableModel {
     int? userId,
     String? keyToken,
     bool? goodAnswer,
+    DateTime? createdAt,
   });
   @override
   Map<String, dynamic> toJson() {
@@ -62,6 +69,7 @@ abstract class ChatSession implements _i1.SerializableModel {
       if (userId != null) 'userId': userId,
       'keyToken': keyToken,
       if (goodAnswer != null) 'goodAnswer': goodAnswer,
+      'createdAt': createdAt.toJson(),
     };
   }
 
@@ -79,11 +87,13 @@ class _ChatSessionImpl extends ChatSession {
     int? userId,
     required String keyToken,
     bool? goodAnswer,
+    DateTime? createdAt,
   }) : super._(
           id: id,
           userId: userId,
           keyToken: keyToken,
           goodAnswer: goodAnswer,
+          createdAt: createdAt,
         );
 
   /// Returns a shallow copy of this [ChatSession]
@@ -95,12 +105,14 @@ class _ChatSessionImpl extends ChatSession {
     Object? userId = _Undefined,
     String? keyToken,
     Object? goodAnswer = _Undefined,
+    DateTime? createdAt,
   }) {
     return ChatSession(
       id: id is int? ? id : this.id,
       userId: userId is int? ? userId : this.userId,
       keyToken: keyToken ?? this.keyToken,
       goodAnswer: goodAnswer is bool? ? goodAnswer : this.goodAnswer,
+      createdAt: createdAt ?? this.createdAt,
     );
   }
 }

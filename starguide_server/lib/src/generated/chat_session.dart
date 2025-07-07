@@ -18,13 +18,15 @@ abstract class ChatSession
     this.userId,
     required this.keyToken,
     this.goodAnswer,
-  });
+    DateTime? createdAt,
+  }) : createdAt = createdAt ?? DateTime.now();
 
   factory ChatSession({
     int? id,
     int? userId,
     required String keyToken,
     bool? goodAnswer,
+    DateTime? createdAt,
   }) = _ChatSessionImpl;
 
   factory ChatSession.fromJson(Map<String, dynamic> jsonSerialization) {
@@ -33,6 +35,8 @@ abstract class ChatSession
       userId: jsonSerialization['userId'] as int?,
       keyToken: jsonSerialization['keyToken'] as String,
       goodAnswer: jsonSerialization['goodAnswer'] as bool?,
+      createdAt:
+          _i1.DateTimeJsonExtension.fromJson(jsonSerialization['createdAt']),
     );
   }
 
@@ -49,6 +53,8 @@ abstract class ChatSession
 
   bool? goodAnswer;
 
+  DateTime createdAt;
+
   @override
   _i1.Table<int?> get table => t;
 
@@ -60,6 +66,7 @@ abstract class ChatSession
     int? userId,
     String? keyToken,
     bool? goodAnswer,
+    DateTime? createdAt,
   });
   @override
   Map<String, dynamic> toJson() {
@@ -68,6 +75,7 @@ abstract class ChatSession
       if (userId != null) 'userId': userId,
       'keyToken': keyToken,
       if (goodAnswer != null) 'goodAnswer': goodAnswer,
+      'createdAt': createdAt.toJson(),
     };
   }
 
@@ -78,6 +86,7 @@ abstract class ChatSession
       if (userId != null) 'userId': userId,
       'keyToken': keyToken,
       if (goodAnswer != null) 'goodAnswer': goodAnswer,
+      'createdAt': createdAt.toJson(),
     };
   }
 
@@ -119,11 +128,13 @@ class _ChatSessionImpl extends ChatSession {
     int? userId,
     required String keyToken,
     bool? goodAnswer,
+    DateTime? createdAt,
   }) : super._(
           id: id,
           userId: userId,
           keyToken: keyToken,
           goodAnswer: goodAnswer,
+          createdAt: createdAt,
         );
 
   /// Returns a shallow copy of this [ChatSession]
@@ -135,12 +146,14 @@ class _ChatSessionImpl extends ChatSession {
     Object? userId = _Undefined,
     String? keyToken,
     Object? goodAnswer = _Undefined,
+    DateTime? createdAt,
   }) {
     return ChatSession(
       id: id is int? ? id : this.id,
       userId: userId is int? ? userId : this.userId,
       keyToken: keyToken ?? this.keyToken,
       goodAnswer: goodAnswer is bool? ? goodAnswer : this.goodAnswer,
+      createdAt: createdAt ?? this.createdAt,
     );
   }
 }
@@ -159,6 +172,11 @@ class ChatSessionTable extends _i1.Table<int?> {
       'goodAnswer',
       this,
     );
+    createdAt = _i1.ColumnDateTime(
+      'createdAt',
+      this,
+      hasDefault: true,
+    );
   }
 
   late final _i1.ColumnInt userId;
@@ -167,12 +185,15 @@ class ChatSessionTable extends _i1.Table<int?> {
 
   late final _i1.ColumnBool goodAnswer;
 
+  late final _i1.ColumnDateTime createdAt;
+
   @override
   List<_i1.Column> get columns => [
         id,
         userId,
         keyToken,
         goodAnswer,
+        createdAt,
       ];
 }
 
