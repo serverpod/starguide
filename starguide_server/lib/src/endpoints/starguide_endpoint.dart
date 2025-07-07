@@ -7,6 +7,7 @@ import 'package:starguide_server/src/recaptcha/recaptcha.dart';
 
 class StarguideEndpoint extends Endpoint {
   static const _maxConversationLength = 25;
+  static const _maxRequestsPerMonth = 10000;
 
   Future<ChatSession> createChatSession(
     Session session,
@@ -21,6 +22,19 @@ class StarguideEndpoint extends Endpoint {
 
     if (score < 0.5) {
       throw RecaptchaException();
+    }
+
+    // Check if max number of requests have been made in the past month and if
+    // so, throw an exception.
+
+    // TODO: Use a cache to store the number of requests.
+    final requests = await ChatSession.db.count(
+      session,
+      where: (chatSession) =>
+          chatSession.createdAt > (DateTime.now().subtract(Duration(days: 30))),
+    );
+    if (requests >= _maxRequestsPerMonth) {
+      throw Exception('Too many requests in the past month.');
     }
 
     // Create a new chat session.
