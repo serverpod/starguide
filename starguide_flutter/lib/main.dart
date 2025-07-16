@@ -16,10 +16,10 @@ import 'package:starguide_flutter/config/theme.dart';
 import 'package:syntax_highlight/syntax_highlight.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-// var client = Client('http://$localhost:8080/')
-//   ..connectivityMonitor = FlutterConnectivityMonitor();
-var client = Client('https://starguide.api.serverpod.space/')
+var client = Client('http://$localhost:8080/')
   ..connectivityMonitor = FlutterConnectivityMonitor();
+// var client = Client('https://starguide.api.serverpod.space/')
+//   ..connectivityMonitor = FlutterConnectivityMonitor();
 
 late final Highlighter highlighterDart;
 late final Highlighter highlighterYaml;
