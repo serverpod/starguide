@@ -16,13 +16,15 @@ import 'chat_session.dart' as _i4;
 import 'data_fetcher_task.dart' as _i5;
 import 'data_fetcher_task_type.dart' as _i6;
 import 'rag_document.dart' as _i7;
-import 'recaptcha/recaptcha_exception.dart' as _i8;
+import 'rag_document_type.dart' as _i8;
+import 'recaptcha/recaptcha_exception.dart' as _i9;
 export 'chat_message.dart';
 export 'chat_message_type.dart';
 export 'chat_session.dart';
 export 'data_fetcher_task.dart';
 export 'data_fetcher_task_type.dart';
 export 'rag_document.dart';
+export 'rag_document_type.dart';
 export 'recaptcha/recaptcha_exception.dart';
 export 'client.dart';
 
@@ -57,8 +59,11 @@ class Protocol extends _i1.SerializationManager {
     if (t == _i7.RAGDocument) {
       return _i7.RAGDocument.fromJson(data) as T;
     }
-    if (t == _i8.RecaptchaException) {
-      return _i8.RecaptchaException.fromJson(data) as T;
+    if (t == _i8.RAGDocumentType) {
+      return _i8.RAGDocumentType.fromJson(data) as T;
+    }
+    if (t == _i9.RecaptchaException) {
+      return _i9.RecaptchaException.fromJson(data) as T;
     }
     if (t == _i1.getType<_i2.ChatMessage?>()) {
       return (data != null ? _i2.ChatMessage.fromJson(data) : null) as T;
@@ -79,8 +84,11 @@ class Protocol extends _i1.SerializationManager {
     if (t == _i1.getType<_i7.RAGDocument?>()) {
       return (data != null ? _i7.RAGDocument.fromJson(data) : null) as T;
     }
-    if (t == _i1.getType<_i8.RecaptchaException?>()) {
-      return (data != null ? _i8.RecaptchaException.fromJson(data) : null) as T;
+    if (t == _i1.getType<_i8.RAGDocumentType?>()) {
+      return (data != null ? _i8.RAGDocumentType.fromJson(data) : null) as T;
+    }
+    if (t == _i1.getType<_i9.RecaptchaException?>()) {
+      return (data != null ? _i9.RecaptchaException.fromJson(data) : null) as T;
     }
     return super.deserialize<T>(data, t);
   }
@@ -107,7 +115,10 @@ class Protocol extends _i1.SerializationManager {
     if (data is _i7.RAGDocument) {
       return 'RAGDocument';
     }
-    if (data is _i8.RecaptchaException) {
+    if (data is _i8.RAGDocumentType) {
+      return 'RAGDocumentType';
+    }
+    if (data is _i9.RecaptchaException) {
       return 'RecaptchaException';
     }
     return null;
@@ -137,8 +148,11 @@ class Protocol extends _i1.SerializationManager {
     if (dataClassName == 'RAGDocument') {
       return deserialize<_i7.RAGDocument>(data['data']);
     }
+    if (dataClassName == 'RAGDocumentType') {
+      return deserialize<_i8.RAGDocumentType>(data['data']);
+    }
     if (dataClassName == 'RecaptchaException') {
-      return deserialize<_i8.RecaptchaException>(data['data']);
+      return deserialize<_i9.RecaptchaException>(data['data']);
     }
     return super.deserializeByClassName(data);
   }

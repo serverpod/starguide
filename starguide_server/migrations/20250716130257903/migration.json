@@ -1,0 +1,43 @@
+{
+  "actions": [
+    {
+      "type": "alterTable",
+      "alterTable": {
+        "name": "rag_document",
+        "schema": "public",
+        "addColumns": [],
+        "deleteColumns": [
+          "type"
+        ],
+        "modifyColumns": [],
+        "addIndexes": [],
+        "deleteIndexes": [],
+        "addForeignKeys": [],
+        "deleteForeignKeys": [],
+        "warnings": [
+          {
+            "type": "columnDropped",
+            "message": "Column \"type\" of table \"rag_document\" will be dropped.",
+            "table": "rag_document",
+            "columns": [
+              "type"
+            ],
+            "destrucive": true
+          }
+        ]
+      }
+    }
+  ],
+  "warnings": [
+    {
+      "type": "columnDropped",
+      "message": "Column \"type\" of table \"rag_document\" will be dropped.",
+      "table": "rag_document",
+      "columns": [
+        "type"
+      ],
+      "destrucive": true
+    }
+  ],
+  "migrationApiVersion": 1
+}

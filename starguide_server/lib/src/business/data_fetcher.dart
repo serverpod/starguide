@@ -73,22 +73,32 @@ class DataFetcher {
   ) async {
     final genAi = GenerativeAi();
 
-    session.log('Summarizing document, length: ${rawDocument.document.length}');
-    final summary = await genAi.generateSimpleAnswer(
-      Prompts.instance.get('summarize_document')! + rawDocument.document,
+    session.log('Summarizing document for description.');
+    final shortDescription = await genAi.generateSimpleAnswer(
+      Prompts.instance.get('summarize_document_for_description')! +
+          rawDocument.document,
     );
 
-    session.log('Generating embedding for summary, length: ${summary.length}');
-    final embedding = await genAi.generateEmbedding(summary);
+    session.log('Summarizing document for embedding.');
+    final embeddingSummary = await genAi.generateSimpleAnswer(
+      Prompts.instance.get('summarize_document_for_embedding')! +
+          rawDocument.document,
+    );
+
+    session.log('Generating embedding for summary.');
+    final embedding = await genAi.generateEmbedding(embeddingSummary);
 
     session.log('Embeddings generated.');
 
     return RAGDocument(
+      title: rawDocument.title,
       sourceUrl: rawDocument.sourceUrl,
       fetchTime: DateTime.now(),
       content: rawDocument.document,
-      summary: summary,
+      embeddingSummary: embeddingSummary,
+      shortDescription: shortDescription,
       embedding: embedding,
+      type: rawDocument.documentType,
     );
   }
 

@@ -6,7 +6,10 @@ fields:
   fetchTime: DateTime
   sourceUrl: Uri
   content: String
-  summary: String
+  title: String
+  embeddingSummary: String
+  shortDescription: String
+  type: RAGDocumentType
 
 indexes:
   rag_document_sourceUrl:

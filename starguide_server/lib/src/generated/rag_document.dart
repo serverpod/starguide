@@ -10,6 +10,7 @@
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod/serverpod.dart' as _i1;
+import 'rag_document_type.dart' as _i2;
 
 abstract class RAGDocument
     implements _i1.TableRow<int?>, _i1.ProtocolSerialization {
@@ -19,7 +20,10 @@ abstract class RAGDocument
     required this.fetchTime,
     required this.sourceUrl,
     required this.content,
-    required this.summary,
+    required this.title,
+    required this.embeddingSummary,
+    required this.shortDescription,
+    required this.type,
   });
 
   factory RAGDocument({
@@ -28,7 +32,10 @@ abstract class RAGDocument
     required DateTime fetchTime,
     required Uri sourceUrl,
     required String content,
-    required String summary,
+    required String title,
+    required String embeddingSummary,
+    required String shortDescription,
+    required _i2.RAGDocumentType type,
   }) = _RAGDocumentImpl;
 
   factory RAGDocument.fromJson(Map<String, dynamic> jsonSerialization) {
@@ -40,7 +47,10 @@ abstract class RAGDocument
           _i1.DateTimeJsonExtension.fromJson(jsonSerialization['fetchTime']),
       sourceUrl: _i1.UriJsonExtension.fromJson(jsonSerialization['sourceUrl']),
       content: jsonSerialization['content'] as String,
-      summary: jsonSerialization['summary'] as String,
+      title: jsonSerialization['title'] as String,
+      embeddingSummary: jsonSerialization['embeddingSummary'] as String,
+      shortDescription: jsonSerialization['shortDescription'] as String,
+      type: _i2.RAGDocumentType.fromJson((jsonSerialization['type'] as int)),
     );
   }
 
@@ -59,7 +69,13 @@ abstract class RAGDocument
 
   String content;
 
-  String summary;
+  String title;
+
+  String embeddingSummary;
+
+  String shortDescription;
+
+  _i2.RAGDocumentType type;
 
   @override
   _i1.Table<int?> get table => t;
@@ -73,7 +89,10 @@ abstract class RAGDocument
     DateTime? fetchTime,
     Uri? sourceUrl,
     String? content,
-    String? summary,
+    String? title,
+    String? embeddingSummary,
+    String? shortDescription,
+    _i2.RAGDocumentType? type,
   });
   @override
   Map<String, dynamic> toJson() {
@@ -83,7 +102,10 @@ abstract class RAGDocument
       'fetchTime': fetchTime.toJson(),
       'sourceUrl': sourceUrl.toJson(),
       'content': content,
-      'summary': summary,
+      'title': title,
+      'embeddingSummary': embeddingSummary,
+      'shortDescription': shortDescription,
+      'type': type.toJson(),
     };
   }
 
@@ -95,7 +117,10 @@ abstract class RAGDocument
       'fetchTime': fetchTime.toJson(),
       'sourceUrl': sourceUrl.toJson(),
       'content': content,
-      'summary': summary,
+      'title': title,
+      'embeddingSummary': embeddingSummary,
+      'shortDescription': shortDescription,
+      'type': type.toJson(),
     };
   }
 
@@ -138,14 +163,20 @@ class _RAGDocumentImpl extends RAGDocument {
     required DateTime fetchTime,
     required Uri sourceUrl,
     required String content,
-    required String summary,
+    required String title,
+    required String embeddingSummary,
+    required String shortDescription,
+    required _i2.RAGDocumentType type,
   }) : super._(
           id: id,
           embedding: embedding,
           fetchTime: fetchTime,
           sourceUrl: sourceUrl,
           content: content,
-          summary: summary,
+          title: title,
+          embeddingSummary: embeddingSummary,
+          shortDescription: shortDescription,
+          type: type,
         );
 
   /// Returns a shallow copy of this [RAGDocument]
@@ -158,7 +189,10 @@ class _RAGDocumentImpl extends RAGDocument {
     DateTime? fetchTime,
     Uri? sourceUrl,
     String? content,
-    String? summary,
+    String? title,
+    String? embeddingSummary,
+    String? shortDescription,
+    _i2.RAGDocumentType? type,
   }) {
     return RAGDocument(
       id: id is int? ? id : this.id,
@@ -166,7 +200,10 @@ class _RAGDocumentImpl extends RAGDocument {
       fetchTime: fetchTime ?? this.fetchTime,
       sourceUrl: sourceUrl ?? this.sourceUrl,
       content: content ?? this.content,
-      summary: summary ?? this.summary,
+      title: title ?? this.title,
+      embeddingSummary: embeddingSummary ?? this.embeddingSummary,
+      shortDescription: shortDescription ?? this.shortDescription,
+      type: type ?? this.type,
     );
   }
 }
@@ -190,9 +227,22 @@ class RAGDocumentTable extends _i1.Table<int?> {
       'content',
       this,
     );
-    summary = _i1.ColumnString(
-      'summary',
+    title = _i1.ColumnString(
+      'title',
       this,
+    );
+    embeddingSummary = _i1.ColumnString(
+      'embeddingSummary',
+      this,
+    );
+    shortDescription = _i1.ColumnString(
+      'shortDescription',
+      this,
+    );
+    type = _i1.ColumnEnum(
+      'type',
+      this,
+      _i1.EnumSerialization.byIndex,
     );
   }
 
@@ -204,7 +254,13 @@ class RAGDocumentTable extends _i1.Table<int?> {
 
   late final _i1.ColumnString content;
 
-  late final _i1.ColumnString summary;
+  late final _i1.ColumnString title;
+
+  late final _i1.ColumnString embeddingSummary;
+
+  late final _i1.ColumnString shortDescription;
+
+  late final _i1.ColumnEnum<_i2.RAGDocumentType> type;
 
   @override
   List<_i1.Column> get columns => [
@@ -213,7 +269,10 @@ class RAGDocumentTable extends _i1.Table<int?> {
         fetchTime,
         sourceUrl,
         content,
-        summary,
+        title,
+        embeddingSummary,
+        shortDescription,
+        type,
       ];
 }
 

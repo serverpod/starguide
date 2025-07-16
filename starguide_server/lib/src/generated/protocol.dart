@@ -17,13 +17,15 @@ import 'chat_session.dart' as _i5;
 import 'data_fetcher_task.dart' as _i6;
 import 'data_fetcher_task_type.dart' as _i7;
 import 'rag_document.dart' as _i8;
-import 'recaptcha/recaptcha_exception.dart' as _i9;
+import 'rag_document_type.dart' as _i9;
+import 'recaptcha/recaptcha_exception.dart' as _i10;
 export 'chat_message.dart';
 export 'chat_message_type.dart';
 export 'chat_session.dart';
 export 'data_fetcher_task.dart';
 export 'data_fetcher_task_type.dart';
 export 'rag_document.dart';
+export 'rag_document_type.dart';
 export 'recaptcha/recaptcha_exception.dart';
 
 class Protocol extends _i1.SerializationManagerServer {
@@ -193,10 +195,28 @@ class Protocol extends _i1.SerializationManagerServer {
           dartType: 'String',
         ),
         _i2.ColumnDefinition(
-          name: 'summary',
+          name: 'title',
           columnType: _i2.ColumnType.text,
           isNullable: false,
           dartType: 'String',
+        ),
+        _i2.ColumnDefinition(
+          name: 'embeddingSummary',
+          columnType: _i2.ColumnType.text,
+          isNullable: false,
+          dartType: 'String',
+        ),
+        _i2.ColumnDefinition(
+          name: 'shortDescription',
+          columnType: _i2.ColumnType.text,
+          isNullable: false,
+          dartType: 'String',
+        ),
+        _i2.ColumnDefinition(
+          name: 'type',
+          columnType: _i2.ColumnType.bigint,
+          isNullable: false,
+          dartType: 'protocol:RAGDocumentType',
         ),
       ],
       foreignKeys: [],
@@ -272,8 +292,11 @@ class Protocol extends _i1.SerializationManagerServer {
     if (t == _i8.RAGDocument) {
       return _i8.RAGDocument.fromJson(data) as T;
     }
-    if (t == _i9.RecaptchaException) {
-      return _i9.RecaptchaException.fromJson(data) as T;
+    if (t == _i9.RAGDocumentType) {
+      return _i9.RAGDocumentType.fromJson(data) as T;
+    }
+    if (t == _i10.RecaptchaException) {
+      return _i10.RecaptchaException.fromJson(data) as T;
     }
     if (t == _i1.getType<_i3.ChatMessage?>()) {
       return (data != null ? _i3.ChatMessage.fromJson(data) : null) as T;
@@ -294,8 +317,12 @@ class Protocol extends _i1.SerializationManagerServer {
     if (t == _i1.getType<_i8.RAGDocument?>()) {
       return (data != null ? _i8.RAGDocument.fromJson(data) : null) as T;
     }
-    if (t == _i1.getType<_i9.RecaptchaException?>()) {
-      return (data != null ? _i9.RecaptchaException.fromJson(data) : null) as T;
+    if (t == _i1.getType<_i9.RAGDocumentType?>()) {
+      return (data != null ? _i9.RAGDocumentType.fromJson(data) : null) as T;
+    }
+    if (t == _i1.getType<_i10.RecaptchaException?>()) {
+      return (data != null ? _i10.RecaptchaException.fromJson(data) : null)
+          as T;
     }
     try {
       return _i2.Protocol().deserialize<T>(data, t);
@@ -325,7 +352,10 @@ class Protocol extends _i1.SerializationManagerServer {
     if (data is _i8.RAGDocument) {
       return 'RAGDocument';
     }
-    if (data is _i9.RecaptchaException) {
+    if (data is _i9.RAGDocumentType) {
+      return 'RAGDocumentType';
+    }
+    if (data is _i10.RecaptchaException) {
       return 'RecaptchaException';
     }
     className = _i2.Protocol().getClassNameForObject(data);
@@ -359,8 +389,11 @@ class Protocol extends _i1.SerializationManagerServer {
     if (dataClassName == 'RAGDocument') {
       return deserialize<_i8.RAGDocument>(data['data']);
     }
+    if (dataClassName == 'RAGDocumentType') {
+      return deserialize<_i9.RAGDocumentType>(data['data']);
+    }
     if (dataClassName == 'RecaptchaException') {
-      return deserialize<_i9.RecaptchaException>(data['data']);
+      return deserialize<_i10.RecaptchaException>(data['data']);
     }
     if (dataClassName.startsWith('serverpod.')) {
       data['className'] = dataClassName.substring(10);

@@ -5,6 +5,7 @@ import 'package:serverpod/serverpod.dart';
 import 'package:starguide_server/src/business/data_fetcher.dart';
 import 'package:starguide_server/src/business/data_source.dart';
 import 'package:starguide_server/src/business/data_source_exception.dart';
+import 'package:starguide_server/src/generated/protocol.dart';
 
 class GithubDiscussionsDataSource implements DataSource {
   final String owner;
@@ -160,7 +161,7 @@ class GithubDiscussionsDataSource implements DataSource {
 
       for (var discussion in discussions) {
         if (discussion['answerChosenAt'] != null) {
-          final title = discussion['title'] ?? 'No title';
+          final title = discussion['title'] ?? 'GitHub Discussion';
           final url = Uri.parse(discussion['url']!);
           final question = discussion['body'] ?? 'No question content';
           final answer = discussion['answer']?['body'] ?? 'No answer content';
@@ -170,7 +171,9 @@ class GithubDiscussionsDataSource implements DataSource {
               sourceUrl: url,
               document:
                   'TITLE: $title\n\nQUESTION:\n$question\n\nANSWER:\n$answer',
-              type: DataSourceType.markdown,
+              dataSourceType: DataSourceType.markdown,
+              documentType: RAGDocumentType.discussion,
+              title: title,
             );
           }
         }

@@ -4,6 +4,7 @@ import 'package:http/http.dart' as http;
 import 'package:serverpod/serverpod.dart';
 import 'package:starguide_server/src/business/data_fetcher.dart';
 import 'package:starguide_server/src/business/data_source.dart';
+import 'package:starguide_server/src/generated/protocol.dart';
 
 class GithubDocsDataSource implements DataSource {
   final String owner;
@@ -92,7 +93,9 @@ class GithubDocsDataSource implements DataSource {
             yield RawRAGDocument(
               sourceUrl: url,
               document: fileResponse.body,
-              type: DataSourceType.markdown,
+              dataSourceType: DataSourceType.markdown,
+              documentType: RAGDocumentType.documentation,
+              title: _getTitle(fileResponse.body),
             );
           }
         }
@@ -109,4 +112,10 @@ String _cleanFileName(String fileName) {
 
   if (cleanedName == 'index') return '';
   return cleanedName;
+}
+
+String _getTitle(String markdown) {
+  final titleRegex = RegExp(r'^\s*# (.+)$', multiLine: true);
+  final match = titleRegex.firstMatch(markdown);
+  return match?.group(1)?.trim() ?? 'Documentation';
 }
