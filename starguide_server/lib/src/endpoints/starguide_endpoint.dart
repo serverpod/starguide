@@ -13,19 +13,23 @@ class StarguideEndpoint extends Endpoint {
     Session session,
     String reCaptchaToken,
   ) async {
-    // Verify the reCAPTCHA token.
-    final score = await verifyRecaptchaToken(
-      session,
-      token: reCaptchaToken,
-      expectedAction: 'create_chat_session',
-    );
-
-    if (score < 0.5) {
-      session.log(
-        'Recaptcha score too low: $score',
-        level: LogLevel.debug,
+    if (Serverpod.instance.runMode != 'development') {
+      // Verify the reCAPTCHA token.
+      final score = await verifyRecaptchaToken(
+        session,
+        token: reCaptchaToken,
+        expectedAction: 'create_chat_session',
       );
-      throw RecaptchaException();
+
+      if (score < 0.5) {
+        session.log(
+          'Recaptcha score too low: $score',
+          level: LogLevel.debug,
+        );
+        throw RecaptchaException();
+      }
+    } else {
+      session.log('Recaptcha verification skipped in development mode.');
     }
 
     // Check if max number of requests have been made in the past month and if
