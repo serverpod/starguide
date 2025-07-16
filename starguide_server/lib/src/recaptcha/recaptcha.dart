@@ -40,7 +40,7 @@ Future<double> verifyRecaptchaToken(
 
   if (!success) {
     session.log(
-      'reCAPTCHA verification failed: ${result['error-codes']}',
+      'reCAPTCHA verification failed: $result',
       level: LogLevel.debug,
     );
     throw RecaptchaException();

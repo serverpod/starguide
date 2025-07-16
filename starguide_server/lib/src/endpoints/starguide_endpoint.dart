@@ -21,6 +21,10 @@ class StarguideEndpoint extends Endpoint {
     );
 
     if (score < 0.5) {
+      session.log(
+        'Recaptcha score too low: $score',
+        level: LogLevel.debug,
+      );
       throw RecaptchaException();
     }
 
@@ -34,6 +38,10 @@ class StarguideEndpoint extends Endpoint {
           chatSession.createdAt > (DateTime.now().subtract(Duration(days: 30))),
     );
     if (requests >= _maxRequestsPerMonth) {
+      session.log(
+        'Too many requests in the past month.',
+        level: LogLevel.debug,
+      );
       throw Exception('Too many requests in the past month.');
     }
 
