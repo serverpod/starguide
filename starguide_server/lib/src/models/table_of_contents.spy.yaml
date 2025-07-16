@@ -1,0 +1,3 @@
+class: TableOfContents
+fields:
+  contents: String

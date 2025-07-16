@@ -18,7 +18,8 @@ import 'data_fetcher_task.dart' as _i6;
 import 'data_fetcher_task_type.dart' as _i7;
 import 'rag_document.dart' as _i8;
 import 'rag_document_type.dart' as _i9;
-import 'recaptcha/recaptcha_exception.dart' as _i10;
+import 'table_of_contents.dart' as _i10;
+import 'recaptcha/recaptcha_exception.dart' as _i11;
 export 'chat_message.dart';
 export 'chat_message_type.dart';
 export 'chat_session.dart';
@@ -26,6 +27,7 @@ export 'data_fetcher_task.dart';
 export 'data_fetcher_task_type.dart';
 export 'rag_document.dart';
 export 'rag_document_type.dart';
+export 'table_of_contents.dart';
 export 'recaptcha/recaptcha_exception.dart';
 
 class Protocol extends _i1.SerializationManagerServer {
@@ -295,8 +297,11 @@ class Protocol extends _i1.SerializationManagerServer {
     if (t == _i9.RAGDocumentType) {
       return _i9.RAGDocumentType.fromJson(data) as T;
     }
-    if (t == _i10.RecaptchaException) {
-      return _i10.RecaptchaException.fromJson(data) as T;
+    if (t == _i10.TableOfContents) {
+      return _i10.TableOfContents.fromJson(data) as T;
+    }
+    if (t == _i11.RecaptchaException) {
+      return _i11.RecaptchaException.fromJson(data) as T;
     }
     if (t == _i1.getType<_i3.ChatMessage?>()) {
       return (data != null ? _i3.ChatMessage.fromJson(data) : null) as T;
@@ -320,8 +325,11 @@ class Protocol extends _i1.SerializationManagerServer {
     if (t == _i1.getType<_i9.RAGDocumentType?>()) {
       return (data != null ? _i9.RAGDocumentType.fromJson(data) : null) as T;
     }
-    if (t == _i1.getType<_i10.RecaptchaException?>()) {
-      return (data != null ? _i10.RecaptchaException.fromJson(data) : null)
+    if (t == _i1.getType<_i10.TableOfContents?>()) {
+      return (data != null ? _i10.TableOfContents.fromJson(data) : null) as T;
+    }
+    if (t == _i1.getType<_i11.RecaptchaException?>()) {
+      return (data != null ? _i11.RecaptchaException.fromJson(data) : null)
           as T;
     }
     try {
@@ -355,7 +363,10 @@ class Protocol extends _i1.SerializationManagerServer {
     if (data is _i9.RAGDocumentType) {
       return 'RAGDocumentType';
     }
-    if (data is _i10.RecaptchaException) {
+    if (data is _i10.TableOfContents) {
+      return 'TableOfContents';
+    }
+    if (data is _i11.RecaptchaException) {
       return 'RecaptchaException';
     }
     className = _i2.Protocol().getClassNameForObject(data);
@@ -392,8 +403,11 @@ class Protocol extends _i1.SerializationManagerServer {
     if (dataClassName == 'RAGDocumentType') {
       return deserialize<_i9.RAGDocumentType>(data['data']);
     }
+    if (dataClassName == 'TableOfContents') {
+      return deserialize<_i10.TableOfContents>(data['data']);
+    }
     if (dataClassName == 'RecaptchaException') {
-      return deserialize<_i10.RecaptchaException>(data['data']);
+      return deserialize<_i11.RecaptchaException>(data['data']);
     }
     if (dataClassName.startsWith('serverpod.')) {
       data['className'] = dataClassName.substring(10);

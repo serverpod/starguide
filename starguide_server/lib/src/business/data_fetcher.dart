@@ -1,5 +1,6 @@
 import 'package:serverpod/serverpod.dart';
 import 'package:starguide_server/src/business/data_source.dart';
+import 'package:starguide_server/src/business/docs_table_of_contents.dart';
 import 'package:starguide_server/src/generated/protocol.dart';
 import 'package:starguide_server/src/generative_ai/generative_ai.dart';
 import 'package:starguide_server/src/generative_ai/prompts.dart';
@@ -121,6 +122,10 @@ class DataFetcher {
         session,
         ragDocument,
       );
+    }
+
+    if (ragDocument.type == RAGDocumentType.documentation) {
+      await DocsTableOfContents.invalidateCache(session);
     }
   }
 
