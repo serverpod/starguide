@@ -210,7 +210,7 @@ packages:
     source: hosted
     version: "4.9.0"
   json_schema:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: json_schema
       sha256: fc8c3e280c7647ed8e94f2565ba107ef4aff94b096764b8460a7e1ae39f20382
