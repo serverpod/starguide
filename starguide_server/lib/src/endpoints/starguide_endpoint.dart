@@ -82,7 +82,7 @@ class StarguideEndpoint extends Endpoint {
 
     final genAi = GenerativeAi();
 
-    // Run both searches in parallel.
+    // Search RAG documents in parallel, using different methods.
     final results = await Future.wait([
       searchDocumentation(session, conversation, question),
       searchDiscussions(session, conversation, question),
