@@ -264,6 +264,19 @@ class Protocol extends _i1.SerializationManagerServer {
           vectorDistanceFunction: _i2.VectorDistanceFunction.cosine,
           vectorColumnType: _i2.ColumnType.vector,
         ),
+        _i2.IndexDefinition(
+          indexName: 'rag_document_type',
+          tableSpace: null,
+          elements: [
+            _i2.IndexElementDefinition(
+              type: _i2.IndexElementDefinitionType.column,
+              definition: 'type',
+            )
+          ],
+          type: 'btree',
+          isUnique: false,
+          isPrimary: false,
+        ),
       ],
       managed: true,
     ),

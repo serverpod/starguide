@@ -19,3 +19,5 @@ indexes:
     fields: embedding
     type: hnsw
     distanceFunction: cosine
+  rag_document_type:
+    fields: type
