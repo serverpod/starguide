@@ -15,10 +15,15 @@ Future<List<RAGDocument>> searchDocumentation(
   // Search documentation for the most relevant URLs.
   final toc = await DocsTableOfContents.getTableOfContents(session);
   final urls = await genAi.generateUrlList(
-    Prompts.instance.get('search_toc_0')! +
-        toc +
-        Prompts.instance.get('search_toc_1')! +
-        question,
+    systemPrompt: Prompts.instance.get('search_toc')! + toc,
+    conversation: [
+      ...conversation,
+      ChatMessage(
+        chatSessionId: 0,
+        message: question,
+        type: ChatMessageType.user,
+      ),
+    ],
   );
 
   for (final url in urls) {

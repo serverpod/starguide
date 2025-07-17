@@ -58,16 +58,33 @@ class GenerativeAi {
     return Vector(embedding.toList());
   }
 
-  Future<List<Uri>> generateUrlList(String question) async {
+  Future<List<Uri>> generateUrlList({
+    required String systemPrompt,
+    List<ChatMessage> conversation = const [],
+  }) async {
     final agent = _createAgent(
-      systemPrompt: 'Please reploy ONLY with JSON containing a field of "urls" '
-          'which is a list of URLs. If you cannot find any URLs, return an '
-          'empty list.',
+      systemPrompt: systemPrompt,
       outputSchema: _UrlList.schemaMap.toSchema(),
       outputFromJson: _UrlList.fromJson,
     );
+
+    final messages = <Message>[];
+
+    // Add conversation history
+    for (final chatMessage in conversation) {
+      messages.add(
+        Message(
+          role: chatMessage.type.aiRole == 'user'
+              ? MessageRole.user
+              : MessageRole.model,
+          parts: [TextPart(chatMessage.message)],
+        ),
+      );
+    }
+
     final response = await agent.runFor<_UrlList>(
-      question,
+      systemPrompt,
+      messages: messages,
     );
     return response.output.urls.map((str) => Uri.parse(str)).toList();
   }
