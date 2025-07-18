@@ -53,8 +53,6 @@ class StarguideEndpoint extends Endpoint {
       ),
     );
 
-    print('cachedSessionCount: ${cachedSessionCount!.count}');
-
     if (cachedSessionCount!.count >= _maxRequestsPerMonth) {
       session.log(
         'Too many requests in the past month.',
