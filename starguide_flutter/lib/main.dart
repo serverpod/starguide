@@ -118,6 +118,15 @@ class StarguideChatPageState extends State<StarguideChatPage> {
         _isInputFocused = _inputFocusNode.hasFocus;
       });
     });
+
+    // Check if there is an initial query in the URL.
+    final uri = Uri.base;
+    final query = uri.queryParameters;
+    if (query.containsKey('q')) {
+      _inputTextController.text = query['q']!;
+      _handleMessageSend(_inputTextController.text);
+      _inputTextController.clear();
+    }
   }
 
   @override
