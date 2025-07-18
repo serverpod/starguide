@@ -1,0 +1,3 @@
+class: CachedSessionCount
+fields:
+  count: int
