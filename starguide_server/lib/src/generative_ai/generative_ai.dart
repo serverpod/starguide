@@ -90,7 +90,7 @@ class GenerativeAi {
   }
 
   String _formatDocument(RAGDocument document) {
-    return '<doc href="${document.sourceUrl}">\n${document.content}\n</doc>';
+    return '<doc href="${document.sourceUrl}" type="${document.type.name}" title="${document.title}">\n${document.content}\n</doc>';
   }
 
   Agent _createAgent({
@@ -140,5 +140,18 @@ class _UrlList {
       'required': ['urls'],
       'additionalProperties': false,
     };
+  }
+}
+
+extension RAGDocumentTypeName on RAGDocumentType {
+  String get name {
+    switch (this) {
+      case RAGDocumentType.documentation:
+        return 'Documentation';
+      case RAGDocumentType.discussion:
+        return 'GitHub Discussion';
+      case RAGDocumentType.issue:
+        return 'GitHub Issue';
+    }
   }
 }
