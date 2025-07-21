@@ -13,6 +13,7 @@ import 'package:starguide_flutter/chat/starguide_text_message.dart';
 import 'package:starguide_flutter/config/chat_theme.dart';
 import 'package:starguide_flutter/config/constants.dart';
 import 'package:starguide_flutter/config/theme.dart';
+import 'package:starguide_flutter/widgets/animated_gradient_border.dart';
 import 'package:syntax_highlight/syntax_highlight.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -290,80 +291,92 @@ class StarguideChatPageState extends State<StarguideChatPage> {
               }),
             ),
           ),
-          Container(
-            margin: const EdgeInsets.only(
-              left: 16,
-              right: 16,
-              bottom: 8,
-            ),
-            decoration: BoxDecoration(
-              color: theme.colorScheme.surface,
-              border: Border.all(
-                color: _isInputFocused
-                    ? theme.colorScheme.outline
-                    : theme.dividerColor,
-                width: 1,
-              ),
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Container(
-                  decoration: BoxDecoration(
-                    color: theme.colorScheme.surfaceContainer,
-                    borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(7),
-                      topRight: Radius.circular(7),
-                    ),
-                  ),
-                  padding: const EdgeInsets.all(4),
-                  child: Row(
-                    spacing: 8,
-                    children: [
-                      TextButton.icon(
-                        onPressed: _handleClearChat,
-                        label: Text('Clear Chat'),
-                        icon: Icon(Icons.autorenew),
-                      ),
-                      Spacer(),
-                      TextButton.icon(
-                        onPressed: _chatSession != null ? _handleUpvote : null,
-                        label: Text('Got Help'),
-                        icon: Icon(
-                          Icons.thumb_up_outlined,
-                          color: _vote == true ? Colors.blue.shade600 : null,
-                        ),
-                      ),
-                      TextButton.icon(
-                        onPressed:
-                            _chatSession != null ? _handleDownvote : null,
-                        label: Text('Poor Answer'),
-                        icon: Icon(
-                          Icons.thumb_down_outlined,
-                          color: _vote == false ? Colors.blue.shade600 : null,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                Divider(
-                  height: 1,
-                  color: _isInputFocused
-                      ? theme.colorScheme.outline
-                      : theme.dividerColor,
-                ),
-                StarguideChatInput(
-                  textController: _inputTextController,
-                  focusNode: _inputFocusNode,
-                  onSend: _handleMessageSend,
-                  enabled: _hasInputText &&
-                      !_isGeneratingResponse &&
-                      _numChatRequests < kMaxChatRequests,
-                  isGeneratingResponse: _isGeneratingResponse,
-                  numChatRequests: _numChatRequests,
-                ),
+          Padding(
+            padding: const EdgeInsets.only(left: 16, right: 16, bottom: 8),
+            child: AnimatedGradientBorder(
+              enabled: _isInputFocused,
+              borderWidth: 2,
+              glowSize: 8,
+              borderRadius: BorderRadius.all(Radius.circular(10)),
+              gradientColors: [
+                Colors.blue.withAlpha(192),
+                Colors.purple.withAlpha(192),
+                Colors.red.withAlpha(192),
               ],
+              child: Container(
+                decoration: BoxDecoration(
+                  color: theme.colorScheme.surface,
+                  border: Border.all(
+                    color: _isInputFocused
+                        ? theme.colorScheme.outline
+                        : theme.dividerColor,
+                    width: 1,
+                  ),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Container(
+                      decoration: BoxDecoration(
+                        color: theme.colorScheme.surfaceContainer,
+                        borderRadius: BorderRadius.only(
+                          topLeft: Radius.circular(7),
+                          topRight: Radius.circular(7),
+                        ),
+                      ),
+                      padding: const EdgeInsets.all(4),
+                      child: Row(
+                        spacing: 8,
+                        children: [
+                          TextButton.icon(
+                            onPressed: _handleClearChat,
+                            label: Text('Clear Chat'),
+                            icon: Icon(Icons.autorenew),
+                          ),
+                          Spacer(),
+                          TextButton.icon(
+                            onPressed:
+                                _chatSession != null ? _handleUpvote : null,
+                            label: Text('Got Help'),
+                            icon: Icon(
+                              Icons.thumb_up_outlined,
+                              color:
+                                  _vote == true ? Colors.blue.shade600 : null,
+                            ),
+                          ),
+                          TextButton.icon(
+                            onPressed:
+                                _chatSession != null ? _handleDownvote : null,
+                            label: Text('Poor Answer'),
+                            icon: Icon(
+                              Icons.thumb_down_outlined,
+                              color:
+                                  _vote == false ? Colors.blue.shade600 : null,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Divider(
+                      height: 1,
+                      color: _isInputFocused
+                          ? theme.colorScheme.outline
+                          : theme.dividerColor,
+                    ),
+                    StarguideChatInput(
+                      textController: _inputTextController,
+                      focusNode: _inputFocusNode,
+                      onSend: _handleMessageSend,
+                      enabled: _hasInputText &&
+                          !_isGeneratingResponse &&
+                          _numChatRequests < kMaxChatRequests,
+                      isGeneratingResponse: _isGeneratingResponse,
+                      numChatRequests: _numChatRequests,
+                    ),
+                  ],
+                ),
+              ),
             ),
           ),
           Padding(
