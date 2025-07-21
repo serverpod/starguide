@@ -9,12 +9,16 @@ class DocsTableOfContents {
     var hasMoreDocuments = true;
     var lastDocumentId = 0;
     StringBuffer toc = StringBuffer();
+    var numberOfDocuments = 0;
 
     while (hasMoreDocuments) {
       final documents = await RAGDocument.db.find(
         session,
-        where: (d) => d.id > (lastDocumentId),
+        where: (d) =>
+            (d.id > (lastDocumentId)) &
+            (d.type.equals(RAGDocumentType.documentation)),
         limit: _batchSize,
+        orderBy: (d) => d.id,
       );
 
       if (documents.isEmpty) {
@@ -27,9 +31,17 @@ class DocsTableOfContents {
           toc.write('Title: ${document.title}\n');
           toc.write('Description: ${document.shortDescription}\n');
           toc.write('\n');
+
+          numberOfDocuments++;
         }
       }
     }
+
+    session.log(
+      'Created TOC with $numberOfDocuments documents.',
+      level: LogLevel.debug,
+    );
+
     return toc.toString();
   }
 
