@@ -33,5 +33,10 @@ ThemeData createTheme() {
         ),
       ),
     ),
+    textSelectionTheme: TextSelectionThemeData(
+      selectionHandleColor: Colors.blue,
+      selectionColor: Colors.blue.shade100,
+      cursorColor: Colors.blue,
+    ),
   );
 }

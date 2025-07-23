@@ -115,32 +115,36 @@ class StarguideTextMessage extends StatelessWidget {
             isSentByMe ? CrossAxisAlignment.center : CrossAxisAlignment.stretch,
         children: [
           if (!isSentByMe) const SizedBox(width: double.infinity),
-          GptMarkdown(
-            gptResponse.text,
-            style: _isOnlyEmoji
-                ? paragraphStyle?.copyWith(fontSize: onlyEmojiFontSize)
-                : paragraphStyle,
-            onLinkTap: onLinkTap,
-            codeBuilder: (context, name, codes, closed) => StarguideCodeField(
-              name: name,
-              codes: codes,
-            ),
-            highlightBuilder: (context, text, style) {
-              return Container(
-                padding: const EdgeInsets.symmetric(horizontal: 2),
-                decoration: BoxDecoration(
-                  color: Colors.grey.shade500.withAlpha(64),
-                  borderRadius: BorderRadius.circular(4),
-                ),
-                child: Text(
-                  text,
-                  style: style.copyWith(
-                    fontFamily: 'JetBrainsMono',
-                    fontSize: style.fontSize! * 0.9,
+          SelectableRegion(
+            focusNode: FocusNode(),
+            selectionControls: MaterialTextSelectionControls(),
+            child: GptMarkdown(
+              gptResponse.text,
+              style: _isOnlyEmoji
+                  ? paragraphStyle?.copyWith(fontSize: onlyEmojiFontSize)
+                  : paragraphStyle,
+              onLinkTap: onLinkTap,
+              codeBuilder: (context, name, codes, closed) => StarguideCodeField(
+                name: name,
+                codes: codes,
+              ),
+              highlightBuilder: (context, text, style) {
+                return Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 2),
+                  decoration: BoxDecoration(
+                    color: Colors.grey.shade500.withAlpha(64),
+                    borderRadius: BorderRadius.circular(4),
                   ),
-                ),
-              );
-            },
+                  child: Text(
+                    text,
+                    style: style.copyWith(
+                      fontFamily: 'JetBrainsMono',
+                      fontSize: style.fontSize! * 0.9,
+                    ),
+                  ),
+                );
+              },
+            ),
           ),
           if (gptResponse.links.isNotEmpty)
             LinkPreviewList(links: gptResponse.links),

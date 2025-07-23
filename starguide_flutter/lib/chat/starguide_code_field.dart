@@ -116,8 +116,8 @@ class _StarguideCodeFieldState extends State<StarguideCodeField> {
               right: 16,
               bottom: 16,
             ),
-            child: RichText(
-              text: formattedCodes,
+            child: Text.rich(
+              formattedCodes,
             ),
           ),
         ],
