@@ -340,35 +340,27 @@ class GptResponse {
   late final List<GptResponseLink> links;
 
   GptResponse(String rawText) {
-    final components = rawText.split('\n# References\n');
+    final components = rawText.split(RegExp(r'\n#+ References\n'));
 
     if (components.isEmpty) {
       text = rawText;
       links = [];
     } else if (components.length == 1) {
-      text = components[0];
+      text = components[0].trim();
       links = [];
     } else {
-      text = components[0];
-      final regex = RegExp(r'^\[([^\]]+)\]\(([^)]+)\)$');
-
-      final rawLinks = components[1].split('\n');
+      text = components[0].trim();
+      final referencesSection = components[1];
+      final regex = RegExp(r'\[([^\]]+)\]\(([^)]+)\)');
+      final matches = regex.allMatches(referencesSection);
       final parsedLinks = <GptResponseLink>[];
-
-      for (var line in rawLinks) {
-        line = line.trim();
-        if (line.isEmpty) {
-          continue;
-        }
-
-        final match = regex.firstMatch(line);
-        if (match != null) {
-          final text = match.group(1);
-          final url = match.group(2);
-          parsedLinks.add(GptResponseLink(url: Uri.parse(url!), title: text!));
+      for (final match in matches) {
+        final text = match.group(1);
+        final url = match.group(2);
+        if (text != null && url != null) {
+          parsedLinks.add(GptResponseLink(url: Uri.parse(url), title: text));
         }
       }
-
       links = parsedLinks;
     }
   }
