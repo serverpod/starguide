@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_chat_core/flutter_chat_core.dart';
 import 'package:flutter_chat_ui/flutter_chat_ui.dart';
 import 'package:g_recaptcha_v3/g_recaptcha_v3.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:markdown_widget/markdown_widget.dart';
 import 'package:starguide_client/starguide_client.dart';
 import 'package:flutter/material.dart';
@@ -332,7 +333,7 @@ class StarguideChatPageState extends State<StarguideChatPage> {
                           TextButton.icon(
                             onPressed: _handleClearChat,
                             label: Text('Clear Chat'),
-                            icon: Icon(Icons.autorenew),
+                            icon: Icon(LucideIcons.refreshCw400),
                           ),
                           Spacer(),
                           TextButton.icon(
@@ -340,7 +341,7 @@ class StarguideChatPageState extends State<StarguideChatPage> {
                                 _chatSession != null ? _handleUpvote : null,
                             label: Text('Got Help'),
                             icon: Icon(
-                              Icons.thumb_up_outlined,
+                              LucideIcons.thumbsUp400,
                               color:
                                   _vote == true ? Colors.blue.shade600 : null,
                             ),
@@ -350,7 +351,7 @@ class StarguideChatPageState extends State<StarguideChatPage> {
                                 _chatSession != null ? _handleDownvote : null,
                             label: Text('Poor Answer'),
                             icon: Icon(
-                              Icons.thumb_down_outlined,
+                              LucideIcons.thumbsDown400,
                               color:
                                   _vote == false ? Colors.blue.shade600 : null,
                             ),

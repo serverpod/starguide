@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:starguide_flutter/config/constants.dart';
 
 class StarguideChatInput extends StatefulWidget {
@@ -39,7 +40,8 @@ class _StarguideChatInputState extends State<StarguideChatInput> {
     }
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 4.0),
+      padding:
+          const EdgeInsets.only(left: 12.0, right: 8.0, top: 8.0, bottom: 8.0),
       child: Column(
         children: [
           Row(
@@ -77,19 +79,32 @@ class _StarguideChatInputState extends State<StarguideChatInput> {
                   width: 40,
                   height: 40,
                   child: CircularProgressIndicator(
-                    color: theme.disabledColor,
+                    color: theme.colorScheme.primary,
                   ),
                 )
               else
-                IconButton(
-                  padding: const EdgeInsets.all(4),
+                TextButton(
+                  style: TextButton.styleFrom(
+                    backgroundColor: widget.focusNode.hasFocus
+                        ? theme.colorScheme.primary
+                        : theme.dividerColor,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                    padding: const EdgeInsets.all(4),
+                    minimumSize: const Size(48, 48),
+                  ),
                   onPressed: widget.enabled
                       ? () {
                           widget.onSend(widget.textController.text);
                           widget.textController.clear();
                         }
                       : null,
-                  icon: const Icon(Icons.send, size: 24),
+                  child: const Icon(
+                    LucideIcons.rocket300,
+                    size: 20,
+                    color: Colors.white,
+                  ),
                 ),
             ],
           ),

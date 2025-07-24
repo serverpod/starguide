@@ -27,6 +27,7 @@ dependencies:
   flutter_chat_core: ^2.3.1
   flutter_chat_ui: ^2.3.1
   flyer_chat_text_message: ^2.2.1
+  lucide_icons_flutter: ^3.0.7
   gpt_markdown: ^1.0.19
   made_with_serverpod: ^1.1.0
   serverpod_flutter: 2.9.1
