@@ -350,7 +350,7 @@ class GptResponse {
       links = [];
     } else {
       text = components[0].trim();
-      final referencesSection = components[1];
+      final referencesSection = components.last;
       final regex = RegExp(r'\[([^\]]+)\]\(([^)]+)\)');
       final matches = regex.allMatches(referencesSection);
       final parsedLinks = <GptResponseLink>[];
