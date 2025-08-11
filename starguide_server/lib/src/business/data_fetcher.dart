@@ -10,13 +10,25 @@ const _futureCallIdentifier = 'DataFetcher';
 
 const _fetchRetryDelay = Duration(minutes: 1);
 
+/// Handles scheduled fetching and caching of external documents.
+///
+/// The [DataFetcher] orchestrates downloading content from configured
+/// [DataSource]s, creates [RAGDocument]s, and stores them in the database. It
+/// also periodically cleans up old data.
 class DataFetcher {
   static DataFetcher? _instance;
 
+  /// Registered data sources that will be crawled for content.
   final List<DataSource> dataSources;
+
+  /// How long a fetched document is considered fresh.
   final Duration cacheDuration;
+
+  /// Duration after which old documents are removed from storage.
   final Duration removeOldDataAfter;
 
+  /// Configures the singleton [DataFetcher] instance. Subsequent calls have no
+  /// effect once the instance has been created.
   static void configure(
     List<DataSource> dataSources, {
     Duration cacheDuration = const Duration(days: 1),
@@ -29,6 +41,7 @@ class DataFetcher {
     );
   }
 
+  /// Accessor for the configured [DataFetcher] singleton.
   static DataFetcher get instance => _instance!;
 
   DataFetcher._({
@@ -37,15 +50,17 @@ class DataFetcher {
     this.removeOldDataAfter = const Duration(days: 3),
   });
 
+  /// Registers the background job with Serverpod so that it can be scheduled.
   void register(Serverpod pod) {
     pod.registerFutureCall(_FetchDataFutureCall(), _futureCallName);
   }
 
+  /// Starts the fetching process by scheduling the first job immediately.
   Future<void> startFetching(Serverpod pod) async {
-    // Cancel any existing future calls, to avoid duplicates.
+    // Cancel any existing future calls to avoid duplicates after restarts.
     await pod.cancelFutureCall(_futureCallIdentifier);
 
-    // Kick off the data fetcher.
+    // Kick off the data fetcher by scheduling the first future call now.
     pod.futureCallWithDelay(
       _futureCallName,
       DataFetcherTask(
@@ -74,23 +89,27 @@ class DataFetcher {
   ) async {
     final genAi = GenerativeAi();
 
+    // Generate a short description used for listing the document.
     session.log('Summarizing document for description.');
     final shortDescription = await genAi.generateSimpleAnswer(
       Prompts.instance.get('summarize_document_for_description')! +
           rawDocument.document,
     );
 
+    // Summaries are embedded to allow similarity searches.
     session.log('Summarizing document for embedding.');
     final embeddingSummary = await genAi.generateSimpleAnswer(
       Prompts.instance.get('summarize_document_for_embedding')! +
           rawDocument.document,
     );
 
+    // Create an embedding vector for the summary text.
     session.log('Generating embedding for summary.');
     final embedding = await genAi.generateEmbedding(embeddingSummary);
 
     session.log('Embeddings generated.');
 
+    // Build the final document object to be stored in the database.
     return RAGDocument(
       title: rawDocument.title,
       sourceUrl: rawDocument.sourceUrl,
@@ -129,10 +148,15 @@ class DataFetcher {
     }
   }
 
+  /// Determines if a given [sourceUrl] needs to be fetched again.
+  ///
+  /// Returns `true` when the URL hasn't been cached recently, meaning new
+  /// content should be downloaded.
   Future<bool> shouldFetchUrl(Session session, Uri sourceUrl) async {
     session.log('Checking if should fetch url: $sourceUrl');
 
-    // Check if the url is already in the database.
+    // Look up the document in the database and check if it has been fetched
+    // within the allowed cache duration.
     final document = await RAGDocument.db.findFirstRow(
       session,
       where: (t) =>

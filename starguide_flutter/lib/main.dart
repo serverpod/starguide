@@ -26,10 +26,14 @@ late final Highlighter highlighterDart;
 late final Highlighter highlighterYaml;
 late final Highlighter highlighterSql;
 
+/// Entry point for the Starguide Flutter application.
+///
+/// Initializes syntax highlighters and reCAPTCHA for web before launching the
+/// app widget tree.
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Initialize the highlighter.
+  // Initialize the syntax highlighters used for code snippets.
   await Highlighter.initialize(['dart', 'yaml', 'sql']);
   var theme = await HighlighterTheme.loadDarkTheme();
   highlighterDart = Highlighter(
@@ -45,6 +49,7 @@ void main() async {
     theme: theme,
   );
 
+  // Prepare reCAPTCHA on web platforms.
   if (kIsWeb) {
     await GRecaptchaV3.hideBadge();
     await GRecaptchaV3.ready(
@@ -54,6 +59,7 @@ void main() async {
   runApp(const StarguideApp());
 }
 
+/// Root widget that sets up the application theme.
 class StarguideApp extends StatelessWidget {
   const StarguideApp({super.key});
 
@@ -67,6 +73,7 @@ class StarguideApp extends StatelessWidget {
   }
 }
 
+/// Top level chat page widget containing the main application state.
 class StarguideChatPage extends StatefulWidget {
   const StarguideChatPage({
     super.key,
@@ -149,10 +156,12 @@ class StarguideChatPageState extends State<StarguideChatPage> {
         kIsWeb ? (await GRecaptchaV3.execute('create_chat_session'))! : '',
       );
 
+      // Ask the server and stream the response as it is generated.
       final responseStream = client.starguide.ask(_chatSession!, text);
 
       var accumulatedText = '';
 
+      // Insert a placeholder message that will be updated as chunks arrive.
       _currentResponse = TextMessage(
         id: _uuid.v4(),
         authorId: _model.id,
@@ -161,6 +170,7 @@ class StarguideChatPageState extends State<StarguideChatPage> {
       );
       await _chatController.insertMessage(_currentResponse!);
 
+      // Append each chunk to the message displayed to the user.
       await for (final chunk in responseStream) {
         accumulatedText += chunk;
         final newMessage = _currentResponse!.copyWith(text: accumulatedText);
@@ -173,6 +183,7 @@ class StarguideChatPageState extends State<StarguideChatPage> {
         _isGeneratingResponse = false;
       });
     } catch (e) {
+      // Flag a connection error so a reconnect UI can be shown.
       setState(() {
         _connectionError = true;
       });
@@ -181,6 +192,7 @@ class StarguideChatPageState extends State<StarguideChatPage> {
   }
 
   void _handleMessageSend(String text) async {
+    // First show the user's message in the chat list.
     await _chatController.insertMessage(
       TextMessage(
         id: _uuid.v4(),
@@ -190,6 +202,7 @@ class StarguideChatPageState extends State<StarguideChatPage> {
       ),
     );
 
+    // Then send the message to the server.
     _sendMessage(text);
   }
 

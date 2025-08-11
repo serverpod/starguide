@@ -7,12 +7,19 @@ import 'package:starguide_server/src/generated/protocol.dart';
 const String _geminiModelName = 'gemini-2.0-flash';
 const String _geminiEmbeddingModelName = 'gemini-embedding-exp-03-07';
 
+/// Utility class wrapping access to the Gemini generative AI APIs.
 class GenerativeAi {
   final String _geminiAPIKey;
 
+  /// Creates a new [GenerativeAi] using credentials stored in Serverpod.
   GenerativeAi()
       : _geminiAPIKey = Serverpod.instance.getPassword('geminiAPIKey')!;
 
+  /// Generates a streaming conversational answer using provided context.
+  ///
+  /// [question] is the user query, [systemPrompt] provides instructions for the
+  /// model, and [documents] and [conversation] give additional grounding
+  /// context.
   Stream<String> generateConversationalAnswer({
     required String question,
     required String systemPrompt,
@@ -21,7 +28,7 @@ class GenerativeAi {
   }) async* {
     final messages = <Message>[];
 
-    // Add conversation history
+    // Convert the existing conversation to Gemini message format.
     for (final chatMessage in conversation) {
       messages.add(
         Message(
@@ -33,22 +40,27 @@ class GenerativeAi {
       );
     }
 
+    // Create an agent with the system prompt and document context.
     final agentWithSystem = _createAgent(
       systemPrompt:
           systemPrompt + documents.map((e) => _formatDocument(e)).join('\n'),
     );
     final response = agentWithSystem.runStream(question, messages: messages);
+
+    // Yield the streamed answer chunk by chunk.
     await for (final chunk in response) {
       yield chunk.output;
     }
   }
 
+  /// Generates a single, non-streaming answer to [question].
   Future<String> generateSimpleAnswer(String question) async {
     final agent = _createAgent();
     final response = await agent.run(question);
     return response.output;
   }
 
+  /// Creates an embedding vector for the given [document] text.
   Future<Vector> generateEmbedding(String document) async {
     final agent = _createAgent();
     final embedding = await agent.createEmbedding(
@@ -58,6 +70,8 @@ class GenerativeAi {
     return Vector(embedding.toList());
   }
 
+  /// Generates a list of URL suggestions based on the [systemPrompt] and
+  /// conversation context.
   Future<List<Uri>> generateUrlList({
     required String systemPrompt,
     List<ChatMessage> conversation = const [],
@@ -70,7 +84,7 @@ class GenerativeAi {
 
     final messages = <Message>[];
 
-    // Add conversation history
+    // Convert the conversation to the provider's message objects.
     for (final chatMessage in conversation) {
       messages.add(
         Message(
@@ -82,6 +96,7 @@ class GenerativeAi {
       );
     }
 
+    // Ask the model for a structured list of URLs.
     final response = await agent.runFor<_UrlList>(
       systemPrompt,
       messages: messages,

@@ -11,7 +11,9 @@ Future<double> verifyRecaptchaToken(
   required String token,
   required String expectedAction,
 }) async {
+  // Endpoint used to validate tokens with Google.
   final uri = Uri.parse('https://www.google.com/recaptcha/api/siteverify');
+  // Secret key configured in Serverpod passwords file.
   final secret = Serverpod.instance.getPassword('recaptchaSecretKey')!;
 
   final response = await http.post(
@@ -33,6 +35,7 @@ Future<double> verifyRecaptchaToken(
     throw RecaptchaException();
   }
 
+  // Parse the JSON response and extract verification details.
   final Map<String, dynamic> result = json.decode(response.body);
   final bool success = result['success'] ?? false;
   final double score = (result['score'] ?? 0.0).toDouble();
