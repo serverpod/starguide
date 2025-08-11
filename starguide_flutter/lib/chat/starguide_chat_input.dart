@@ -2,6 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:starguide_flutter/config/constants.dart';
 
+/// Text input widget used to compose chat messages.
+///
+/// Displays a single-line text field and a send button that triggers [onSend]
+/// when pressed or when the user submits the input field.
 class StarguideChatInput extends StatefulWidget {
   const StarguideChatInput({
     super.key,
@@ -13,11 +17,22 @@ class StarguideChatInput extends StatefulWidget {
     required this.focusNode,
   });
 
+  /// Callback invoked when the user sends a message.
   final void Function(String message) onSend;
+
+  /// Controller that holds the current input text.
   final TextEditingController textController;
+
+  /// Whether the send button is enabled.
   final bool enabled;
+
+  /// Indicates if the server is currently generating an answer.
   final bool isGeneratingResponse;
+
+  /// Number of chat requests made so far.
   final int numChatRequests;
+
+  /// Focus node for controlling keyboard focus.
   final FocusNode focusNode;
 
   @override
@@ -29,6 +44,7 @@ class _StarguideChatInputState extends State<StarguideChatInput> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
+    // Select an appropriate hint based on the number of requests made.
     final String hintText;
 
     if (widget.numChatRequests >= kMaxChatRequests) {
@@ -67,6 +83,7 @@ class _StarguideChatInputState extends State<StarguideChatInput> {
                   ),
                   controller: widget.textController,
                   onSubmitted: (value) {
+                    // Send the message when the user hits enter.
                     widget.onSend(widget.textController.text);
                     widget.textController.clear();
                     widget.focusNode.requestFocus();
@@ -74,6 +91,7 @@ class _StarguideChatInputState extends State<StarguideChatInput> {
                 ),
               ),
               if (widget.isGeneratingResponse)
+                // Show a spinner while the server generates a reply.
                 Container(
                   padding: const EdgeInsets.all(10),
                   width: 40,
@@ -96,6 +114,7 @@ class _StarguideChatInputState extends State<StarguideChatInput> {
                   ),
                   onPressed: widget.enabled
                       ? () {
+                          // Trigger message send and clear the input field.
                           widget.onSend(widget.textController.text);
                           widget.textController.clear();
                         }
