@@ -1,0 +1,3 @@
+class: MarkdownResourceList
+fields:
+  resources: List<MarkdownResourceInfo>

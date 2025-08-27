@@ -1,3 +1,7 @@
+mcp:
+  - mcpInstructions:
+  - getAllResources:
+  - ask:
 starguide:
   - createChatSession:
   - ask:
