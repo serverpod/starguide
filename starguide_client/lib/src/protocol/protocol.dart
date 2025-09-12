@@ -16,20 +16,22 @@ import 'chat_message_type.dart' as _i4;
 import 'chat_session.dart' as _i5;
 import 'data_fetcher_task.dart' as _i6;
 import 'data_fetcher_task_type.dart' as _i7;
-import 'markdown_resource_info.dart' as _i8;
-import 'markdown_resource_list.dart' as _i9;
-import 'rag_document.dart' as _i10;
-import 'rag_document_type.dart' as _i11;
-import 'table_of_contents.dart' as _i12;
-import 'recaptcha/recaptcha_exception.dart' as _i13;
+import 'exceptions/generative_ai_exception.dart' as _i8;
+import 'markdown_resource_info.dart' as _i9;
+import 'markdown_resource_list.dart' as _i10;
+import 'rag_document.dart' as _i11;
+import 'rag_document_type.dart' as _i12;
+import 'table_of_contents.dart' as _i13;
+import 'recaptcha/recaptcha_exception.dart' as _i14;
 import 'package:starguide_client/src/protocol/markdown_resource_info.dart'
-    as _i14;
+    as _i15;
 export 'cached_session_count.dart';
 export 'chat_message.dart';
 export 'chat_message_type.dart';
 export 'chat_session.dart';
 export 'data_fetcher_task.dart';
 export 'data_fetcher_task_type.dart';
+export 'exceptions/generative_ai_exception.dart';
 export 'markdown_resource_info.dart';
 export 'markdown_resource_list.dart';
 export 'rag_document.dart';
@@ -69,23 +71,26 @@ class Protocol extends _i1.SerializationManager {
     if (t == _i7.DataFetcherTaskType) {
       return _i7.DataFetcherTaskType.fromJson(data) as T;
     }
-    if (t == _i8.MarkdownResourceInfo) {
-      return _i8.MarkdownResourceInfo.fromJson(data) as T;
+    if (t == _i8.GenerativeAiException) {
+      return _i8.GenerativeAiException.fromJson(data) as T;
     }
-    if (t == _i9.MarkdownResourceList) {
-      return _i9.MarkdownResourceList.fromJson(data) as T;
+    if (t == _i9.MarkdownResourceInfo) {
+      return _i9.MarkdownResourceInfo.fromJson(data) as T;
     }
-    if (t == _i10.RAGDocument) {
-      return _i10.RAGDocument.fromJson(data) as T;
+    if (t == _i10.MarkdownResourceList) {
+      return _i10.MarkdownResourceList.fromJson(data) as T;
     }
-    if (t == _i11.RAGDocumentType) {
-      return _i11.RAGDocumentType.fromJson(data) as T;
+    if (t == _i11.RAGDocument) {
+      return _i11.RAGDocument.fromJson(data) as T;
     }
-    if (t == _i12.TableOfContents) {
-      return _i12.TableOfContents.fromJson(data) as T;
+    if (t == _i12.RAGDocumentType) {
+      return _i12.RAGDocumentType.fromJson(data) as T;
     }
-    if (t == _i13.RecaptchaException) {
-      return _i13.RecaptchaException.fromJson(data) as T;
+    if (t == _i13.TableOfContents) {
+      return _i13.TableOfContents.fromJson(data) as T;
+    }
+    if (t == _i14.RecaptchaException) {
+      return _i14.RecaptchaException.fromJson(data) as T;
     }
     if (t == _i1.getType<_i2.CachedSessionCount?>()) {
       return (data != null ? _i2.CachedSessionCount.fromJson(data) : null) as T;
@@ -106,35 +111,39 @@ class Protocol extends _i1.SerializationManager {
       return (data != null ? _i7.DataFetcherTaskType.fromJson(data) : null)
           as T;
     }
-    if (t == _i1.getType<_i8.MarkdownResourceInfo?>()) {
-      return (data != null ? _i8.MarkdownResourceInfo.fromJson(data) : null)
+    if (t == _i1.getType<_i8.GenerativeAiException?>()) {
+      return (data != null ? _i8.GenerativeAiException.fromJson(data) : null)
           as T;
     }
-    if (t == _i1.getType<_i9.MarkdownResourceList?>()) {
-      return (data != null ? _i9.MarkdownResourceList.fromJson(data) : null)
+    if (t == _i1.getType<_i9.MarkdownResourceInfo?>()) {
+      return (data != null ? _i9.MarkdownResourceInfo.fromJson(data) : null)
           as T;
     }
-    if (t == _i1.getType<_i10.RAGDocument?>()) {
-      return (data != null ? _i10.RAGDocument.fromJson(data) : null) as T;
-    }
-    if (t == _i1.getType<_i11.RAGDocumentType?>()) {
-      return (data != null ? _i11.RAGDocumentType.fromJson(data) : null) as T;
-    }
-    if (t == _i1.getType<_i12.TableOfContents?>()) {
-      return (data != null ? _i12.TableOfContents.fromJson(data) : null) as T;
-    }
-    if (t == _i1.getType<_i13.RecaptchaException?>()) {
-      return (data != null ? _i13.RecaptchaException.fromJson(data) : null)
+    if (t == _i1.getType<_i10.MarkdownResourceList?>()) {
+      return (data != null ? _i10.MarkdownResourceList.fromJson(data) : null)
           as T;
     }
-    if (t == List<_i8.MarkdownResourceInfo>) {
+    if (t == _i1.getType<_i11.RAGDocument?>()) {
+      return (data != null ? _i11.RAGDocument.fromJson(data) : null) as T;
+    }
+    if (t == _i1.getType<_i12.RAGDocumentType?>()) {
+      return (data != null ? _i12.RAGDocumentType.fromJson(data) : null) as T;
+    }
+    if (t == _i1.getType<_i13.TableOfContents?>()) {
+      return (data != null ? _i13.TableOfContents.fromJson(data) : null) as T;
+    }
+    if (t == _i1.getType<_i14.RecaptchaException?>()) {
+      return (data != null ? _i14.RecaptchaException.fromJson(data) : null)
+          as T;
+    }
+    if (t == List<_i9.MarkdownResourceInfo>) {
       return (data as List)
-          .map((e) => deserialize<_i8.MarkdownResourceInfo>(e))
+          .map((e) => deserialize<_i9.MarkdownResourceInfo>(e))
           .toList() as T;
     }
-    if (t == List<_i14.MarkdownResourceInfo>) {
+    if (t == List<_i15.MarkdownResourceInfo>) {
       return (data as List)
-          .map((e) => deserialize<_i14.MarkdownResourceInfo>(e))
+          .map((e) => deserialize<_i15.MarkdownResourceInfo>(e))
           .toList() as T;
     }
     return super.deserialize<T>(data, t);
@@ -162,22 +171,25 @@ class Protocol extends _i1.SerializationManager {
     if (data is _i7.DataFetcherTaskType) {
       return 'DataFetcherTaskType';
     }
-    if (data is _i8.MarkdownResourceInfo) {
+    if (data is _i8.GenerativeAiException) {
+      return 'GenerativeAiException';
+    }
+    if (data is _i9.MarkdownResourceInfo) {
       return 'MarkdownResourceInfo';
     }
-    if (data is _i9.MarkdownResourceList) {
+    if (data is _i10.MarkdownResourceList) {
       return 'MarkdownResourceList';
     }
-    if (data is _i10.RAGDocument) {
+    if (data is _i11.RAGDocument) {
       return 'RAGDocument';
     }
-    if (data is _i11.RAGDocumentType) {
+    if (data is _i12.RAGDocumentType) {
       return 'RAGDocumentType';
     }
-    if (data is _i12.TableOfContents) {
+    if (data is _i13.TableOfContents) {
       return 'TableOfContents';
     }
-    if (data is _i13.RecaptchaException) {
+    if (data is _i14.RecaptchaException) {
       return 'RecaptchaException';
     }
     return null;
@@ -207,23 +219,26 @@ class Protocol extends _i1.SerializationManager {
     if (dataClassName == 'DataFetcherTaskType') {
       return deserialize<_i7.DataFetcherTaskType>(data['data']);
     }
+    if (dataClassName == 'GenerativeAiException') {
+      return deserialize<_i8.GenerativeAiException>(data['data']);
+    }
     if (dataClassName == 'MarkdownResourceInfo') {
-      return deserialize<_i8.MarkdownResourceInfo>(data['data']);
+      return deserialize<_i9.MarkdownResourceInfo>(data['data']);
     }
     if (dataClassName == 'MarkdownResourceList') {
-      return deserialize<_i9.MarkdownResourceList>(data['data']);
+      return deserialize<_i10.MarkdownResourceList>(data['data']);
     }
     if (dataClassName == 'RAGDocument') {
-      return deserialize<_i10.RAGDocument>(data['data']);
+      return deserialize<_i11.RAGDocument>(data['data']);
     }
     if (dataClassName == 'RAGDocumentType') {
-      return deserialize<_i11.RAGDocumentType>(data['data']);
+      return deserialize<_i12.RAGDocumentType>(data['data']);
     }
     if (dataClassName == 'TableOfContents') {
-      return deserialize<_i12.TableOfContents>(data['data']);
+      return deserialize<_i13.TableOfContents>(data['data']);
     }
     if (dataClassName == 'RecaptchaException') {
-      return deserialize<_i13.RecaptchaException>(data['data']);
+      return deserialize<_i14.RecaptchaException>(data['data']);
     }
     return super.deserializeByClassName(data);
   }
