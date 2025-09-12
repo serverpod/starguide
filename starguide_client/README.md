@@ -14,9 +14,8 @@ The client library for connecting to Serverpod's Starguide server. Starguide is 
 
 Add this to your package's `pubspec.yaml` file:
 
-```yaml
-dependencies:
-  starguide_client: ^0.1.0
+```bash
+dart pub add starguide_client
 ```
 
 Then run:

@@ -1,3 +1,6 @@
+## 0.1.2
+- Correctly names example file.
+
 ## 0.1.1
 - Improved error handling.
 - Adds API documentation.
