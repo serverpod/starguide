@@ -4,7 +4,7 @@
 //   dart run example/basic_usage.dart
 
 import 'dart:async';
-import 'dart:io' show Platform, stdout, stderr;
+import 'dart:io';
 
 import 'package:starguide_client/starguide_client.dart';
 
