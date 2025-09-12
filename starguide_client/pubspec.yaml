@@ -1,6 +1,6 @@
 name: starguide_client
 description: The client for connecting to Serverpod's Starguide server.
-version: 0.1.0
+version: 0.1.1
 repository: https://github.com/serverpod/starguide
 
 environment:
