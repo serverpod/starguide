@@ -6,6 +6,9 @@ import 'package:starguide_server/src/generated/protocol.dart';
 import 'package:starguide_server/src/generative_ai/generative_ai.dart';
 import 'package:starguide_server/src/generative_ai/prompts.dart';
 
+/// Default instruction string returned to Model Context Protocol (MCP)
+/// clients during capability discovery. It describes available tools and how
+/// to use them to obtain Serverpod guides and documentation answers.
 const _mcpInstructions =
     'Provides code samples, guides, and full documentation about Serverpod, a '
     'backend framework written in Dart. To list available coding guides, use '
@@ -16,13 +19,18 @@ const _mcpInstructions =
 
 /// Endpoint for handling Model Context Protocol (MCP) related operations.
 ///
-/// This endpoint provides functionality for:
-/// - Retrieving markdown resources describing the Serverpod framework.
-/// - Processing questions using RAG (Retrieval-Augmented Generation) with
-///   documentation and discussion search.
-/// - Loading and parsing markdown resources with metadata extraction.
+/// Exposes utilities used by MCP-compatible clients to:
+/// - Retrieve markdown resources describing the Serverpod framework.
+/// - Ask questions answered via RAG (Retrieval-Augmented Generation) over
+///   Serverpod documentation and GitHub discussions.
+/// - Load and parse markdown resources with metadata extraction.
+///
+/// {@category Endpoint}
 class McpEndpoint extends Endpoint {
-  /// Returns the MCP instructions.
+  /// Returns the MCP instruction string presented to MCP clients.
+  ///
+  /// The returned text outlines the available tools (e.g., list-guides,
+  /// get-guide, ask-docs) and how to interact with this server.
   Future<String> mcpInstructions(Session session) async {
     return _mcpInstructions;
   }
@@ -34,6 +42,10 @@ class McpEndpoint extends Endpoint {
   /// - URI (serverpod:// prefixed path).
   /// - Description (first paragraph after title).
   /// - Full text content.
+  ///
+  /// The resources are discovered by scanning the `assets/resources` directory
+  /// for files ending in `.md`. Each file is parsed and converted to a
+  /// [MarkdownResourceInfo].
   ///
   /// Throws [FileSystemException] if the resources cannot be accessed.
   Future<List<MarkdownResourceInfo>> getAllResources(
@@ -61,6 +73,12 @@ class McpEndpoint extends Endpoint {
   ///
   /// Returns a [String] containing the generated answer based on the retrieved
   /// context and the user's question.
+  ///
+  /// This method returns a fully assembled answer (non-streaming). For a
+  /// streaming, conversational experience see the `starguide.ask` endpoint.
+  ///
+  /// May throw if the generative AI provider rejects the request or if the
+  /// provided [geminiAPIKey] is invalid.
   Future<String> ask(
     Session session,
     String question,

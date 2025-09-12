@@ -18,11 +18,13 @@ import 'protocol.dart' as _i5;
 
 /// Endpoint for handling Model Context Protocol (MCP) related operations.
 ///
-/// This endpoint provides functionality for:
-/// - Retrieving markdown resources describing the Serverpod framework.
-/// - Processing questions using RAG (Retrieval-Augmented Generation) with
-///   documentation and discussion search.
-/// - Loading and parsing markdown resources with metadata extraction.
+/// Exposes utilities used by MCP-compatible clients to:
+/// - Retrieve markdown resources describing the Serverpod framework.
+/// - Ask questions answered via RAG (Retrieval-Augmented Generation) over
+///   Serverpod documentation and GitHub discussions.
+/// - Load and parse markdown resources with metadata extraction.
+///
+/// {@category Endpoint}
 /// {@category Endpoint}
 class EndpointMcp extends _i1.EndpointRef {
   EndpointMcp(_i1.EndpointCaller caller) : super(caller);
@@ -30,7 +32,10 @@ class EndpointMcp extends _i1.EndpointRef {
   @override
   String get name => 'mcp';
 
-  /// Returns the MCP instructions.
+  /// Returns the MCP instruction string presented to MCP clients.
+  ///
+  /// The returned text outlines the available tools (e.g., list-guides,
+  /// get-guide, ask-docs) and how to interact with this server.
   _i2.Future<String> mcpInstructions() => caller.callServerEndpoint<String>(
         'mcp',
         'mcpInstructions',
@@ -44,6 +49,10 @@ class EndpointMcp extends _i1.EndpointRef {
   /// - URI (serverpod:// prefixed path).
   /// - Description (first paragraph after title).
   /// - Full text content.
+  ///
+  /// The resources are discovered by scanning the `assets/resources` directory
+  /// for files ending in `.md`. Each file is parsed and converted to a
+  /// [MarkdownResourceInfo].
   ///
   /// Throws [FileSystemException] if the resources cannot be accessed.
   _i2.Future<List<_i3.MarkdownResourceInfo>> getAllResources() =>
@@ -64,6 +73,12 @@ class EndpointMcp extends _i1.EndpointRef {
   ///
   /// Returns a [String] containing the generated answer based on the retrieved
   /// context and the user's question.
+  ///
+  /// This method returns a fully assembled answer (non-streaming). For a
+  /// streaming, conversational experience see the `starguide.ask` endpoint.
+  ///
+  /// May throw if the generative AI provider rejects the request or if the
+  /// provided [geminiAPIKey] is invalid.
   _i2.Future<String> ask(
     String question,
     String geminiAPIKey,
@@ -78,6 +93,7 @@ class EndpointMcp extends _i1.EndpointRef {
       );
 }
 
+/// Endpoint for chat sessions and Q&A powered by RAG over Serverpod docs.
 /// {@category Endpoint}
 class EndpointStarguide extends _i1.EndpointRef {
   EndpointStarguide(_i1.EndpointCaller caller) : super(caller);
@@ -85,6 +101,10 @@ class EndpointStarguide extends _i1.EndpointRef {
   @override
   String get name => 'starguide';
 
+  /// Creates a new chat session for a user after reCAPTCHA check.
+  ///
+  /// Throws [RecaptchaException] if reCAPTCHA verification fails in
+  /// non-development environments. Limits total monthly requests.
   _i2.Future<_i4.ChatSession> createChatSession(String reCaptchaToken) =>
       caller.callServerEndpoint<_i4.ChatSession>(
         'starguide',
@@ -92,6 +112,10 @@ class EndpointStarguide extends _i1.EndpointRef {
         {'reCaptchaToken': reCaptchaToken},
       );
 
+  /// Asks a question and streams the generated answer as chunks.
+  ///
+  /// Combines previous conversation context with searched RAG documents
+  /// from docs and discussions to produce the answer.
   _i2.Stream<String> ask(
     _i4.ChatSession chatSession,
     String question,
@@ -106,6 +130,7 @@ class EndpointStarguide extends _i1.EndpointRef {
         {},
       );
 
+  /// Records a thumbs up or down for the final answer of a chat session.
   _i2.Future<void> vote(
     _i4.ChatSession chatSession,
     bool goodAnswer,
