@@ -13,6 +13,8 @@ class GenerativeAi {
   GenerativeAi()
       : _geminiAPIKey = Serverpod.instance.getPassword('geminiAPIKey')!;
 
+  GenerativeAi.withAPIKey(String geminiAPIKey) : _geminiAPIKey = geminiAPIKey;
+
   Stream<String> generateConversationalAnswer({
     required String question,
     required String systemPrompt,

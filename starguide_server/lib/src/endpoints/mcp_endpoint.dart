@@ -66,7 +66,7 @@ class McpEndpoint extends Endpoint {
     String question,
     String geminiAPIKey,
   ) async {
-    final genAi = GenerativeAi();
+    final genAi = GenerativeAi.withAPIKey(geminiAPIKey);
 
     // Search RAG documents in parallel, using different methods.
     final results = await Future.wait([
