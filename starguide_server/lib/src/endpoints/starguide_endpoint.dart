@@ -6,11 +6,16 @@ import 'package:starguide_server/src/generated/protocol.dart';
 import 'package:starguide_server/src/generative_ai/prompts.dart';
 import 'package:starguide_server/src/recaptcha/recaptcha.dart';
 
+/// Endpoint for chat sessions and Q&A powered by RAG over Serverpod docs.
 class StarguideEndpoint extends Endpoint {
   static const _maxConversationLength = 25;
   static const _maxRequestsPerMonth = 10000;
   static const _sessionCountKey = 'session_count';
 
+  /// Creates a new chat session for a user after reCAPTCHA check.
+  ///
+  /// Throws [RecaptchaException] if reCAPTCHA verification fails in
+  /// non-development environments. Limits total monthly requests.
   Future<ChatSession> createChatSession(
     Session session,
     String reCaptchaToken,
@@ -71,6 +76,10 @@ class StarguideEndpoint extends Endpoint {
     );
   }
 
+  /// Asks a question and streams the generated answer as chunks.
+  ///
+  /// Combines previous conversation context with searched RAG documents
+  /// from docs and discussions to produce the answer.
   Stream<String> ask(
     Session session,
     ChatSession chatSession,
@@ -130,6 +139,7 @@ class StarguideEndpoint extends Endpoint {
     );
   }
 
+  /// Records a thumbs up or down for the final answer of a chat session.
   Future<void> vote(
     Session session,
     ChatSession chatSession,
@@ -143,6 +153,7 @@ class StarguideEndpoint extends Endpoint {
     await ChatSession.db.updateRow(session, chatSession);
   }
 
+  /// Verifies that a provided chat session exists and has a matching key.
   Future<void> _verifyChatSession(
     Session session,
     ChatSession chatSession,

@@ -14,8 +14,10 @@
 import 'package:serverpod_test/serverpod_test.dart' as _i1;
 import 'package:serverpod/serverpod.dart' as _i2;
 import 'dart:async' as _i3;
-import 'package:starguide_server/src/generated/chat_session.dart' as _i4;
-import 'dart:convert' as _i5;
+import 'package:starguide_server/src/generated/markdown_resource_info.dart'
+    as _i4;
+import 'package:starguide_server/src/generated/chat_session.dart' as _i5;
+import 'dart:convert' as _i6;
 import 'package:starguide_server/src/generated/protocol.dart';
 import 'package:starguide_server/src/generated/endpoints.dart';
 export 'package:serverpod_test/serverpod_test_public_exports.dart';
@@ -102,6 +104,8 @@ void withServerpod(
 }
 
 class TestEndpoints {
+  late final _McpEndpoint mcp;
+
   late final _StarguideEndpoint starguide;
 }
 
@@ -112,10 +116,112 @@ class _InternalTestEndpoints extends TestEndpoints
     _i2.SerializationManager serializationManager,
     _i2.EndpointDispatch endpoints,
   ) {
+    mcp = _McpEndpoint(
+      endpoints,
+      serializationManager,
+    );
     starguide = _StarguideEndpoint(
       endpoints,
       serializationManager,
     );
+  }
+}
+
+class _McpEndpoint {
+  _McpEndpoint(
+    this._endpointDispatch,
+    this._serializationManager,
+  );
+
+  final _i2.EndpointDispatch _endpointDispatch;
+
+  final _i2.SerializationManager _serializationManager;
+
+  _i3.Future<String> mcpInstructions(
+      _i1.TestSessionBuilder sessionBuilder) async {
+    return _i1.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _i1.InternalTestSessionBuilder).internalBuild(
+        endpoint: 'mcp',
+        method: 'mcpInstructions',
+      );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'mcp',
+          methodName: 'mcpInstructions',
+          parameters: _i1.testObjectToJson({}),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue = await (_localCallContext.method.call(
+          _localUniqueSession,
+          _localCallContext.arguments,
+        ) as _i3.Future<String>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+
+  _i3.Future<List<_i4.MarkdownResourceInfo>> getAllResources(
+      _i1.TestSessionBuilder sessionBuilder) async {
+    return _i1.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _i1.InternalTestSessionBuilder).internalBuild(
+        endpoint: 'mcp',
+        method: 'getAllResources',
+      );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'mcp',
+          methodName: 'getAllResources',
+          parameters: _i1.testObjectToJson({}),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue = await (_localCallContext.method.call(
+          _localUniqueSession,
+          _localCallContext.arguments,
+        ) as _i3.Future<List<_i4.MarkdownResourceInfo>>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+
+  _i3.Future<String> ask(
+    _i1.TestSessionBuilder sessionBuilder,
+    String question,
+    String geminiAPIKey,
+  ) async {
+    return _i1.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _i1.InternalTestSessionBuilder).internalBuild(
+        endpoint: 'mcp',
+        method: 'ask',
+      );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'mcp',
+          methodName: 'ask',
+          parameters: _i1.testObjectToJson({
+            'question': question,
+            'geminiAPIKey': geminiAPIKey,
+          }),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue = await (_localCallContext.method.call(
+          _localUniqueSession,
+          _localCallContext.arguments,
+        ) as _i3.Future<String>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
   }
 }
 
@@ -129,7 +235,7 @@ class _StarguideEndpoint {
 
   final _i2.SerializationManager _serializationManager;
 
-  _i3.Future<_i4.ChatSession> createChatSession(
+  _i3.Future<_i5.ChatSession> createChatSession(
     _i1.TestSessionBuilder sessionBuilder,
     String reCaptchaToken,
   ) async {
@@ -150,7 +256,7 @@ class _StarguideEndpoint {
         var _localReturnValue = await (_localCallContext.method.call(
           _localUniqueSession,
           _localCallContext.arguments,
-        ) as _i3.Future<_i4.ChatSession>);
+        ) as _i3.Future<_i5.ChatSession>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();
@@ -160,7 +266,7 @@ class _StarguideEndpoint {
 
   _i3.Stream<String> ask(
     _i1.TestSessionBuilder sessionBuilder,
-    _i4.ChatSession chatSession,
+    _i5.ChatSession chatSession,
     String question,
   ) {
     var _localTestStreamManager = _i1.TestStreamManager<String>();
@@ -178,7 +284,7 @@ class _StarguideEndpoint {
           methodName: 'ask',
           arguments: {
             'chatSession':
-                _i5.jsonDecode(_i2.SerializationManager.encode(chatSession)),
+                _i6.jsonDecode(_i2.SerializationManager.encode(chatSession)),
             'question': question,
           },
           requestedInputStreams: [],
@@ -197,7 +303,7 @@ class _StarguideEndpoint {
 
   _i3.Future<void> vote(
     _i1.TestSessionBuilder sessionBuilder,
-    _i4.ChatSession chatSession,
+    _i5.ChatSession chatSession,
     bool goodAnswer,
   ) async {
     return _i1.callAwaitableFunctionAndHandleExceptions(() async {

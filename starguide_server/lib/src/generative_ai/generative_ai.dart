@@ -13,6 +13,8 @@ class GenerativeAi {
   GenerativeAi()
       : _geminiAPIKey = Serverpod.instance.getPassword('geminiAPIKey')!;
 
+  GenerativeAi.withAPIKey(String geminiAPIKey) : _geminiAPIKey = geminiAPIKey;
+
   Stream<String> generateConversationalAnswer({
     required String question,
     required String systemPrompt,
@@ -37,25 +39,37 @@ class GenerativeAi {
       systemPrompt:
           systemPrompt + documents.map((e) => _formatDocument(e)).join('\n'),
     );
-    final response = agentWithSystem.runStream(question, messages: messages);
-    await for (final chunk in response) {
-      yield chunk.output;
+    try {
+      final response = agentWithSystem.runStream(question, messages: messages);
+      await for (final chunk in response) {
+        yield chunk.output;
+      }
+    } catch (e) {
+      throw GenerativeAiException(message: e.toString());
     }
   }
 
   Future<String> generateSimpleAnswer(String question) async {
     final agent = _createAgent();
-    final response = await agent.run(question);
-    return response.output;
+    try {
+      final response = await agent.run(question);
+      return response.output;
+    } catch (e) {
+      throw GenerativeAiException(message: e.toString());
+    }
   }
 
   Future<Vector> generateEmbedding(String document) async {
     final agent = _createAgent();
-    final embedding = await agent.createEmbedding(
-      document,
-      dimensions: 1536,
-    );
-    return Vector(embedding.toList());
+    try {
+      final embedding = await agent.createEmbedding(
+        document,
+        dimensions: 1536,
+      );
+      return Vector(embedding.toList());
+    } catch (e) {
+      throw GenerativeAiException(message: e.toString());
+    }
   }
 
   Future<List<Uri>> generateUrlList({
@@ -81,12 +95,15 @@ class GenerativeAi {
         ),
       );
     }
-
-    final response = await agent.runFor<_UrlList>(
-      systemPrompt,
-      messages: messages,
-    );
-    return response.output.urls.map((str) => Uri.parse(str)).toList();
+    try {
+      final response = await agent.runFor<_UrlList>(
+        systemPrompt,
+        messages: messages,
+      );
+      return response.output.urls.map((str) => Uri.parse(str)).toList();
+    } catch (e) {
+      throw GenerativeAiException(message: e.toString());
+    }
   }
 
   String _formatDocument(RAGDocument document) {
