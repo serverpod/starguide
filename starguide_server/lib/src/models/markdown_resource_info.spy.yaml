@@ -1,0 +1,8 @@
+class: MarkdownResourceInfo
+fields:
+  name: String
+  uri: String
+  description: String
+  text: String
+
+  

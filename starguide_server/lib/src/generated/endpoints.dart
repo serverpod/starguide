@@ -10,20 +10,75 @@
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod/serverpod.dart' as _i1;
-import '../endpoints/starguide_endpoint.dart' as _i2;
-import 'package:starguide_server/src/generated/chat_session.dart' as _i3;
+import '../endpoints/mcp_endpoint.dart' as _i2;
+import '../endpoints/starguide_endpoint.dart' as _i3;
+import 'package:starguide_server/src/generated/chat_session.dart' as _i4;
 
 class Endpoints extends _i1.EndpointDispatch {
   @override
   void initializeEndpoints(_i1.Server server) {
     var endpoints = <String, _i1.Endpoint>{
-      'starguide': _i2.StarguideEndpoint()
+      'mcp': _i2.McpEndpoint()
+        ..initialize(
+          server,
+          'mcp',
+          null,
+        ),
+      'starguide': _i3.StarguideEndpoint()
         ..initialize(
           server,
           'starguide',
           null,
-        )
+        ),
     };
+    connectors['mcp'] = _i1.EndpointConnector(
+      name: 'mcp',
+      endpoint: endpoints['mcp']!,
+      methodConnectors: {
+        'mcpInstructions': _i1.MethodConnector(
+          name: 'mcpInstructions',
+          params: {},
+          call: (
+            _i1.Session session,
+            Map<String, dynamic> params,
+          ) async =>
+              (endpoints['mcp'] as _i2.McpEndpoint).mcpInstructions(session),
+        ),
+        'getAllResources': _i1.MethodConnector(
+          name: 'getAllResources',
+          params: {},
+          call: (
+            _i1.Session session,
+            Map<String, dynamic> params,
+          ) async =>
+              (endpoints['mcp'] as _i2.McpEndpoint).getAllResources(session),
+        ),
+        'ask': _i1.MethodConnector(
+          name: 'ask',
+          params: {
+            'question': _i1.ParameterDescription(
+              name: 'question',
+              type: _i1.getType<String>(),
+              nullable: false,
+            ),
+            'geminiAPIKey': _i1.ParameterDescription(
+              name: 'geminiAPIKey',
+              type: _i1.getType<String>(),
+              nullable: false,
+            ),
+          },
+          call: (
+            _i1.Session session,
+            Map<String, dynamic> params,
+          ) async =>
+              (endpoints['mcp'] as _i2.McpEndpoint).ask(
+            session,
+            params['question'],
+            params['geminiAPIKey'],
+          ),
+        ),
+      },
+    );
     connectors['starguide'] = _i1.EndpointConnector(
       name: 'starguide',
       endpoint: endpoints['starguide']!,
@@ -41,7 +96,7 @@ class Endpoints extends _i1.EndpointDispatch {
             _i1.Session session,
             Map<String, dynamic> params,
           ) async =>
-              (endpoints['starguide'] as _i2.StarguideEndpoint)
+              (endpoints['starguide'] as _i3.StarguideEndpoint)
                   .createChatSession(
             session,
             params['reCaptchaToken'],
@@ -52,7 +107,7 @@ class Endpoints extends _i1.EndpointDispatch {
           params: {
             'chatSession': _i1.ParameterDescription(
               name: 'chatSession',
-              type: _i1.getType<_i3.ChatSession>(),
+              type: _i1.getType<_i4.ChatSession>(),
               nullable: false,
             ),
             'goodAnswer': _i1.ParameterDescription(
@@ -65,7 +120,7 @@ class Endpoints extends _i1.EndpointDispatch {
             _i1.Session session,
             Map<String, dynamic> params,
           ) async =>
-              (endpoints['starguide'] as _i2.StarguideEndpoint).vote(
+              (endpoints['starguide'] as _i3.StarguideEndpoint).vote(
             session,
             params['chatSession'],
             params['goodAnswer'],
@@ -76,7 +131,7 @@ class Endpoints extends _i1.EndpointDispatch {
           params: {
             'chatSession': _i1.ParameterDescription(
               name: 'chatSession',
-              type: _i1.getType<_i3.ChatSession>(),
+              type: _i1.getType<_i4.ChatSession>(),
               nullable: false,
             ),
             'question': _i1.ParameterDescription(
@@ -92,7 +147,7 @@ class Endpoints extends _i1.EndpointDispatch {
             Map<String, dynamic> params,
             Map<String, Stream> streamParams,
           ) =>
-              (endpoints['starguide'] as _i2.StarguideEndpoint).ask(
+              (endpoints['starguide'] as _i3.StarguideEndpoint).ask(
             session,
             params['chatSession'],
             params['question'],
