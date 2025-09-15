@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:starguide_flutter/config/constants.dart';
 
@@ -40,37 +41,42 @@ class _StarguideChatInputState extends State<StarguideChatInput> {
     }
 
     return Container(
-      padding:
-          const EdgeInsets.only(left: 12.0, right: 8.0, top: 8.0, bottom: 8.0),
+      padding: const EdgeInsets.only(
+        left: 12.0,
+        right: 8.0,
+        top: 8.0,
+        bottom: 8.0,
+      ),
       child: Column(
         children: [
           Row(
             children: [
               Expanded(
-                child: TextField(
+                child: KeyboardListener(
                   focusNode: widget.focusNode,
-                  autofocus: true,
-                  enabled: widget.numChatRequests < kMaxChatRequests,
-                  buildCounter: (
-                    context, {
-                    required currentLength,
-                    required isFocused,
-                    required maxLength,
-                  }) {
-                    return const SizedBox();
-                  },
-                  maxLength: kMaxChatRequestLength,
-                  maxLines: 1,
-                  decoration: InputDecoration.collapsed(
-                    hintText: hintText,
-                    hintStyle: TextStyle(color: theme.disabledColor),
+                  onKeyEvent: (event) => _handleKeyboardEvents(event),
+                  child: TextField(
+                    autofocus: true,
+                    enabled: widget.numChatRequests < kMaxChatRequests,
+                    buildCounter: (
+                      context, {
+                      required currentLength,
+                      required isFocused,
+                      required maxLength,
+                    }) {
+                      return const SizedBox();
+                    },
+                    maxLength: kMaxChatRequestLength,
+                    maxLines: null,
+                    minLines: 1,
+                    keyboardType: TextInputType.multiline,
+                    textInputAction: TextInputAction.newline,
+                    decoration: InputDecoration.collapsed(
+                      hintText: hintText,
+                      hintStyle: TextStyle(color: theme.disabledColor),
+                    ),
+                    controller: widget.textController,
                   ),
-                  controller: widget.textController,
-                  onSubmitted: (value) {
-                    widget.onSend(widget.textController.text);
-                    widget.textController.clear();
-                    widget.focusNode.requestFocus();
-                  },
                 ),
               ),
               if (widget.isGeneratingResponse)
@@ -94,12 +100,7 @@ class _StarguideChatInputState extends State<StarguideChatInput> {
                     padding: const EdgeInsets.all(4),
                     minimumSize: const Size(48, 48),
                   ),
-                  onPressed: widget.enabled
-                      ? () {
-                          widget.onSend(widget.textController.text);
-                          widget.textController.clear();
-                        }
-                      : null,
+                  onPressed: widget.enabled ? _handleSubmit : null,
                   child: const Icon(
                     LucideIcons.rocket300,
                     size: 20,
@@ -111,5 +112,23 @@ class _StarguideChatInputState extends State<StarguideChatInput> {
         ],
       ),
     );
+  }
+
+  void _handleKeyboardEvents(KeyEvent event) {
+    if (event is KeyDownEvent) {
+      final isEnterPressed = event.logicalKey == LogicalKeyboardKey.enter;
+      final isShiftPressed = HardwareKeyboard.instance.isShiftPressed;
+
+      if (isEnterPressed && !isShiftPressed && widget.enabled) {
+        _handleSubmit();
+      }
+    }
+  }
+
+  void _handleSubmit() {
+    if (widget.textController.text.trim().isNotEmpty) {
+      widget.onSend(widget.textController.text);
+      widget.textController.clear();
+    }
   }
 }
