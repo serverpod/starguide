@@ -536,6 +536,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.8.5+1"
+  serverpod_auth_client:
+    dependency: transitive
+    description:
+      name: serverpod_auth_client
+      sha256: "41615696ff57d86e45dbbd8b51f48e914b3c1719b229e8b01ebd937c983ae1ad"
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.9.1"
   serverpod_client:
     dependency: transitive
     description:
@@ -595,7 +603,7 @@ packages:
       path: "../starguide_client"
       relative: true
     source: path
-    version: "0.1.0"
+    version: "0.1.2"
   stream_channel:
     dependency: transitive
     description:

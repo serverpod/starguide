@@ -14,7 +14,8 @@ import 'dart:async' as _i2;
 import 'package:starguide_client/src/protocol/markdown_resource_info.dart'
     as _i3;
 import 'package:starguide_client/src/protocol/chat_session.dart' as _i4;
-import 'protocol.dart' as _i5;
+import 'package:serverpod_auth_client/serverpod_auth_client.dart' as _i5;
+import 'protocol.dart' as _i6;
 
 /// Endpoint for handling Model Context Protocol (MCP) related operations.
 ///
@@ -145,6 +146,14 @@ class EndpointStarguide extends _i1.EndpointRef {
       );
 }
 
+class Modules {
+  Modules(Client client) {
+    auth = _i5.Caller(client);
+  }
+
+  late final _i5.Caller auth;
+}
+
 class Client extends _i1.ServerpodClientShared {
   Client(
     String host, {
@@ -161,7 +170,7 @@ class Client extends _i1.ServerpodClientShared {
     bool? disconnectStreamsOnLostInternetConnection,
   }) : super(
           host,
-          _i5.Protocol(),
+          _i6.Protocol(),
           securityContext: securityContext,
           authenticationKeyManager: authenticationKeyManager,
           streamingConnectionTimeout: streamingConnectionTimeout,
@@ -173,11 +182,14 @@ class Client extends _i1.ServerpodClientShared {
         ) {
     mcp = EndpointMcp(this);
     starguide = EndpointStarguide(this);
+    modules = Modules(this);
   }
 
   late final EndpointMcp mcp;
 
   late final EndpointStarguide starguide;
+
+  late final Modules modules;
 
   @override
   Map<String, _i1.EndpointRef> get endpointRefLookup => {
@@ -186,5 +198,6 @@ class Client extends _i1.ServerpodClientShared {
       };
 
   @override
-  Map<String, _i1.ModuleEndpointCaller> get moduleLookup => {};
+  Map<String, _i1.ModuleEndpointCaller> get moduleLookup =>
+      {'auth': modules.auth};
 }

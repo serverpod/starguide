@@ -1,4 +1,5 @@
 import 'package:serverpod/serverpod.dart';
+import 'package:serverpod_auth_server/serverpod_auth_server.dart' as auth;
 import 'package:starguide_server/src/business/data_fetcher.dart';
 import 'package:starguide_server/src/config/setup_data_fetcher.dart';
 
@@ -13,6 +14,7 @@ void run(List<String> args) async {
     args,
     Protocol(),
     Endpoints(),
+    authenticationHandler: auth.authenticationHandler,
   );
 
   configureDataFetcher();

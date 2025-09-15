@@ -25,6 +25,7 @@ import 'table_of_contents.dart' as _i13;
 import 'recaptcha/recaptcha_exception.dart' as _i14;
 import 'package:starguide_client/src/protocol/markdown_resource_info.dart'
     as _i15;
+import 'package:serverpod_auth_client/serverpod_auth_client.dart' as _i16;
 export 'cached_session_count.dart';
 export 'chat_message.dart';
 export 'chat_message_type.dart';
@@ -146,6 +147,9 @@ class Protocol extends _i1.SerializationManager {
           .map((e) => deserialize<_i15.MarkdownResourceInfo>(e))
           .toList() as T;
     }
+    try {
+      return _i16.Protocol().deserialize<T>(data, t);
+    } on _i1.DeserializationTypeNotFoundException catch (_) {}
     return super.deserialize<T>(data, t);
   }
 
@@ -191,6 +195,10 @@ class Protocol extends _i1.SerializationManager {
     }
     if (data is _i14.RecaptchaException) {
       return 'RecaptchaException';
+    }
+    className = _i16.Protocol().getClassNameForObject(data);
+    if (className != null) {
+      return 'serverpod_auth.$className';
     }
     return null;
   }
@@ -239,6 +247,10 @@ class Protocol extends _i1.SerializationManager {
     }
     if (dataClassName == 'RecaptchaException') {
       return deserialize<_i14.RecaptchaException>(data['data']);
+    }
+    if (dataClassName.startsWith('serverpod_auth.')) {
+      data['className'] = dataClassName.substring(15);
+      return _i16.Protocol().deserializeByClassName(data);
     }
     return super.deserializeByClassName(data);
   }
