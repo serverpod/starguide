@@ -103,6 +103,7 @@ class StarguideChatPageState extends State<StarguideChatPage> {
   bool _isInputFocused = false;
 
   bool _connectionError = false;
+  bool _recaptchaError = false;
 
   @override
   void initState() {
@@ -172,7 +173,13 @@ class StarguideChatPageState extends State<StarguideChatPage> {
       setState(() {
         _isGeneratingResponse = false;
       });
-    } catch (e) {
+    } on RecaptchaException catch (_) {
+      setState(() {
+        _recaptchaError = true;
+        _connectionError = true;
+      });
+      return;
+    } catch (_) {
       setState(() {
         _connectionError = true;
       });
@@ -231,10 +238,12 @@ class StarguideChatPageState extends State<StarguideChatPage> {
 
     if (_connectionError) {
       return StarguideDisconnected(
+        recaptchaError: _recaptchaError,
         onReconnect: () {
           _handleClearChat();
           setState(() {
             _connectionError = false;
+            _recaptchaError = false;
           });
         },
       );
