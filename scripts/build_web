@@ -5,7 +5,9 @@ set -e
 
 # Build the web app.
 cd starguide_flutter
-flutter build web --release
+flutter clean
+flutter pub get
+flutter build web --release --source-maps
 cd ..
 
 # Copy the build files into the web/app diretory.
