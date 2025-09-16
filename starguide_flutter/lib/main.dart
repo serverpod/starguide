@@ -4,6 +4,7 @@ import 'package:flutter_chat_ui/flutter_chat_ui.dart';
 import 'package:g_recaptcha_v3/g_recaptcha_v3.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:markdown_widget/markdown_widget.dart';
+import 'package:serverpod_auth_shared_flutter/serverpod_auth_shared_flutter.dart';
 import 'package:starguide_client/starguide_client.dart';
 import 'package:flutter/material.dart';
 import 'package:serverpod_flutter/serverpod_flutter.dart';
@@ -18,9 +19,18 @@ import 'package:starguide_flutter/widgets/animated_gradient_border.dart';
 import 'package:syntax_highlight/syntax_highlight.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-// var client = Client('http://$localhost:8080/')
-var client = Client('https://starguide.api.serverpod.space/')
+// final client = Client(
+//   'http://$localhost:8080/',
+//   authenticationKeyManager: FlutterAuthenticationKeyManager(),
+// )
+var client = Client(
+  'https://starguide.api.serverpod.space/',
+  authenticationKeyManager: FlutterAuthenticationKeyManager(),
+)
+//
   ..connectivityMonitor = FlutterConnectivityMonitor();
+
+late SessionManager sessionManager;
 
 late final Highlighter highlighterDart;
 late final Highlighter highlighterYaml;
@@ -28,6 +38,9 @@ late final Highlighter highlighterSql;
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  sessionManager = SessionManager(caller: client.modules.auth);
+  await sessionManager.initialize();
 
   // Initialize the highlighter.
   await Highlighter.initialize(['dart', 'yaml', 'sql']);
@@ -129,6 +142,16 @@ class StarguideChatPageState extends State<StarguideChatPage> {
       _handleMessageSend(_inputTextController.text);
       _inputTextController.clear();
     }
+
+    sessionManager.addListener(() {
+      setState(() {
+        if (sessionManager.isSignedIn) {
+          _recaptchaError = false;
+          _connectionError = false;
+          _isGeneratingResponse = false;
+        }
+      });
+    });
   }
 
   @override
@@ -417,41 +440,55 @@ class StarguideChatPageState extends State<StarguideChatPage> {
                   ),
                 ),
                 Spacer(),
-                Text(
-                  'Protected by ',
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    color: theme.disabledColor,
+                if (!sessionManager.isSignedIn)
+                  Text(
+                    'Protected by ',
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: theme.disabledColor,
+                    ),
                   ),
-                ),
-                PopupMenuButton<String>(
-                  tooltip: '',
-                  color: Colors.white,
-                  offset: const Offset(0, -8),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  itemBuilder: (context) => [
-                    PopupMenuItem<String>(
-                      enabled: false,
-                      child: Container(
-                        constraints: const BoxConstraints(maxWidth: 500),
-                        child: MarkdownBlock(
-                          config: MarkdownConfig(configs: [
-                            PConfig(textStyle: theme.textTheme.bodySmall!),
-                          ]),
-                          data:
-                              'This site is protected by reCAPTCHA and the Google [Privacy Policy](https://policies.google.com/privacy) and [Terms of Service](https://policies.google.com/terms) apply.',
+                if (!sessionManager.isSignedIn)
+                  PopupMenuButton<String>(
+                    tooltip: '',
+                    color: Colors.white,
+                    offset: const Offset(0, -8),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    itemBuilder: (context) => [
+                      PopupMenuItem<String>(
+                        enabled: false,
+                        child: Container(
+                          constraints: const BoxConstraints(maxWidth: 500),
+                          child: MarkdownBlock(
+                            config: MarkdownConfig(configs: [
+                              PConfig(textStyle: theme.textTheme.bodySmall!),
+                            ]),
+                            data:
+                                'This site is protected by reCAPTCHA and the Google [Privacy Policy](https://policies.google.com/privacy) and [Terms of Service](https://policies.google.com/terms) apply.',
+                          ),
                         ),
                       ),
-                    ),
-                  ],
-                  child: Text(
-                    'reCAPTCHA',
-                    style: theme.textTheme.bodySmall?.copyWith(
-                      color: Colors.blue.shade600,
+                    ],
+                    child: Text(
+                      'reCAPTCHA',
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: Colors.blue.shade600,
+                      ),
                     ),
                   ),
-                ),
+                if (sessionManager.isSignedIn)
+                  TextButton(
+                    onPressed: () {
+                      sessionManager.signOutDevice();
+                    },
+                    child: Text(
+                      'Sign out',
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: Colors.blue.shade600,
+                      ),
+                    ),
+                  ),
               ],
             ),
           ),

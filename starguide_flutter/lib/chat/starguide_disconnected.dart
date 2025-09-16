@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:serverpod_auth_google_flutter/serverpod_auth_google_flutter.dart';
+import 'package:starguide_flutter/main.dart';
 
 class StarguideDisconnected extends StatelessWidget {
   const StarguideDisconnected({
@@ -31,14 +33,22 @@ class StarguideDisconnected extends StatelessWidget {
                 ? 'Are you a robot? Please sign in to access Starguide.'
                 : 'Oops. Something went wrong.'),
             const SizedBox(height: 32),
-            OutlinedButton(
-              onPressed: onReconnect,
-              child: Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                child: Text('Try Again'),
+            if (!recaptchaError)
+              OutlinedButton(
+                onPressed: onReconnect,
+                child: Padding(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  child: Text('Try Again'),
+                ),
               ),
-            ),
+            if (recaptchaError)
+              SignInWithGoogleButton(
+                caller: client.modules.auth,
+                redirectUri: Uri.parse('http://localhost:8082/googlesignin'),
+                serverClientId:
+                    '228196660760-93k92hcfke8ettcokvm7hdtm2uq19je0.apps.googleusercontent.com',
+              ),
           ],
         ),
       ),
