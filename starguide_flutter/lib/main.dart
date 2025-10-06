@@ -4,6 +4,7 @@ import 'package:flutter_chat_ui/flutter_chat_ui.dart';
 import 'package:g_recaptcha_v3/g_recaptcha_v3.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:markdown_widget/markdown_widget.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:serverpod_auth_shared_flutter/serverpod_auth_shared_flutter.dart';
 import 'package:starguide_client/starguide_client.dart';
 import 'package:flutter/material.dart';
@@ -36,8 +37,12 @@ late final Highlighter highlighterDart;
 late final Highlighter highlighterYaml;
 late final Highlighter highlighterSql;
 
+late final String starguideVersion;
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  PackageInfo packageInfo = await PackageInfo.fromPlatform();
+  starguideVersion = packageInfo.version;
 
   sessionManager = SessionManager(caller: client.modules.auth);
   await sessionManager.initialize();
@@ -116,6 +121,7 @@ class StarguideChatPageState extends State<StarguideChatPage> {
   bool _isInputFocused = false;
 
   bool _connectionError = false;
+  String? _connectionErrorMessage;
   bool _recaptchaError = false;
 
   @override
@@ -148,6 +154,7 @@ class StarguideChatPageState extends State<StarguideChatPage> {
         if (sessionManager.isSignedIn) {
           _recaptchaError = false;
           _connectionError = false;
+          _connectionErrorMessage = null;
           _isGeneratingResponse = false;
         }
       });
@@ -202,9 +209,10 @@ class StarguideChatPageState extends State<StarguideChatPage> {
         _connectionError = true;
       });
       return;
-    } catch (_) {
+    } catch (e) {
       setState(() {
         _connectionError = true;
+        _connectionErrorMessage = 'Error: $e';
       });
       return;
     }
@@ -262,11 +270,13 @@ class StarguideChatPageState extends State<StarguideChatPage> {
     if (_connectionError) {
       return StarguideDisconnected(
         recaptchaError: _recaptchaError,
+        errorMessage: _connectionErrorMessage,
         onReconnect: () {
           _handleClearChat();
           setState(() {
             _connectionError = false;
             _recaptchaError = false;
+            _connectionErrorMessage = null;
           });
         },
       );
@@ -421,7 +431,7 @@ class StarguideChatPageState extends State<StarguideChatPage> {
             child: Row(
               children: [
                 Text(
-                  'Built with Serverpod',
+                  'Version $starguideVersion',
                   style: theme.textTheme.bodySmall?.copyWith(
                     color: theme.disabledColor,
                   ),

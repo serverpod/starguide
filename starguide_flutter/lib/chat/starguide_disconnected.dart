@@ -7,10 +7,12 @@ class StarguideDisconnected extends StatelessWidget {
     super.key,
     required this.onReconnect,
     required this.recaptchaError,
+    this.errorMessage,
   });
 
   final VoidCallback onReconnect;
   final bool recaptchaError;
+  final String? errorMessage;
 
   @override
   Widget build(BuildContext context) {
@@ -32,6 +34,15 @@ class StarguideDisconnected extends StatelessWidget {
             Text(recaptchaError
                 ? 'Are you a robot? Please sign in to access Starguide.'
                 : 'Oops. Something went wrong.'),
+            if (errorMessage != null)
+              Container(
+                padding: const EdgeInsets.only(top: 8),
+                width: 256,
+                child: Text(
+                  errorMessage!,
+                  style: Theme.of(context).textTheme.labelSmall,
+                ),
+              ),
             const SizedBox(height: 32),
             if (!recaptchaError)
               OutlinedButton(
