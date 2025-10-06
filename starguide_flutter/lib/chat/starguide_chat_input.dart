@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:starguide_flutter/config/constants.dart';
 
@@ -32,7 +33,7 @@ class _StarguideChatInputState extends State<StarguideChatInput> {
     final String hintText;
 
     if (widget.numChatRequests >= kMaxChatRequests) {
-      hintText = 'Clear the chat to start a new conversation.';
+      hintText = 'Clear the chat to start aR new conversation.';
     } else if (widget.numChatRequests == 0) {
       hintText = 'Ask me anything about Serverpod...';
     } else {
@@ -40,15 +41,20 @@ class _StarguideChatInputState extends State<StarguideChatInput> {
     }
 
     return Container(
-      padding:
-          const EdgeInsets.only(left: 12.0, right: 8.0, top: 8.0, bottom: 8.0),
-      child: Column(
+      padding: const EdgeInsets.only(
+        left: 12.0,
+        right: 8.0,
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.end,
         children: [
-          Row(
-            children: [
-              Expanded(
+          Expanded(
+            child: KeyboardListener(
+              focusNode: widget.focusNode,
+              onKeyEvent: (event) => _handleKeyboardEvents(event),
+              child: Container(
+                constraints: BoxConstraints(maxHeight: 400.0),
                 child: TextField(
-                  focusNode: widget.focusNode,
                   autofocus: true,
                   enabled: widget.numChatRequests < kMaxChatRequests,
                   buildCounter: (
@@ -60,56 +66,76 @@ class _StarguideChatInputState extends State<StarguideChatInput> {
                     return const SizedBox();
                   },
                   maxLength: kMaxChatRequestLength,
-                  maxLines: 1,
-                  decoration: InputDecoration.collapsed(
+                  maxLines: null,
+                  minLines: 1,
+                  keyboardType: TextInputType.multiline,
+                  textInputAction: TextInputAction.newline,
+                  textAlignVertical: TextAlignVertical.top,
+                  decoration: InputDecoration(
                     hintText: hintText,
                     hintStyle: TextStyle(color: theme.disabledColor),
+                    border: InputBorder.none,
                   ),
                   controller: widget.textController,
-                  onSubmitted: (value) {
-                    widget.onSend(widget.textController.text);
-                    widget.textController.clear();
-                    widget.focusNode.requestFocus();
-                  },
                 ),
               ),
-              if (widget.isGeneratingResponse)
-                Container(
-                  padding: const EdgeInsets.all(10),
-                  width: 40,
-                  height: 40,
-                  child: CircularProgressIndicator(
-                    color: theme.colorScheme.primary,
-                  ),
-                )
-              else
-                TextButton(
-                  style: TextButton.styleFrom(
-                    backgroundColor: widget.focusNode.hasFocus
-                        ? theme.colorScheme.primary
-                        : theme.dividerColor,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(4),
-                    ),
-                    padding: const EdgeInsets.all(4),
-                    minimumSize: const Size(48, 48),
-                  ),
-                  onPressed: widget.enabled
-                      ? () {
-                          widget.onSend(widget.textController.text);
-                          widget.textController.clear();
-                        }
-                      : null,
-                  child: const Icon(
-                    LucideIcons.rocket300,
-                    size: 20,
-                    color: Colors.white,
-                  ),
-                ),
-            ],
+            ),
           ),
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 8),
+            child: Column(
+              children: [
+                if (widget.isGeneratingResponse)
+                  Container(
+                    padding: const EdgeInsets.all(10),
+                    width: 40,
+                    height: 40,
+                    child: CircularProgressIndicator(
+                      color: theme.colorScheme.primary,
+                    ),
+                  )
+                else
+                  TextButton(
+                    style: TextButton.styleFrom(
+                      backgroundColor: widget.focusNode.hasFocus
+                          ? theme.colorScheme.primary
+                          : theme.dividerColor,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                      padding: const EdgeInsets.all(4),
+                      minimumSize: const Size(48, 48),
+                    ),
+                    onPressed: widget.enabled ? _handleSubmit : null,
+                    child: const Icon(
+                      LucideIcons.rocket300,
+                      size: 20,
+                      color: Colors.white,
+                    ),
+                  ),
+              ],
+            ),
+          )
         ],
       ),
     );
+  }
+
+  void _handleKeyboardEvents(KeyEvent event) {
+    if (event is KeyDownEvent) {
+      final isEnterPressed = event.logicalKey == LogicalKeyboardKey.enter;
+      final isShiftPressed = HardwareKeyboard.instance.isShiftPressed;
+
+      if (isEnterPressed && !isShiftPressed && widget.enabled) {
+        _handleSubmit();
+      }
+    }
+  }
+
+  void _handleSubmit() {
+    if (widget.textController.text.trim().isNotEmpty) {
+      widget.onSend(widget.textController.text);
+      widget.textController.clear();
+    }
   }
 }
