@@ -26,6 +26,7 @@ void run(List<String> args) async {
   // Setup a default page at the web root.
   pod.webServer.addRoute(RouteRoot(), '/');
   pod.webServer.addRoute(RouteRoot(), '/index.html');
+  pod.webServer.addRoute(RouteRoot(), '/app/index.html');
 
   // Setup a Google sign in route.
   pod.webServer.addRoute(auth.RouteGoogleSignIn(), '/googlesignin');
