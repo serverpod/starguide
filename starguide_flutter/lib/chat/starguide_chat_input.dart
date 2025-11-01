@@ -67,6 +67,9 @@ class _StarguideChatInputState extends State<StarguideChatInput> {
                   ),
                   controller: widget.textController,
                   onSubmitted: (value) {
+                    if (widget.textController.text.isEmpty) {
+                      return;
+                    }
                     widget.onSend(widget.textController.text);
                     widget.textController.clear();
                     widget.focusNode.requestFocus();
@@ -96,6 +99,9 @@ class _StarguideChatInputState extends State<StarguideChatInput> {
                   ),
                   onPressed: widget.enabled
                       ? () {
+                          if (widget.textController.text.isEmpty) {
+                            return;
+                          }
                           widget.onSend(widget.textController.text);
                           widget.textController.clear();
                         }
