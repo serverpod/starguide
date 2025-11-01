@@ -7,6 +7,7 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
+// ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod/serverpod.dart' as _i1;
@@ -158,8 +159,34 @@ class _ChatSessionImpl extends ChatSession {
   }
 }
 
+class ChatSessionUpdateTable extends _i1.UpdateTable<ChatSessionTable> {
+  ChatSessionUpdateTable(super.table);
+
+  _i1.ColumnValue<int, int> userId(int? value) => _i1.ColumnValue(
+        table.userId,
+        value,
+      );
+
+  _i1.ColumnValue<String, String> keyToken(String value) => _i1.ColumnValue(
+        table.keyToken,
+        value,
+      );
+
+  _i1.ColumnValue<bool, bool> goodAnswer(bool? value) => _i1.ColumnValue(
+        table.goodAnswer,
+        value,
+      );
+
+  _i1.ColumnValue<DateTime, DateTime> createdAt(DateTime value) =>
+      _i1.ColumnValue(
+        table.createdAt,
+        value,
+      );
+}
+
 class ChatSessionTable extends _i1.Table<int?> {
   ChatSessionTable({super.tableRelation}) : super(tableName: 'chat_session') {
+    updateTable = ChatSessionUpdateTable(this);
     userId = _i1.ColumnInt(
       'userId',
       this,
@@ -178,6 +205,8 @@ class ChatSessionTable extends _i1.Table<int?> {
       hasDefault: true,
     );
   }
+
+  late final ChatSessionUpdateTable updateTable;
 
   late final _i1.ColumnInt userId;
 
@@ -382,6 +411,46 @@ class ChatSessionRepository {
     return session.db.updateRow<ChatSession>(
       row,
       columns: columns?.call(ChatSession.t),
+      transaction: transaction,
+    );
+  }
+
+  /// Updates a single [ChatSession] by its [id] with the specified [columnValues].
+  /// Returns the updated row or null if no row with the given id exists.
+  Future<ChatSession?> updateById(
+    _i1.Session session,
+    int id, {
+    required _i1.ColumnValueListBuilder<ChatSessionUpdateTable> columnValues,
+    _i1.Transaction? transaction,
+  }) async {
+    return session.db.updateById<ChatSession>(
+      id,
+      columnValues: columnValues(ChatSession.t.updateTable),
+      transaction: transaction,
+    );
+  }
+
+  /// Updates all [ChatSession]s matching the [where] expression with the specified [columnValues].
+  /// Returns the list of updated rows.
+  Future<List<ChatSession>> updateWhere(
+    _i1.Session session, {
+    required _i1.ColumnValueListBuilder<ChatSessionUpdateTable> columnValues,
+    required _i1.WhereExpressionBuilder<ChatSessionTable> where,
+    int? limit,
+    int? offset,
+    _i1.OrderByBuilder<ChatSessionTable>? orderBy,
+    _i1.OrderByListBuilder<ChatSessionTable>? orderByList,
+    bool orderDescending = false,
+    _i1.Transaction? transaction,
+  }) async {
+    return session.db.updateWhere<ChatSession>(
+      columnValues: columnValues(ChatSession.t.updateTable),
+      where: where(ChatSession.t),
+      limit: limit,
+      offset: offset,
+      orderBy: orderBy?.call(ChatSession.t),
+      orderByList: orderByList?.call(ChatSession.t),
+      orderDescending: orderDescending,
       transaction: transaction,
     );
   }
