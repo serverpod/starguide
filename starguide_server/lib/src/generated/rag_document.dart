@@ -7,6 +7,7 @@
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
+// ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod/serverpod.dart' as _i1;
@@ -208,8 +209,59 @@ class _RAGDocumentImpl extends RAGDocument {
   }
 }
 
+class RAGDocumentUpdateTable extends _i1.UpdateTable<RAGDocumentTable> {
+  RAGDocumentUpdateTable(super.table);
+
+  _i1.ColumnValue<_i1.Vector, _i1.Vector> embedding(_i1.Vector value) =>
+      _i1.ColumnValue(
+        table.embedding,
+        value,
+      );
+
+  _i1.ColumnValue<DateTime, DateTime> fetchTime(DateTime value) =>
+      _i1.ColumnValue(
+        table.fetchTime,
+        value,
+      );
+
+  _i1.ColumnValue<Uri, Uri> sourceUrl(Uri value) => _i1.ColumnValue(
+        table.sourceUrl,
+        value,
+      );
+
+  _i1.ColumnValue<String, String> content(String value) => _i1.ColumnValue(
+        table.content,
+        value,
+      );
+
+  _i1.ColumnValue<String, String> title(String value) => _i1.ColumnValue(
+        table.title,
+        value,
+      );
+
+  _i1.ColumnValue<String, String> embeddingSummary(String value) =>
+      _i1.ColumnValue(
+        table.embeddingSummary,
+        value,
+      );
+
+  _i1.ColumnValue<String, String> shortDescription(String value) =>
+      _i1.ColumnValue(
+        table.shortDescription,
+        value,
+      );
+
+  _i1.ColumnValue<_i2.RAGDocumentType, _i2.RAGDocumentType> type(
+          _i2.RAGDocumentType value) =>
+      _i1.ColumnValue(
+        table.type,
+        value,
+      );
+}
+
 class RAGDocumentTable extends _i1.Table<int?> {
   RAGDocumentTable({super.tableRelation}) : super(tableName: 'rag_document') {
+    updateTable = RAGDocumentUpdateTable(this);
     embedding = _i1.ColumnVector(
       'embedding',
       this,
@@ -245,6 +297,8 @@ class RAGDocumentTable extends _i1.Table<int?> {
       _i1.EnumSerialization.byIndex,
     );
   }
+
+  late final RAGDocumentUpdateTable updateTable;
 
   late final _i1.ColumnVector embedding;
 
@@ -461,6 +515,46 @@ class RAGDocumentRepository {
     return session.db.updateRow<RAGDocument>(
       row,
       columns: columns?.call(RAGDocument.t),
+      transaction: transaction,
+    );
+  }
+
+  /// Updates a single [RAGDocument] by its [id] with the specified [columnValues].
+  /// Returns the updated row or null if no row with the given id exists.
+  Future<RAGDocument?> updateById(
+    _i1.Session session,
+    int id, {
+    required _i1.ColumnValueListBuilder<RAGDocumentUpdateTable> columnValues,
+    _i1.Transaction? transaction,
+  }) async {
+    return session.db.updateById<RAGDocument>(
+      id,
+      columnValues: columnValues(RAGDocument.t.updateTable),
+      transaction: transaction,
+    );
+  }
+
+  /// Updates all [RAGDocument]s matching the [where] expression with the specified [columnValues].
+  /// Returns the list of updated rows.
+  Future<List<RAGDocument>> updateWhere(
+    _i1.Session session, {
+    required _i1.ColumnValueListBuilder<RAGDocumentUpdateTable> columnValues,
+    required _i1.WhereExpressionBuilder<RAGDocumentTable> where,
+    int? limit,
+    int? offset,
+    _i1.OrderByBuilder<RAGDocumentTable>? orderBy,
+    _i1.OrderByListBuilder<RAGDocumentTable>? orderByList,
+    bool orderDescending = false,
+    _i1.Transaction? transaction,
+  }) async {
+    return session.db.updateWhere<RAGDocument>(
+      columnValues: columnValues(RAGDocument.t.updateTable),
+      where: where(RAGDocument.t),
+      limit: limit,
+      offset: offset,
+      orderBy: orderBy?.call(RAGDocument.t),
+      orderByList: orderByList?.call(RAGDocument.t),
+      orderDescending: orderDescending,
       transaction: transaction,
     );
   }
