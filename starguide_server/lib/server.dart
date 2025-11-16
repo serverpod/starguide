@@ -53,21 +53,6 @@ void run(List<String> args) async {
         );
       },
     ),
-    '/app/**',
-  );
-
-  pod.webServer.addRoute(
-    StaticRoute.directory(
-      Directory('web/static'),
-      cacheBustingConfig: busterStatic,
-      cacheControlFactory: (ctx, fileInfo) {
-        return CacheControlHeader(
-          maxAge: 31536000, // 1 year - safe with cache busting
-          publicCache: true,
-          immutable: true,
-        );
-      },
-    ),
     '/**',
   );
 
