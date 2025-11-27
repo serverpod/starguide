@@ -22,6 +22,15 @@ Future<void> configureDataFetcher() async {
     domain: 'Serverpod',
   );
 
+  final serverpodCloudDocs = GithubDocsDataSource(
+    owner: 'serverpod',
+    repo: 'serverpod_cloud',
+    basePath: 'docs/docs',
+    referenceUrl: Uri.parse('https://docs.serverpod.cloud'),
+    branch: 'main',
+    domain: 'Serverpod Cloud',
+  );
+
   final relicDocs = GithubDocsDataSource(
     owner: 'serverpod',
     repo: 'relic',
@@ -33,6 +42,7 @@ Future<void> configureDataFetcher() async {
 
   final dataSources = [
     serverpodDocs,
+    serverpodCloudDocs,
     serverpodDiscussions,
     relicDocs,
   ];
