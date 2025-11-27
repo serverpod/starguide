@@ -14,15 +14,17 @@ class GithubDocsDataSource implements DataSource {
   final String basePath;
   final Uri referenceUrl;
 
+  /// Latest version, if known.
+  final String? latestVersion;
+
   GithubDocsDataSource({
     required this.owner,
     required this.repo,
     required this.branch,
     required this.basePath,
     required this.referenceUrl,
-  }) {
-    print('basePath: $basePath');
-  }
+    this.latestVersion,
+  });
 
   static Future<http.Response> _githubApiGet(Uri url) async {
     final githubToken = Serverpod.instance.getPassword('githubToken');
@@ -89,7 +91,6 @@ class GithubDocsDataSource implements DataSource {
 
     // Find latest version by comparing semantic versions using pub_semver
     final latestVersion = _findLatestVersion(versions.cast<String>());
-    print('Latest version: $latestVersion');
 
     // Append versioned_docs/version-<version> to the normalized path
     final finalBasePath =
@@ -115,6 +116,7 @@ class GithubDocsDataSource implements DataSource {
       branch: branch,
       basePath: finalBasePath,
       referenceUrl: referenceUrl,
+      latestVersion: latestVersion,
     );
   }
 

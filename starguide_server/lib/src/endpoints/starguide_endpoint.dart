@@ -1,6 +1,7 @@
 import 'package:serverpod/serverpod.dart';
 import 'package:serverpod_auth_server/serverpod_auth_server.dart';
 import 'package:starguide_server/src/business/search.dart';
+import 'package:starguide_server/src/config/setup_data_fetcher.dart';
 import 'package:starguide_server/src/generative_ai/generative_ai.dart';
 import 'package:starguide_server/src/util/random_string.dart';
 import 'package:starguide_server/src/generated/protocol.dart';
@@ -114,7 +115,8 @@ class StarguideEndpoint extends Endpoint {
 
     // Generate the answer
     final answerStream = genAi.generateConversationalAnswer(
-      systemPrompt: Prompts.instance.get('final_answer')!,
+      systemPrompt: 'The latest version of Serverpod is '
+          '$latestServerpodVersion.\n${Prompts.instance.get('final_answer')!}',
       question: question,
       documents: documents,
       conversation: conversation,
