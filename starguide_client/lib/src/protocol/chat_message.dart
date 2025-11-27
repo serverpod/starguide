@@ -33,7 +33,7 @@ abstract class ChatMessage implements _i1.SerializableModel {
       id: jsonSerialization['id'] as int?,
       chatSessionId: jsonSerialization['chatSessionId'] as int,
       message: jsonSerialization['message'] as String,
-      type: _i2.ChatMessageType.fromJson((jsonSerialization['type'] as int)),
+      type: _i2.ChatMessageType.fromJson((jsonSerialization['type'] as String)),
     );
   }
 
@@ -60,6 +60,7 @@ abstract class ChatMessage implements _i1.SerializableModel {
   @override
   Map<String, dynamic> toJson() {
     return {
+      '__className__': 'ChatMessage',
       if (id != null) 'id': id,
       'chatSessionId': chatSessionId,
       'message': message,
@@ -82,11 +83,11 @@ class _ChatMessageImpl extends ChatMessage {
     required String message,
     required _i2.ChatMessageType type,
   }) : super._(
-          id: id,
-          chatSessionId: chatSessionId,
-          message: message,
-          type: type,
-        );
+         id: id,
+         chatSessionId: chatSessionId,
+         message: message,
+         type: type,
+       );
 
   /// Returns a shallow copy of this [ChatMessage]
   /// with some or all fields replaced by the given arguments.

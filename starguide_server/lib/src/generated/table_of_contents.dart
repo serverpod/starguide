@@ -30,12 +30,18 @@ abstract class TableOfContents
   TableOfContents copyWith({String? contents});
   @override
   Map<String, dynamic> toJson() {
-    return {'contents': contents};
+    return {
+      '__className__': 'TableOfContents',
+      'contents': contents,
+    };
   }
 
   @override
   Map<String, dynamic> toJsonForProtocol() {
-    return {'contents': contents};
+    return {
+      '__className__': 'TableOfContents',
+      'contents': contents,
+    };
   }
 
   @override
@@ -46,7 +52,7 @@ abstract class TableOfContents
 
 class _TableOfContentsImpl extends TableOfContents {
   _TableOfContentsImpl({required String contents})
-      : super._(contents: contents);
+    : super._(contents: contents);
 
   /// Returns a shallow copy of this [TableOfContents]
   /// with some or all fields replaced by the given arguments.

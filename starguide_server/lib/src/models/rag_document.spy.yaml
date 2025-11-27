@@ -2,7 +2,7 @@ class: RAGDocument
 table: rag_document
 
 fields:
-  embedding: Vector(1536)
+  embedding: Vector(768)
   fetchTime: DateTime
   sourceUrl: Uri
   content: String

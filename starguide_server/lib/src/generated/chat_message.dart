@@ -34,7 +34,7 @@ abstract class ChatMessage
       id: jsonSerialization['id'] as int?,
       chatSessionId: jsonSerialization['chatSessionId'] as int,
       message: jsonSerialization['message'] as String,
-      type: _i2.ChatMessageType.fromJson((jsonSerialization['type'] as int)),
+      type: _i2.ChatMessageType.fromJson((jsonSerialization['type'] as String)),
     );
   }
 
@@ -66,6 +66,7 @@ abstract class ChatMessage
   @override
   Map<String, dynamic> toJson() {
     return {
+      '__className__': 'ChatMessage',
       if (id != null) 'id': id,
       'chatSessionId': chatSessionId,
       'message': message,
@@ -76,6 +77,7 @@ abstract class ChatMessage
   @override
   Map<String, dynamic> toJsonForProtocol() {
     return {
+      '__className__': 'ChatMessage',
       if (id != null) 'id': id,
       'chatSessionId': chatSessionId,
       'message': message,
@@ -122,11 +124,11 @@ class _ChatMessageImpl extends ChatMessage {
     required String message,
     required _i2.ChatMessageType type,
   }) : super._(
-          id: id,
-          chatSessionId: chatSessionId,
-          message: message,
-          type: type,
-        );
+         id: id,
+         chatSessionId: chatSessionId,
+         message: message,
+         type: type,
+       );
 
   /// Returns a shallow copy of this [ChatMessage]
   /// with some or all fields replaced by the given arguments.
@@ -151,21 +153,21 @@ class ChatMessageUpdateTable extends _i1.UpdateTable<ChatMessageTable> {
   ChatMessageUpdateTable(super.table);
 
   _i1.ColumnValue<int, int> chatSessionId(int value) => _i1.ColumnValue(
-        table.chatSessionId,
-        value,
-      );
+    table.chatSessionId,
+    value,
+  );
 
   _i1.ColumnValue<String, String> message(String value) => _i1.ColumnValue(
-        table.message,
-        value,
-      );
+    table.message,
+    value,
+  );
 
   _i1.ColumnValue<_i2.ChatMessageType, _i2.ChatMessageType> type(
-          _i2.ChatMessageType value) =>
-      _i1.ColumnValue(
-        table.type,
-        value,
-      );
+    _i2.ChatMessageType value,
+  ) => _i1.ColumnValue(
+    table.type,
+    value,
+  );
 }
 
 class ChatMessageTable extends _i1.Table<int?> {
@@ -182,7 +184,7 @@ class ChatMessageTable extends _i1.Table<int?> {
     type = _i1.ColumnEnum(
       'type',
       this,
-      _i1.EnumSerialization.byIndex,
+      _i1.EnumSerialization.byName,
     );
   }
 
@@ -196,11 +198,11 @@ class ChatMessageTable extends _i1.Table<int?> {
 
   @override
   List<_i1.Column> get columns => [
-        id,
-        chatSessionId,
-        message,
-        type,
-      ];
+    id,
+    chatSessionId,
+    message,
+    type,
+  ];
 }
 
 class ChatMessageInclude extends _i1.IncludeObject {

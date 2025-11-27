@@ -35,8 +35,9 @@ abstract class ChatSession implements _i1.SerializableModel {
       userId: jsonSerialization['userId'] as int?,
       keyToken: jsonSerialization['keyToken'] as String,
       goodAnswer: jsonSerialization['goodAnswer'] as bool?,
-      createdAt:
-          _i1.DateTimeJsonExtension.fromJson(jsonSerialization['createdAt']),
+      createdAt: _i1.DateTimeJsonExtension.fromJson(
+        jsonSerialization['createdAt'],
+      ),
     );
   }
 
@@ -66,6 +67,7 @@ abstract class ChatSession implements _i1.SerializableModel {
   @override
   Map<String, dynamic> toJson() {
     return {
+      '__className__': 'ChatSession',
       if (id != null) 'id': id,
       if (userId != null) 'userId': userId,
       'keyToken': keyToken,
@@ -90,12 +92,12 @@ class _ChatSessionImpl extends ChatSession {
     bool? goodAnswer,
     DateTime? createdAt,
   }) : super._(
-          id: id,
-          userId: userId,
-          keyToken: keyToken,
-          goodAnswer: goodAnswer,
-          createdAt: createdAt,
-        );
+         id: id,
+         userId: userId,
+         keyToken: keyToken,
+         goodAnswer: goodAnswer,
+         createdAt: createdAt,
+       );
 
   /// Returns a shallow copy of this [ChatSession]
   /// with some or all fields replaced by the given arguments.

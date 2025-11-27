@@ -31,12 +31,12 @@ abstract class RecaptchaException
   RecaptchaException copyWith();
   @override
   Map<String, dynamic> toJson() {
-    return {};
+    return {'__className__': 'RecaptchaException'};
   }
 
   @override
   Map<String, dynamic> toJsonForProtocol() {
-    return {};
+    return {'__className__': 'RecaptchaException'};
   }
 
   @override

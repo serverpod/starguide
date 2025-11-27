@@ -17,22 +17,23 @@ enum RAGDocumentType implements _i1.SerializableModel {
   discussion,
   issue;
 
-  static RAGDocumentType fromJson(int index) {
-    switch (index) {
-      case 0:
+  static RAGDocumentType fromJson(String name) {
+    switch (name) {
+      case 'documentation':
         return RAGDocumentType.documentation;
-      case 1:
+      case 'discussion':
         return RAGDocumentType.discussion;
-      case 2:
+      case 'issue':
         return RAGDocumentType.issue;
       default:
         throw ArgumentError(
-            'Value "$index" cannot be converted to "RAGDocumentType"');
+          'Value "$name" cannot be converted to "RAGDocumentType"',
+        );
     }
   }
 
   @override
-  int toJson() => index;
+  String toJson() => name;
 
   @override
   String toString() => name;

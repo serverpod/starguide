@@ -42,16 +42,18 @@ abstract class RAGDocument
   factory RAGDocument.fromJson(Map<String, dynamic> jsonSerialization) {
     return RAGDocument(
       id: jsonSerialization['id'] as int?,
-      embedding:
-          _i1.VectorJsonExtension.fromJson(jsonSerialization['embedding']),
-      fetchTime:
-          _i1.DateTimeJsonExtension.fromJson(jsonSerialization['fetchTime']),
+      embedding: _i1.VectorJsonExtension.fromJson(
+        jsonSerialization['embedding'],
+      ),
+      fetchTime: _i1.DateTimeJsonExtension.fromJson(
+        jsonSerialization['fetchTime'],
+      ),
       sourceUrl: _i1.UriJsonExtension.fromJson(jsonSerialization['sourceUrl']),
       content: jsonSerialization['content'] as String,
       title: jsonSerialization['title'] as String,
       embeddingSummary: jsonSerialization['embeddingSummary'] as String,
       shortDescription: jsonSerialization['shortDescription'] as String,
-      type: _i2.RAGDocumentType.fromJson((jsonSerialization['type'] as int)),
+      type: _i2.RAGDocumentType.fromJson((jsonSerialization['type'] as String)),
     );
   }
 
@@ -98,6 +100,7 @@ abstract class RAGDocument
   @override
   Map<String, dynamic> toJson() {
     return {
+      '__className__': 'RAGDocument',
       if (id != null) 'id': id,
       'embedding': embedding.toJson(),
       'fetchTime': fetchTime.toJson(),
@@ -113,6 +116,7 @@ abstract class RAGDocument
   @override
   Map<String, dynamic> toJsonForProtocol() {
     return {
+      '__className__': 'RAGDocument',
       if (id != null) 'id': id,
       'embedding': embedding.toJson(),
       'fetchTime': fetchTime.toJson(),
@@ -169,16 +173,16 @@ class _RAGDocumentImpl extends RAGDocument {
     required String shortDescription,
     required _i2.RAGDocumentType type,
   }) : super._(
-          id: id,
-          embedding: embedding,
-          fetchTime: fetchTime,
-          sourceUrl: sourceUrl,
-          content: content,
-          title: title,
-          embeddingSummary: embeddingSummary,
-          shortDescription: shortDescription,
-          type: type,
-        );
+         id: id,
+         embedding: embedding,
+         fetchTime: fetchTime,
+         sourceUrl: sourceUrl,
+         content: content,
+         title: title,
+         embeddingSummary: embeddingSummary,
+         shortDescription: shortDescription,
+         type: type,
+       );
 
   /// Returns a shallow copy of this [RAGDocument]
   /// with some or all fields replaced by the given arguments.
@@ -225,19 +229,19 @@ class RAGDocumentUpdateTable extends _i1.UpdateTable<RAGDocumentTable> {
       );
 
   _i1.ColumnValue<Uri, Uri> sourceUrl(Uri value) => _i1.ColumnValue(
-        table.sourceUrl,
-        value,
-      );
+    table.sourceUrl,
+    value,
+  );
 
   _i1.ColumnValue<String, String> content(String value) => _i1.ColumnValue(
-        table.content,
-        value,
-      );
+    table.content,
+    value,
+  );
 
   _i1.ColumnValue<String, String> title(String value) => _i1.ColumnValue(
-        table.title,
-        value,
-      );
+    table.title,
+    value,
+  );
 
   _i1.ColumnValue<String, String> embeddingSummary(String value) =>
       _i1.ColumnValue(
@@ -252,11 +256,11 @@ class RAGDocumentUpdateTable extends _i1.UpdateTable<RAGDocumentTable> {
       );
 
   _i1.ColumnValue<_i2.RAGDocumentType, _i2.RAGDocumentType> type(
-          _i2.RAGDocumentType value) =>
-      _i1.ColumnValue(
-        table.type,
-        value,
-      );
+    _i2.RAGDocumentType value,
+  ) => _i1.ColumnValue(
+    table.type,
+    value,
+  );
 }
 
 class RAGDocumentTable extends _i1.Table<int?> {
@@ -265,7 +269,7 @@ class RAGDocumentTable extends _i1.Table<int?> {
     embedding = _i1.ColumnVector(
       'embedding',
       this,
-      dimension: 1536,
+      dimension: 768,
     );
     fetchTime = _i1.ColumnDateTime(
       'fetchTime',
@@ -294,7 +298,7 @@ class RAGDocumentTable extends _i1.Table<int?> {
     type = _i1.ColumnEnum(
       'type',
       this,
-      _i1.EnumSerialization.byIndex,
+      _i1.EnumSerialization.byName,
     );
   }
 
@@ -318,16 +322,16 @@ class RAGDocumentTable extends _i1.Table<int?> {
 
   @override
   List<_i1.Column> get columns => [
-        id,
-        embedding,
-        fetchTime,
-        sourceUrl,
-        content,
-        title,
-        embeddingSummary,
-        shortDescription,
-        type,
-      ];
+    id,
+    embedding,
+    fetchTime,
+    sourceUrl,
+    content,
+    title,
+    embeddingSummary,
+    shortDescription,
+    type,
+  ];
 }
 
 class RAGDocumentInclude extends _i1.IncludeObject {

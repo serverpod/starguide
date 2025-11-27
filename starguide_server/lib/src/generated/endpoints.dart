@@ -40,20 +40,24 @@ class Endpoints extends _i1.EndpointDispatch {
         'mcpInstructions': _i1.MethodConnector(
           name: 'mcpInstructions',
           params: {},
-          call: (
-            _i1.Session session,
-            Map<String, dynamic> params,
-          ) async =>
-              (endpoints['mcp'] as _i2.McpEndpoint).mcpInstructions(session),
+          call:
+              (
+                _i1.Session session,
+                Map<String, dynamic> params,
+              ) async => (endpoints['mcp'] as _i2.McpEndpoint).mcpInstructions(
+                session,
+              ),
         ),
         'getAllResources': _i1.MethodConnector(
           name: 'getAllResources',
           params: {},
-          call: (
-            _i1.Session session,
-            Map<String, dynamic> params,
-          ) async =>
-              (endpoints['mcp'] as _i2.McpEndpoint).getAllResources(session),
+          call:
+              (
+                _i1.Session session,
+                Map<String, dynamic> params,
+              ) async => (endpoints['mcp'] as _i2.McpEndpoint).getAllResources(
+                session,
+              ),
         ),
         'ask': _i1.MethodConnector(
           name: 'ask',
@@ -69,15 +73,15 @@ class Endpoints extends _i1.EndpointDispatch {
               nullable: false,
             ),
           },
-          call: (
-            _i1.Session session,
-            Map<String, dynamic> params,
-          ) async =>
-              (endpoints['mcp'] as _i2.McpEndpoint).ask(
-            session,
-            params['question'],
-            params['geminiAPIKey'],
-          ),
+          call:
+              (
+                _i1.Session session,
+                Map<String, dynamic> params,
+              ) async => (endpoints['mcp'] as _i2.McpEndpoint).ask(
+                session,
+                params['question'],
+                params['geminiAPIKey'],
+              ),
         ),
       },
     );
@@ -92,17 +96,17 @@ class Endpoints extends _i1.EndpointDispatch {
               name: 'reCaptchaToken',
               type: _i1.getType<String>(),
               nullable: false,
-            )
+            ),
           },
-          call: (
-            _i1.Session session,
-            Map<String, dynamic> params,
-          ) async =>
-              (endpoints['starguide'] as _i3.StarguideEndpoint)
+          call:
+              (
+                _i1.Session session,
+                Map<String, dynamic> params,
+              ) async => (endpoints['starguide'] as _i3.StarguideEndpoint)
                   .createChatSession(
-            session,
-            params['reCaptchaToken'],
-          ),
+                    session,
+                    params['reCaptchaToken'],
+                  ),
         ),
         'vote': _i1.MethodConnector(
           name: 'vote',
@@ -118,15 +122,15 @@ class Endpoints extends _i1.EndpointDispatch {
               nullable: false,
             ),
           },
-          call: (
-            _i1.Session session,
-            Map<String, dynamic> params,
-          ) async =>
-              (endpoints['starguide'] as _i3.StarguideEndpoint).vote(
-            session,
-            params['chatSession'],
-            params['goodAnswer'],
-          ),
+          call:
+              (
+                _i1.Session session,
+                Map<String, dynamic> params,
+              ) async => (endpoints['starguide'] as _i3.StarguideEndpoint).vote(
+                session,
+                params['chatSession'],
+                params['goodAnswer'],
+              ),
         ),
         'ask': _i1.MethodStreamConnector(
           name: 'ask',
@@ -144,16 +148,16 @@ class Endpoints extends _i1.EndpointDispatch {
           },
           streamParams: {},
           returnType: _i1.MethodStreamReturnType.streamType,
-          call: (
-            _i1.Session session,
-            Map<String, dynamic> params,
-            Map<String, Stream> streamParams,
-          ) =>
-              (endpoints['starguide'] as _i3.StarguideEndpoint).ask(
-            session,
-            params['chatSession'],
-            params['question'],
-          ),
+          call:
+              (
+                _i1.Session session,
+                Map<String, dynamic> params,
+                Map<String, Stream> streamParams,
+              ) => (endpoints['starguide'] as _i3.StarguideEndpoint).ask(
+                session,
+                params['chatSession'],
+                params['question'],
+              ),
         ),
       },
     );

@@ -17,22 +17,23 @@ enum DataFetcherTaskType implements _i1.SerializableModel {
   cleanUp,
   startFetching;
 
-  static DataFetcherTaskType fromJson(int index) {
-    switch (index) {
-      case 0:
+  static DataFetcherTaskType fromJson(String name) {
+    switch (name) {
+      case 'dataSource':
         return DataFetcherTaskType.dataSource;
-      case 1:
+      case 'cleanUp':
         return DataFetcherTaskType.cleanUp;
-      case 2:
+      case 'startFetching':
         return DataFetcherTaskType.startFetching;
       default:
         throw ArgumentError(
-            'Value "$index" cannot be converted to "DataFetcherTaskType"');
+          'Value "$name" cannot be converted to "DataFetcherTaskType"',
+        );
     }
   }
 
   @override
-  int toJson() => index;
+  String toJson() => name;
 
   @override
   String toString() => name;

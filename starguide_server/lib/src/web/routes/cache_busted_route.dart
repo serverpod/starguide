@@ -12,15 +12,15 @@ abstract class CacheBustedRoute extends Route {
   Future<WebWidget> build(Session session, Request request);
 
   @override
-  FutureOr<HandledContext> handleCall(
+  Future<Response> handleCall(
     Session session,
-    NewContext context,
+    Request request,
   ) async {
-    var widget = await build(session, context.request);
+    var widget = await build(session, request);
 
     if (widget is RedirectWidget) {
       var uri = Uri.parse(widget.url);
-      return context.respond(Response.seeOther(uri));
+      return Response.seeOther(uri);
     }
 
     final mimeType = widget is JsonWidget ? MimeType.json : MimeType.html;
@@ -32,13 +32,13 @@ abstract class CacheBustedRoute extends Route {
       ),
     );
 
-    return context.respond(Response.ok(
+    return Response.ok(
       body: Body.fromString(
         await _bustPaths(widget.toString()),
         mimeType: mimeType,
       ),
       headers: headers,
-    ));
+    );
   }
 
   /// Replace all !{/path} patterns in the rendered HTML with cache-busted paths

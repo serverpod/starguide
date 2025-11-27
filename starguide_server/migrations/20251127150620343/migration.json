@@ -1,0 +1,50 @@
+{
+  "__className__": "serverpod.DatabaseMigration",
+  "actions": [
+    {
+      "__className__": "serverpod.DatabaseMigrationAction",
+      "type": "alterTable",
+      "alterTable": {
+        "__className__": "serverpod.TableMigration",
+        "name": "rag_document",
+        "schema": "public",
+        "addColumns": [],
+        "deleteColumns": [
+          "embedding"
+        ],
+        "modifyColumns": [],
+        "addIndexes": [],
+        "deleteIndexes": [
+          "rag_document_vector"
+        ],
+        "addForeignKeys": [],
+        "deleteForeignKeys": [],
+        "warnings": [
+          {
+            "__className__": "serverpod.DatabaseMigrationWarning",
+            "type": "columnDropped",
+            "message": "Column \"embedding\" of table \"rag_document\" will be dropped.",
+            "table": "rag_document",
+            "columns": [
+              "embedding"
+            ],
+            "destrucive": true
+          }
+        ]
+      }
+    }
+  ],
+  "warnings": [
+    {
+      "__className__": "serverpod.DatabaseMigrationWarning",
+      "type": "columnDropped",
+      "message": "Column \"embedding\" of table \"rag_document\" will be dropped.",
+      "table": "rag_document",
+      "columns": [
+        "embedding"
+      ],
+      "destrucive": true
+    }
+  ],
+  "migrationApiVersion": 1
+}

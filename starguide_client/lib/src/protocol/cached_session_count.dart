@@ -29,7 +29,10 @@ abstract class CachedSessionCount implements _i1.SerializableModel {
   CachedSessionCount copyWith({int? count});
   @override
   Map<String, dynamic> toJson() {
-    return {'count': count};
+    return {
+      '__className__': 'CachedSessionCount',
+      'count': count,
+    };
   }
 
   @override

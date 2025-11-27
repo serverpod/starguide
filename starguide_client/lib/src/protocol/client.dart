@@ -39,10 +39,10 @@ class EndpointMcp extends _i1.EndpointRef {
   /// The returned text outlines the available tools (e.g., list-guides,
   /// get-guide, ask-docs) and how to interact with this server.
   _i2.Future<String> mcpInstructions() => caller.callServerEndpoint<String>(
-        'mcp',
-        'mcpInstructions',
-        {},
-      );
+    'mcp',
+    'mcpInstructions',
+    {},
+  );
 
   /// Retrieves all markdown resources.
   ///
@@ -84,15 +84,14 @@ class EndpointMcp extends _i1.EndpointRef {
   _i2.Future<String> ask(
     String question,
     String geminiAPIKey,
-  ) =>
-      caller.callServerEndpoint<String>(
-        'mcp',
-        'ask',
-        {
-          'question': question,
-          'geminiAPIKey': geminiAPIKey,
-        },
-      );
+  ) => caller.callServerEndpoint<String>(
+    'mcp',
+    'ask',
+    {
+      'question': question,
+      'geminiAPIKey': geminiAPIKey,
+    },
+  );
 }
 
 /// Endpoint for chat sessions and Q&A powered by RAG over Serverpod docs.
@@ -121,30 +120,28 @@ class EndpointStarguide extends _i1.EndpointRef {
   _i2.Stream<String> ask(
     _i4.ChatSession chatSession,
     String question,
-  ) =>
-      caller.callStreamingServerEndpoint<_i2.Stream<String>, String>(
-        'starguide',
-        'ask',
-        {
-          'chatSession': chatSession,
-          'question': question,
-        },
-        {},
-      );
+  ) => caller.callStreamingServerEndpoint<_i2.Stream<String>, String>(
+    'starguide',
+    'ask',
+    {
+      'chatSession': chatSession,
+      'question': question,
+    },
+    {},
+  );
 
   /// Records a thumbs up or down for the final answer of a chat session.
   _i2.Future<void> vote(
     _i4.ChatSession chatSession,
     bool goodAnswer,
-  ) =>
-      caller.callServerEndpoint<void>(
-        'starguide',
-        'vote',
-        {
-          'chatSession': chatSession,
-          'goodAnswer': goodAnswer,
-        },
-      );
+  ) => caller.callServerEndpoint<void>(
+    'starguide',
+    'vote',
+    {
+      'chatSession': chatSession,
+      'goodAnswer': goodAnswer,
+    },
+  );
 }
 
 class Modules {
@@ -166,21 +163,22 @@ class Client extends _i1.ServerpodClientShared {
       _i1.MethodCallContext,
       Object,
       StackTrace,
-    )? onFailedCall,
+    )?
+    onFailedCall,
     Function(_i1.MethodCallContext)? onSucceededCall,
     bool? disconnectStreamsOnLostInternetConnection,
   }) : super(
-          host,
-          _i6.Protocol(),
-          securityContext: securityContext,
-          authenticationKeyManager: authenticationKeyManager,
-          streamingConnectionTimeout: streamingConnectionTimeout,
-          connectionTimeout: connectionTimeout,
-          onFailedCall: onFailedCall,
-          onSucceededCall: onSucceededCall,
-          disconnectStreamsOnLostInternetConnection:
-              disconnectStreamsOnLostInternetConnection,
-        ) {
+         host,
+         _i6.Protocol(),
+         securityContext: securityContext,
+         authenticationKeyManager: authenticationKeyManager,
+         streamingConnectionTimeout: streamingConnectionTimeout,
+         connectionTimeout: connectionTimeout,
+         onFailedCall: onFailedCall,
+         onSucceededCall: onSucceededCall,
+         disconnectStreamsOnLostInternetConnection:
+             disconnectStreamsOnLostInternetConnection,
+       ) {
     mcp = EndpointMcp(this);
     starguide = EndpointStarguide(this);
     modules = Modules(this);
@@ -194,11 +192,12 @@ class Client extends _i1.ServerpodClientShared {
 
   @override
   Map<String, _i1.EndpointRef> get endpointRefLookup => {
-        'mcp': mcp,
-        'starguide': starguide,
-      };
+    'mcp': mcp,
+    'starguide': starguide,
+  };
 
   @override
-  Map<String, _i1.ModuleEndpointCaller> get moduleLookup =>
-      {'auth': modules.auth};
+  Map<String, _i1.ModuleEndpointCaller> get moduleLookup => {
+    'auth': modules.auth,
+  };
 }

@@ -16,20 +16,21 @@ enum ChatMessageType implements _i1.SerializableModel {
   user,
   model;
 
-  static ChatMessageType fromJson(int index) {
-    switch (index) {
-      case 0:
+  static ChatMessageType fromJson(String name) {
+    switch (name) {
+      case 'user':
         return ChatMessageType.user;
-      case 1:
+      case 'model':
         return ChatMessageType.model;
       default:
         throw ArgumentError(
-            'Value "$index" cannot be converted to "ChatMessageType"');
+          'Value "$name" cannot be converted to "ChatMessageType"',
+        );
     }
   }
 
   @override
-  int toJson() => index;
+  String toJson() => name;
 
   @override
   String toString() => name;

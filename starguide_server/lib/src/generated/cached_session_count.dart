@@ -30,12 +30,18 @@ abstract class CachedSessionCount
   CachedSessionCount copyWith({int? count});
   @override
   Map<String, dynamic> toJson() {
-    return {'count': count};
+    return {
+      '__className__': 'CachedSessionCount',
+      'count': count,
+    };
   }
 
   @override
   Map<String, dynamic> toJsonForProtocol() {
-    return {'count': count};
+    return {
+      '__className__': 'CachedSessionCount',
+      'count': count,
+    };
   }
 
   @override

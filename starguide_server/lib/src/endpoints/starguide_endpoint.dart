@@ -21,7 +21,7 @@ class StarguideEndpoint extends Endpoint {
     Session session,
     String reCaptchaToken,
   ) async {
-    final userId = (await session.authenticated)?.userId;
+    final userId = session.authenticated?.userId;
     if (userId == null) {
       if (Serverpod.instance.runMode != 'development') {
         // Verify the reCAPTCHA token.
@@ -74,7 +74,7 @@ class StarguideEndpoint extends Endpoint {
     return await ChatSession.db.insertRow(
       session,
       ChatSession(
-        userId: (await session.authenticated)?.userId,
+        userId: session.authenticated?.userId,
         keyToken: generateRandomString(16),
       ),
     );

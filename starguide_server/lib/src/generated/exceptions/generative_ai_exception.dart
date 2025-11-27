@@ -23,9 +23,11 @@ abstract class GenerativeAiException
       _GenerativeAiExceptionImpl;
 
   factory GenerativeAiException.fromJson(
-      Map<String, dynamic> jsonSerialization) {
+    Map<String, dynamic> jsonSerialization,
+  ) {
     return GenerativeAiException(
-        message: jsonSerialization['message'] as String);
+      message: jsonSerialization['message'] as String,
+    );
   }
 
   String message;
@@ -36,12 +38,18 @@ abstract class GenerativeAiException
   GenerativeAiException copyWith({String? message});
   @override
   Map<String, dynamic> toJson() {
-    return {'message': message};
+    return {
+      '__className__': 'GenerativeAiException',
+      'message': message,
+    };
   }
 
   @override
   Map<String, dynamic> toJsonForProtocol() {
-    return {'message': message};
+    return {
+      '__className__': 'GenerativeAiException',
+      'message': message,
+    };
   }
 
   @override
@@ -52,7 +60,7 @@ abstract class GenerativeAiException
 
 class _GenerativeAiExceptionImpl extends GenerativeAiException {
   _GenerativeAiExceptionImpl({required String message})
-      : super._(message: message);
+    : super._(message: message);
 
   /// Returns a shallow copy of this [GenerativeAiException]
   /// with some or all fields replaced by the given arguments.

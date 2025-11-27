@@ -26,8 +26,9 @@ abstract class DataFetcherTask implements _i1.SerializableModel {
 
   factory DataFetcherTask.fromJson(Map<String, dynamic> jsonSerialization) {
     return DataFetcherTask(
-      type:
-          _i2.DataFetcherTaskType.fromJson((jsonSerialization['type'] as int)),
+      type: _i2.DataFetcherTaskType.fromJson(
+        (jsonSerialization['type'] as String),
+      ),
       name: jsonSerialization['name'] as String?,
     );
   }
@@ -46,6 +47,7 @@ abstract class DataFetcherTask implements _i1.SerializableModel {
   @override
   Map<String, dynamic> toJson() {
     return {
+      '__className__': 'DataFetcherTask',
       'type': type.toJson(),
       if (name != null) 'name': name,
     };
@@ -64,9 +66,9 @@ class _DataFetcherTaskImpl extends DataFetcherTask {
     required _i2.DataFetcherTaskType type,
     String? name,
   }) : super._(
-          type: type,
-          name: name,
-        );
+         type: type,
+         name: name,
+       );
 
   /// Returns a shallow copy of this [DataFetcherTask]
   /// with some or all fields replaced by the given arguments.

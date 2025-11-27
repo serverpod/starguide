@@ -41,16 +41,18 @@ abstract class RAGDocument implements _i1.SerializableModel {
   factory RAGDocument.fromJson(Map<String, dynamic> jsonSerialization) {
     return RAGDocument(
       id: jsonSerialization['id'] as int?,
-      embedding:
-          _i1.VectorJsonExtension.fromJson(jsonSerialization['embedding']),
-      fetchTime:
-          _i1.DateTimeJsonExtension.fromJson(jsonSerialization['fetchTime']),
+      embedding: _i1.VectorJsonExtension.fromJson(
+        jsonSerialization['embedding'],
+      ),
+      fetchTime: _i1.DateTimeJsonExtension.fromJson(
+        jsonSerialization['fetchTime'],
+      ),
       sourceUrl: _i1.UriJsonExtension.fromJson(jsonSerialization['sourceUrl']),
       content: jsonSerialization['content'] as String,
       title: jsonSerialization['title'] as String,
       embeddingSummary: jsonSerialization['embeddingSummary'] as String,
       shortDescription: jsonSerialization['shortDescription'] as String,
-      type: _i2.RAGDocumentType.fromJson((jsonSerialization['type'] as int)),
+      type: _i2.RAGDocumentType.fromJson((jsonSerialization['type'] as String)),
     );
   }
 
@@ -92,6 +94,7 @@ abstract class RAGDocument implements _i1.SerializableModel {
   @override
   Map<String, dynamic> toJson() {
     return {
+      '__className__': 'RAGDocument',
       if (id != null) 'id': id,
       'embedding': embedding.toJson(),
       'fetchTime': fetchTime.toJson(),
@@ -124,16 +127,16 @@ class _RAGDocumentImpl extends RAGDocument {
     required String shortDescription,
     required _i2.RAGDocumentType type,
   }) : super._(
-          id: id,
-          embedding: embedding,
-          fetchTime: fetchTime,
-          sourceUrl: sourceUrl,
-          content: content,
-          title: title,
-          embeddingSummary: embeddingSummary,
-          shortDescription: shortDescription,
-          type: type,
-        );
+         id: id,
+         embedding: embedding,
+         fetchTime: fetchTime,
+         sourceUrl: sourceUrl,
+         content: content,
+         title: title,
+         embeddingSummary: embeddingSummary,
+         shortDescription: shortDescription,
+         type: type,
+       );
 
   /// Returns a shallow copy of this [RAGDocument]
   /// with some or all fields replaced by the given arguments.

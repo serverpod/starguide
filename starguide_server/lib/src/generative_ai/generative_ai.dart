@@ -1,11 +1,10 @@
 import 'package:dartantic_ai/dartantic_ai.dart';
+
+import 'package:dartantic_interface/dartantic_interface.dart' as ai;
 import 'package:json_schema/json_schema.dart';
-import 'package:serverpod/serverpod.dart';
+import 'package:serverpod/serverpod.dart' hide Message;
 import 'package:starguide_server/src/extensions/chat_message_to_role.dart';
 import 'package:starguide_server/src/generated/protocol.dart';
-
-const String _geminiModelName = 'gemini-2.0-flash';
-const String _geminiEmbeddingModelName = 'gemini-embedding-exp-03-07';
 
 class GenerativeAi {
   final String _geminiAPIKey;
@@ -21,26 +20,33 @@ class GenerativeAi {
     List<RAGDocument> documents = const [],
     List<ChatMessage> conversation = const [],
   }) async* {
-    final messages = <Message>[];
+    final messages = <ai.ChatMessage>[];
+
+    // Add system prompt as the first message
+    messages.add(
+      ai.ChatMessage.system(
+        systemPrompt + documents.map((e) => _formatDocument(e)).join('\n'),
+      ),
+    );
 
     // Add conversation history
     for (final chatMessage in conversation) {
       messages.add(
-        Message(
+        ai.ChatMessage(
           role: chatMessage.type.aiRole == 'user'
-              ? MessageRole.user
-              : MessageRole.model,
-          parts: [TextPart(chatMessage.message)],
+              ? ai.ChatMessageRole.user
+              : ai.ChatMessageRole.model,
+          parts: [ai.TextPart(chatMessage.message)],
         ),
       );
     }
 
-    final agentWithSystem = _createAgent(
-      systemPrompt:
-          systemPrompt + documents.map((e) => _formatDocument(e)).join('\n'),
-    );
+    final agent = _createAgent();
     try {
-      final response = agentWithSystem.runStream(question, messages: messages);
+      final response = agent.sendStream(
+        question,
+        history: messages,
+      );
       await for (final chunk in response) {
         yield chunk.output;
       }
@@ -52,7 +58,7 @@ class GenerativeAi {
   Future<String> generateSimpleAnswer(String question) async {
     final agent = _createAgent();
     try {
-      final response = await agent.run(question);
+      final response = await agent.send(question);
       return response.output;
     } catch (e) {
       throw GenerativeAiException(message: e.toString());
@@ -62,11 +68,8 @@ class GenerativeAi {
   Future<Vector> generateEmbedding(String document) async {
     final agent = _createAgent();
     try {
-      final embedding = await agent.createEmbedding(
-        document,
-        dimensions: 1536,
-      );
-      return Vector(embedding.toList());
+      final embedding = await agent.embedQuery(document);
+      return Vector(embedding.embeddings);
     } catch (e) {
       throw GenerativeAiException(message: e.toString());
     }
@@ -76,29 +79,37 @@ class GenerativeAi {
     required String systemPrompt,
     List<ChatMessage> conversation = const [],
   }) async {
-    final agent = _createAgent(
-      systemPrompt: systemPrompt,
-      outputSchema: _UrlList.schemaMap.toSchema(),
-      outputFromJson: _UrlList.fromJson,
-    );
+    final messages = <ai.ChatMessage>[];
 
-    final messages = <Message>[];
+    // Add system prompt as the first message
+    messages.add(ai.ChatMessage.system(systemPrompt));
 
     // Add conversation history
     for (final chatMessage in conversation) {
       messages.add(
-        Message(
+        ai.ChatMessage(
           role: chatMessage.type.aiRole == 'user'
-              ? MessageRole.user
-              : MessageRole.model,
-          parts: [TextPart(chatMessage.message)],
+              ? ai.ChatMessageRole.user
+              : ai.ChatMessageRole.model,
+          parts: [ai.TextPart(chatMessage.message)],
         ),
       );
     }
+
+    final agent = Agent(
+      'google',
+      embeddingsModelOptions: const GoogleEmbeddingsModelOptions(
+        dimensions: 768,
+      ),
+    );
+    Agent.environment['GEMINI_API_KEY'] = _geminiAPIKey;
+
     try {
-      final response = await agent.runFor<_UrlList>(
+      final response = await agent.sendFor<_UrlList>(
         systemPrompt,
-        messages: messages,
+        history: messages,
+        outputSchema: JsonSchema.create(_UrlList.schemaMap),
+        outputFromJson: _UrlList.fromJson,
       );
       return response.output.urls.map((str) => Uri.parse(str)).toList();
     } catch (e) {
@@ -110,20 +121,13 @@ class GenerativeAi {
     return '<doc href="${document.sourceUrl}" type="${document.type.name}" title="${document.title}">\n${document.content}\n</doc>';
   }
 
-  Agent _createAgent({
-    String? systemPrompt,
-    JsonSchema? outputSchema,
-    dynamic Function(Map<String, dynamic> json)? outputFromJson,
-  }) {
-    return Agent.provider(
-      GeminiProvider(
-        apiKey: _geminiAPIKey,
-        modelName: _geminiModelName,
-        embeddingModelName: _geminiEmbeddingModelName,
+  Agent _createAgent() {
+    Agent.environment['GEMINI_API_KEY'] = _geminiAPIKey;
+    return Agent(
+      'google',
+      embeddingsModelOptions: const GoogleEmbeddingsModelOptions(
+        dimensions: 768,
       ),
-      systemPrompt: systemPrompt,
-      outputSchema: outputSchema,
-      outputFromJson: outputFromJson,
     );
   }
 }

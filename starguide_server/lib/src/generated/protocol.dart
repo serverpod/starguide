@@ -77,7 +77,7 @@ class Protocol extends _i1.SerializationManagerServer {
         ),
         _i2.ColumnDefinition(
           name: 'type',
-          columnType: _i2.ColumnType.bigint,
+          columnType: _i2.ColumnType.text,
           isNullable: false,
           dartType: 'protocol:ChatMessageType',
         ),
@@ -91,12 +91,12 @@ class Protocol extends _i1.SerializationManagerServer {
             _i2.IndexElementDefinition(
               type: _i2.IndexElementDefinitionType.column,
               definition: 'id',
-            )
+            ),
           ],
           type: 'btree',
           isUnique: true,
           isPrimary: true,
-        )
+        ),
       ],
       managed: true,
     ),
@@ -148,7 +148,7 @@ class Protocol extends _i1.SerializationManagerServer {
             _i2.IndexElementDefinition(
               type: _i2.IndexElementDefinitionType.column,
               definition: 'id',
-            )
+            ),
           ],
           type: 'btree',
           isUnique: true,
@@ -161,7 +161,7 @@ class Protocol extends _i1.SerializationManagerServer {
             _i2.IndexElementDefinition(
               type: _i2.IndexElementDefinitionType.column,
               definition: 'createdAt',
-            )
+            ),
           ],
           type: 'btree',
           isUnique: false,
@@ -187,8 +187,8 @@ class Protocol extends _i1.SerializationManagerServer {
           name: 'embedding',
           columnType: _i2.ColumnType.vector,
           isNullable: false,
-          dartType: 'Vector(1536)',
-          vectorDimension: 1536,
+          dartType: 'Vector(768)',
+          vectorDimension: 768,
         ),
         _i2.ColumnDefinition(
           name: 'fetchTime',
@@ -228,7 +228,7 @@ class Protocol extends _i1.SerializationManagerServer {
         ),
         _i2.ColumnDefinition(
           name: 'type',
-          columnType: _i2.ColumnType.bigint,
+          columnType: _i2.ColumnType.text,
           isNullable: false,
           dartType: 'protocol:RAGDocumentType',
         ),
@@ -242,7 +242,7 @@ class Protocol extends _i1.SerializationManagerServer {
             _i2.IndexElementDefinition(
               type: _i2.IndexElementDefinitionType.column,
               definition: 'id',
-            )
+            ),
           ],
           type: 'btree',
           isUnique: true,
@@ -255,7 +255,7 @@ class Protocol extends _i1.SerializationManagerServer {
             _i2.IndexElementDefinition(
               type: _i2.IndexElementDefinitionType.column,
               definition: 'sourceUrl',
-            )
+            ),
           ],
           type: 'btree',
           isUnique: true,
@@ -268,7 +268,7 @@ class Protocol extends _i1.SerializationManagerServer {
             _i2.IndexElementDefinition(
               type: _i2.IndexElementDefinitionType.column,
               definition: 'embedding',
-            )
+            ),
           ],
           type: 'hnsw',
           isUnique: false,
@@ -283,7 +283,7 @@ class Protocol extends _i1.SerializationManagerServer {
             _i2.IndexElementDefinition(
               type: _i2.IndexElementDefinitionType.column,
               definition: 'type',
-            )
+            ),
           ],
           type: 'btree',
           isUnique: false,
@@ -296,12 +296,33 @@ class Protocol extends _i1.SerializationManagerServer {
     ..._i2.Protocol.targetTableDefinitions,
   ];
 
+  static String? getClassNameFromObjectJson(dynamic data) {
+    if (data is! Map) return null;
+    final className = data['__className__'] as String?;
+    return className;
+  }
+
   @override
   T deserialize<T>(
     dynamic data, [
     Type? t,
   ]) {
     t ??= T;
+
+    final dataClassName = getClassNameFromObjectJson(data);
+    if (dataClassName != null && dataClassName != t.toString()) {
+      try {
+        return deserializeByClassName({
+          'className': dataClassName,
+          'data': data,
+        });
+      } on FormatException catch (_) {
+        // If the className is not recognized (e.g., older client receiving
+        // data with a new subtype), fall back to deserializing without the
+        // className, using the expected type T.
+      }
+    }
+
     if (t == _i4.CachedSessionCount) {
       return _i4.CachedSessionCount.fromJson(data) as T;
     }
@@ -387,13 +408,15 @@ class Protocol extends _i1.SerializationManagerServer {
     }
     if (t == List<_i11.MarkdownResourceInfo>) {
       return (data as List)
-          .map((e) => deserialize<_i11.MarkdownResourceInfo>(e))
-          .toList() as T;
+              .map((e) => deserialize<_i11.MarkdownResourceInfo>(e))
+              .toList()
+          as T;
     }
     if (t == List<_i17.MarkdownResourceInfo>) {
       return (data as List)
-          .map((e) => deserialize<_i17.MarkdownResourceInfo>(e))
-          .toList() as T;
+              .map((e) => deserialize<_i17.MarkdownResourceInfo>(e))
+              .toList()
+          as T;
     }
     try {
       return _i3.Protocol().deserialize<T>(data, t);
@@ -408,6 +431,11 @@ class Protocol extends _i1.SerializationManagerServer {
   String? getClassNameForObject(Object? data) {
     String? className = super.getClassNameForObject(data);
     if (className != null) return className;
+
+    if (data is Map<String, dynamic> && data['__className__'] is String) {
+      return (data['__className__'] as String).replaceFirst('starguide.', '');
+    }
+
     switch (data) {
       case _i4.CachedSessionCount():
         return 'CachedSessionCount';

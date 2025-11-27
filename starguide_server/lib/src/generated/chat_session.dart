@@ -36,8 +36,9 @@ abstract class ChatSession
       userId: jsonSerialization['userId'] as int?,
       keyToken: jsonSerialization['keyToken'] as String,
       goodAnswer: jsonSerialization['goodAnswer'] as bool?,
-      createdAt:
-          _i1.DateTimeJsonExtension.fromJson(jsonSerialization['createdAt']),
+      createdAt: _i1.DateTimeJsonExtension.fromJson(
+        jsonSerialization['createdAt'],
+      ),
     );
   }
 
@@ -72,6 +73,7 @@ abstract class ChatSession
   @override
   Map<String, dynamic> toJson() {
     return {
+      '__className__': 'ChatSession',
       if (id != null) 'id': id,
       if (userId != null) 'userId': userId,
       'keyToken': keyToken,
@@ -83,6 +85,7 @@ abstract class ChatSession
   @override
   Map<String, dynamic> toJsonForProtocol() {
     return {
+      '__className__': 'ChatSession',
       if (id != null) 'id': id,
       if (userId != null) 'userId': userId,
       'keyToken': keyToken,
@@ -131,12 +134,12 @@ class _ChatSessionImpl extends ChatSession {
     bool? goodAnswer,
     DateTime? createdAt,
   }) : super._(
-          id: id,
-          userId: userId,
-          keyToken: keyToken,
-          goodAnswer: goodAnswer,
-          createdAt: createdAt,
-        );
+         id: id,
+         userId: userId,
+         keyToken: keyToken,
+         goodAnswer: goodAnswer,
+         createdAt: createdAt,
+       );
 
   /// Returns a shallow copy of this [ChatSession]
   /// with some or all fields replaced by the given arguments.
@@ -163,19 +166,19 @@ class ChatSessionUpdateTable extends _i1.UpdateTable<ChatSessionTable> {
   ChatSessionUpdateTable(super.table);
 
   _i1.ColumnValue<int, int> userId(int? value) => _i1.ColumnValue(
-        table.userId,
-        value,
-      );
+    table.userId,
+    value,
+  );
 
   _i1.ColumnValue<String, String> keyToken(String value) => _i1.ColumnValue(
-        table.keyToken,
-        value,
-      );
+    table.keyToken,
+    value,
+  );
 
   _i1.ColumnValue<bool, bool> goodAnswer(bool? value) => _i1.ColumnValue(
-        table.goodAnswer,
-        value,
-      );
+    table.goodAnswer,
+    value,
+  );
 
   _i1.ColumnValue<DateTime, DateTime> createdAt(DateTime value) =>
       _i1.ColumnValue(
@@ -218,12 +221,12 @@ class ChatSessionTable extends _i1.Table<int?> {
 
   @override
   List<_i1.Column> get columns => [
-        id,
-        userId,
-        keyToken,
-        goodAnswer,
-        createdAt,
-      ];
+    id,
+    userId,
+    keyToken,
+    goodAnswer,
+    createdAt,
+  ];
 }
 
 class ChatSessionInclude extends _i1.IncludeObject {

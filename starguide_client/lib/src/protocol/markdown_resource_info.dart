@@ -28,7 +28,8 @@ abstract class MarkdownResourceInfo implements _i1.SerializableModel {
   }) = _MarkdownResourceInfoImpl;
 
   factory MarkdownResourceInfo.fromJson(
-      Map<String, dynamic> jsonSerialization) {
+    Map<String, dynamic> jsonSerialization,
+  ) {
     return MarkdownResourceInfo(
       name: jsonSerialization['name'] as String,
       uri: jsonSerialization['uri'] as String,
@@ -57,6 +58,7 @@ abstract class MarkdownResourceInfo implements _i1.SerializableModel {
   @override
   Map<String, dynamic> toJson() {
     return {
+      '__className__': 'MarkdownResourceInfo',
       'name': name,
       'uri': uri,
       'description': description,
@@ -77,11 +79,11 @@ class _MarkdownResourceInfoImpl extends MarkdownResourceInfo {
     required String description,
     required String text,
   }) : super._(
-          name: name,
-          uri: uri,
-          description: description,
-          text: text,
-        );
+         name: name,
+         uri: uri,
+         description: description,
+         text: text,
+       );
 
   /// Returns a shallow copy of this [MarkdownResourceInfo]
   /// with some or all fields replaced by the given arguments.
