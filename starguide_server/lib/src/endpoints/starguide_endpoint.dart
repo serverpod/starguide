@@ -40,7 +40,10 @@ class StarguideEndpoint extends Endpoint {
           throw RecaptchaException();
         }
       } else {
-        session.log('Recaptcha verification skipped in development mode.');
+        session.log(
+          'Recaptcha verification skipped in development mode.',
+          level: LogLevel.info,
+        );
       }
     }
 
@@ -66,7 +69,7 @@ class StarguideEndpoint extends Endpoint {
     if (cachedSessionCount!.count >= _maxRequestsPerMonth) {
       session.log(
         'Too many requests in the past month.',
-        level: LogLevel.debug,
+        level: LogLevel.warning,
       );
       throw Exception('Too many requests in the past month.');
     }

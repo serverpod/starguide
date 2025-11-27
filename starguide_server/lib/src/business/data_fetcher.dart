@@ -58,7 +58,10 @@ class DataFetcher {
 
   Future<void> _fetchDataSource(Session session, DataSource dataSource) async {
     await for (final rawDocument in dataSource.fetch(session, this)) {
-      session.log('Loaded document: ${rawDocument.sourceUrl}');
+      session.log(
+        'Loaded document: ${rawDocument.sourceUrl}',
+        level: LogLevel.debug,
+      );
 
       final ragDocument = await _createRagDocument(session, rawDocument);
       await _saveRagDocument(session, ragDocument);
@@ -74,22 +77,22 @@ class DataFetcher {
   ) async {
     final genAi = GenerativeAi();
 
-    session.log('Summarizing document for description.');
+    session.log('Summarizing document for description.', level: LogLevel.debug);
     final shortDescription = await genAi.generateSimpleAnswer(
       Prompts.instance.get('summarize_document_for_description')! +
           rawDocument.document,
     );
 
-    session.log('Summarizing document for embedding.');
+    session.log('Summarizing document for embedding.', level: LogLevel.debug);
     final embeddingSummary = await genAi.generateSimpleAnswer(
       Prompts.instance.get('summarize_document_for_embedding')! +
           rawDocument.document,
     );
 
-    session.log('Generating embedding for summary.');
+    session.log('Generating embedding for summary.', level: LogLevel.debug);
     final embedding = await genAi.generateEmbedding(embeddingSummary);
 
-    session.log('Embeddings generated.');
+    session.log('Embeddings generated.', level: LogLevel.debug);
 
     return RAGDocument(
       title: rawDocument.title,
@@ -108,7 +111,10 @@ class DataFetcher {
     Session session,
     RAGDocument ragDocument,
   ) async {
-    session.log('Saving rag document: ${ragDocument.sourceUrl}');
+    session.log(
+      'Saving rag document: ${ragDocument.sourceUrl}',
+      level: LogLevel.debug,
+    );
 
     final existingDocument = await RAGDocument.db.findFirstRow(
       session,
@@ -131,7 +137,10 @@ class DataFetcher {
   }
 
   Future<bool> shouldFetchUrl(Session session, Uri sourceUrl) async {
-    session.log('Checking if should fetch url: $sourceUrl');
+    session.log(
+      'Checking if should fetch url: $sourceUrl',
+      level: LogLevel.debug,
+    );
 
     // Check if the url is already in the database.
     final document = await RAGDocument.db.findFirstRow(
@@ -159,7 +168,10 @@ class _FetchDataFutureCall extends FutureCall<DataFetcherTask> {
 
     if (task.type == DataFetcherTaskType.startFetching) {
       // Spawn tasks for each data source.
-      session.log('Starting data fetcher.');
+      session.log(
+        'Starting data fetcher.',
+        level: LogLevel.debug,
+      );
 
       for (var dataSource in dataFetcher.dataSources) {
         session.serverpod.futureCallWithDelay(
@@ -184,7 +196,10 @@ class _FetchDataFutureCall extends FutureCall<DataFetcherTask> {
       );
     } else if (task.type == DataFetcherTaskType.dataSource) {
       // Fetch data from a specific data source.
-      session.log('Fetching data from ${task.name}.');
+      session.log(
+        'Fetching data from ${task.name}.',
+        level: LogLevel.debug,
+      );
 
       bool success = false;
 
@@ -228,7 +243,10 @@ class _FetchDataFutureCall extends FutureCall<DataFetcherTask> {
       }
     } else if (task.type == DataFetcherTaskType.cleanUp) {
       // Remove old data.
-      session.log('Cleaning up data.');
+      session.log(
+        'Cleaning up data.',
+        level: LogLevel.debug,
+      );
       bool success = false;
       try {
         await dataFetcher._cleanUp(session);

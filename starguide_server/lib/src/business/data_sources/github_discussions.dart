@@ -78,6 +78,7 @@ class GithubDiscussionsDataSource implements DataSource {
 
     session.log(
       'GitHub API quota - Remaining: $remaining/$limit, Resets at: $resetAt',
+      level: LogLevel.debug,
     );
 
     final categoryId = await _fetchGithubDiscussionCategoryId(
@@ -159,6 +160,7 @@ class GithubDiscussionsDataSource implements DataSource {
       totalFetched += discussions.length as int;
       session.log(
         'Fetched ${discussions.length} discussions (total: $totalFetched)',
+        level: LogLevel.debug,
       );
 
       for (var discussion in discussions) {
@@ -188,7 +190,10 @@ class GithubDiscussionsDataSource implements DataSource {
       }
     }
 
-    session.log('Finished fetching discussions. Total fetched: $totalFetched');
+    session.log(
+      'Finished fetching discussions. Total fetched: $totalFetched',
+      level: LogLevel.debug,
+    );
   }
 
   Future<String?> _fetchGithubDiscussionCategoryId({
