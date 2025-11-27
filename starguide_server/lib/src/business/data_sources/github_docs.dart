@@ -123,7 +123,7 @@ class GithubDocsDataSource implements DataSource {
   }
 
   @override
-  String get name => 'GithubDocs';
+  String get name => 'GithubDocs:$owner/$repo:$basePath';
 
   @override
   Stream<RawRAGDocument> fetch(

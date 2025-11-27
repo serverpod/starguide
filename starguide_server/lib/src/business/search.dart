@@ -14,6 +14,9 @@ Future<List<RAGDocument>> searchDocumentation(
 
   // Search documentation for the most relevant URLs.
   final toc = await DocsTableOfContents.getTableOfContents(session);
+
+  print('TOC:\n$toc');
+
   final urls = await genAi.generateUrlList(
     systemPrompt: Prompts.instance.get('search_toc')! + toc,
     conversation: [

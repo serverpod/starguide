@@ -22,9 +22,19 @@ Future<void> configureDataFetcher() async {
     domain: 'Serverpod',
   );
 
+  final relicDocs = GithubDocsDataSource(
+    owner: 'serverpod',
+    repo: 'relic',
+    basePath: 'doc/site/docs',
+    referenceUrl: Uri.parse('https://docs.dartrelic.dev'),
+    branch: 'main',
+    domain: 'Relic',
+  );
+
   final dataSources = [
     serverpodDocs,
     serverpodDiscussions,
+    relicDocs,
   ];
 
   DataFetcher.configure(dataSources);
