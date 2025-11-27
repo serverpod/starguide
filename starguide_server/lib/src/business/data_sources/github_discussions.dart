@@ -11,11 +11,13 @@ class GithubDiscussionsDataSource implements DataSource {
   final String owner;
   final String repo;
   final String categoryName;
+  final String domain;
 
   GithubDiscussionsDataSource({
     required this.owner,
     required this.repo,
     required this.categoryName,
+    required this.domain,
   });
 
   @override
@@ -174,6 +176,7 @@ class GithubDiscussionsDataSource implements DataSource {
               dataSourceType: DataSourceType.markdown,
               documentType: RAGDocumentType.discussion,
               title: title,
+              domain: domain,
             );
           }
         }

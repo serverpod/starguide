@@ -100,6 +100,7 @@ class DataFetcher {
       shortDescription: shortDescription,
       embedding: embedding,
       type: rawDocument.documentType,
+      domain: rawDocument.domain,
     );
   }
 

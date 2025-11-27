@@ -5,3 +5,7 @@ This project is an AI assistant that searches Serverpod's documentation. It fetc
 ## Tech stack
 
 - Flutter and Serverpod.
+
+## Rules
+
+- Always run `dart analyze` after editing code.

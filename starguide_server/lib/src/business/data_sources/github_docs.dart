@@ -13,6 +13,7 @@ class GithubDocsDataSource implements DataSource {
   final String branch;
   final String basePath;
   final Uri referenceUrl;
+  final String domain;
 
   /// Latest version, if known.
   final String? latestVersion;
@@ -23,6 +24,7 @@ class GithubDocsDataSource implements DataSource {
     required this.branch,
     required this.basePath,
     required this.referenceUrl,
+    required this.domain,
     this.latestVersion,
   });
 
@@ -47,6 +49,7 @@ class GithubDocsDataSource implements DataSource {
     required final String branch,
     required final String basePath,
     required final Uri referenceUrl,
+    required final String domain,
   }) async {
     // Normalize basePath: remove leading slash, ensure trailing slash (or empty)
     var normalizedPath = basePath;
@@ -114,6 +117,7 @@ class GithubDocsDataSource implements DataSource {
       branch: branch,
       basePath: finalBasePath,
       referenceUrl: referenceUrl,
+      domain: domain,
       latestVersion: latestVersion,
     );
   }
@@ -178,6 +182,7 @@ class GithubDocsDataSource implements DataSource {
               dataSourceType: DataSourceType.markdown,
               documentType: RAGDocumentType.documentation,
               title: _getTitle(fileResponse.body),
+              domain: domain,
             );
           }
         }

@@ -11,6 +11,7 @@ Future<void> configureDataFetcher() async {
     basePath: '/',
     referenceUrl: Uri.parse('https://docs.serverpod.dev'),
     branch: 'main',
+    domain: 'Serverpod framework',
   );
   latestServerpodVersion = serverpodDocs.latestVersion!;
 
@@ -18,6 +19,7 @@ Future<void> configureDataFetcher() async {
     owner: 'serverpod',
     repo: 'serverpod',
     categoryName: 'Q&A',
+    domain: 'Serverpod',
   );
 
   final dataSources = [

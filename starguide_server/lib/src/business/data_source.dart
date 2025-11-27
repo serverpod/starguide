@@ -20,6 +20,7 @@ class RawRAGDocument {
   final String title;
   final DataSourceType dataSourceType;
   final RAGDocumentType documentType;
+  final String domain;
 
   RawRAGDocument({
     required this.sourceUrl,
@@ -27,5 +28,6 @@ class RawRAGDocument {
     required this.title,
     required this.dataSourceType,
     required this.documentType,
+    required this.domain,
   });
 }

@@ -25,6 +25,7 @@ abstract class RAGDocument
     required this.embeddingSummary,
     required this.shortDescription,
     required this.type,
+    required this.domain,
   });
 
   factory RAGDocument({
@@ -37,6 +38,7 @@ abstract class RAGDocument
     required String embeddingSummary,
     required String shortDescription,
     required _i2.RAGDocumentType type,
+    required String domain,
   }) = _RAGDocumentImpl;
 
   factory RAGDocument.fromJson(Map<String, dynamic> jsonSerialization) {
@@ -54,6 +56,7 @@ abstract class RAGDocument
       embeddingSummary: jsonSerialization['embeddingSummary'] as String,
       shortDescription: jsonSerialization['shortDescription'] as String,
       type: _i2.RAGDocumentType.fromJson((jsonSerialization['type'] as String)),
+      domain: jsonSerialization['domain'] as String,
     );
   }
 
@@ -80,6 +83,8 @@ abstract class RAGDocument
 
   _i2.RAGDocumentType type;
 
+  String domain;
+
   @override
   _i1.Table<int?> get table => t;
 
@@ -96,6 +101,7 @@ abstract class RAGDocument
     String? embeddingSummary,
     String? shortDescription,
     _i2.RAGDocumentType? type,
+    String? domain,
   });
   @override
   Map<String, dynamic> toJson() {
@@ -110,6 +116,7 @@ abstract class RAGDocument
       'embeddingSummary': embeddingSummary,
       'shortDescription': shortDescription,
       'type': type.toJson(),
+      'domain': domain,
     };
   }
 
@@ -126,6 +133,7 @@ abstract class RAGDocument
       'embeddingSummary': embeddingSummary,
       'shortDescription': shortDescription,
       'type': type.toJson(),
+      'domain': domain,
     };
   }
 
@@ -172,6 +180,7 @@ class _RAGDocumentImpl extends RAGDocument {
     required String embeddingSummary,
     required String shortDescription,
     required _i2.RAGDocumentType type,
+    required String domain,
   }) : super._(
          id: id,
          embedding: embedding,
@@ -182,6 +191,7 @@ class _RAGDocumentImpl extends RAGDocument {
          embeddingSummary: embeddingSummary,
          shortDescription: shortDescription,
          type: type,
+         domain: domain,
        );
 
   /// Returns a shallow copy of this [RAGDocument]
@@ -198,6 +208,7 @@ class _RAGDocumentImpl extends RAGDocument {
     String? embeddingSummary,
     String? shortDescription,
     _i2.RAGDocumentType? type,
+    String? domain,
   }) {
     return RAGDocument(
       id: id is int? ? id : this.id,
@@ -209,6 +220,7 @@ class _RAGDocumentImpl extends RAGDocument {
       embeddingSummary: embeddingSummary ?? this.embeddingSummary,
       shortDescription: shortDescription ?? this.shortDescription,
       type: type ?? this.type,
+      domain: domain ?? this.domain,
     );
   }
 }
@@ -261,6 +273,11 @@ class RAGDocumentUpdateTable extends _i1.UpdateTable<RAGDocumentTable> {
     table.type,
     value,
   );
+
+  _i1.ColumnValue<String, String> domain(String value) => _i1.ColumnValue(
+    table.domain,
+    value,
+  );
 }
 
 class RAGDocumentTable extends _i1.Table<int?> {
@@ -300,6 +317,10 @@ class RAGDocumentTable extends _i1.Table<int?> {
       this,
       _i1.EnumSerialization.byName,
     );
+    domain = _i1.ColumnString(
+      'domain',
+      this,
+    );
   }
 
   late final RAGDocumentUpdateTable updateTable;
@@ -320,6 +341,8 @@ class RAGDocumentTable extends _i1.Table<int?> {
 
   late final _i1.ColumnEnum<_i2.RAGDocumentType> type;
 
+  late final _i1.ColumnString domain;
+
   @override
   List<_i1.Column> get columns => [
     id,
@@ -331,6 +354,7 @@ class RAGDocumentTable extends _i1.Table<int?> {
     embeddingSummary,
     shortDescription,
     type,
+    domain,
   ];
 }
 

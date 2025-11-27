@@ -30,6 +30,7 @@ class DocsTableOfContents {
           toc.write('URL: ${document.sourceUrl}\n');
           toc.write('Title: ${document.title}\n');
           toc.write('Description: ${document.shortDescription}\n');
+          toc.write('Domain: ${document.domain}\n');
           toc.write('\n');
 
           numberOfDocuments++;

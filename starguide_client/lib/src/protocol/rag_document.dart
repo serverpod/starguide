@@ -24,6 +24,7 @@ abstract class RAGDocument implements _i1.SerializableModel {
     required this.embeddingSummary,
     required this.shortDescription,
     required this.type,
+    required this.domain,
   });
 
   factory RAGDocument({
@@ -36,6 +37,7 @@ abstract class RAGDocument implements _i1.SerializableModel {
     required String embeddingSummary,
     required String shortDescription,
     required _i2.RAGDocumentType type,
+    required String domain,
   }) = _RAGDocumentImpl;
 
   factory RAGDocument.fromJson(Map<String, dynamic> jsonSerialization) {
@@ -53,6 +55,7 @@ abstract class RAGDocument implements _i1.SerializableModel {
       embeddingSummary: jsonSerialization['embeddingSummary'] as String,
       shortDescription: jsonSerialization['shortDescription'] as String,
       type: _i2.RAGDocumentType.fromJson((jsonSerialization['type'] as String)),
+      domain: jsonSerialization['domain'] as String,
     );
   }
 
@@ -77,6 +80,8 @@ abstract class RAGDocument implements _i1.SerializableModel {
 
   _i2.RAGDocumentType type;
 
+  String domain;
+
   /// Returns a shallow copy of this [RAGDocument]
   /// with some or all fields replaced by the given arguments.
   @_i1.useResult
@@ -90,6 +95,7 @@ abstract class RAGDocument implements _i1.SerializableModel {
     String? embeddingSummary,
     String? shortDescription,
     _i2.RAGDocumentType? type,
+    String? domain,
   });
   @override
   Map<String, dynamic> toJson() {
@@ -104,6 +110,7 @@ abstract class RAGDocument implements _i1.SerializableModel {
       'embeddingSummary': embeddingSummary,
       'shortDescription': shortDescription,
       'type': type.toJson(),
+      'domain': domain,
     };
   }
 
@@ -126,6 +133,7 @@ class _RAGDocumentImpl extends RAGDocument {
     required String embeddingSummary,
     required String shortDescription,
     required _i2.RAGDocumentType type,
+    required String domain,
   }) : super._(
          id: id,
          embedding: embedding,
@@ -136,6 +144,7 @@ class _RAGDocumentImpl extends RAGDocument {
          embeddingSummary: embeddingSummary,
          shortDescription: shortDescription,
          type: type,
+         domain: domain,
        );
 
   /// Returns a shallow copy of this [RAGDocument]
@@ -152,6 +161,7 @@ class _RAGDocumentImpl extends RAGDocument {
     String? embeddingSummary,
     String? shortDescription,
     _i2.RAGDocumentType? type,
+    String? domain,
   }) {
     return RAGDocument(
       id: id is int? ? id : this.id,
@@ -163,6 +173,7 @@ class _RAGDocumentImpl extends RAGDocument {
       embeddingSummary: embeddingSummary ?? this.embeddingSummary,
       shortDescription: shortDescription ?? this.shortDescription,
       type: type ?? this.type,
+      domain: domain ?? this.domain,
     );
   }
 }
