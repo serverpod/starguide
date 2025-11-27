@@ -32,8 +32,6 @@ class GithubDocsDataSource implements DataSource {
       throw Exception('GitHub token not configured');
     }
 
-    print('GET: $url');
-
     return await http.get(
       url,
       headers: {
