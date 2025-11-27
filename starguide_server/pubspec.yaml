@@ -11,6 +11,7 @@ dependencies:
   dartantic_ai: ^1.2.0
   dartantic_interface: ^1.1.0
   json_schema: ^5.2.1
+  pub_semver: ^2.2.0
   serverpod: 3.0.0-rc.2
   serverpod_auth_server: 3.0.0-rc.2
 

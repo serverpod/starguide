@@ -18,7 +18,7 @@ void run(List<String> args) async {
     authenticationHandler: auth.authenticationHandler,
   );
 
-  configureDataFetcher();
+  await configureDataFetcher();
   DataFetcher.instance.register(pod);
 
   // Setup a default page at the web root.
