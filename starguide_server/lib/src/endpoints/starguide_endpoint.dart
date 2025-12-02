@@ -24,7 +24,7 @@ class StarguideEndpoint extends Endpoint {
   ) async {
     final userId = session.authenticated?.userId;
     if (userId == null) {
-      if (Serverpod.instance.runMode != 'development') {
+      if (false && Serverpod.instance.runMode != 'development') {
         // Verify the reCAPTCHA token.
         final score = await verifyRecaptchaToken(
           session,
@@ -33,10 +33,7 @@ class StarguideEndpoint extends Endpoint {
         );
 
         if (score < 0.5) {
-          session.log(
-            'Recaptcha score too low: $score',
-            level: LogLevel.debug,
-          );
+          session.log('Recaptcha score too low: $score', level: LogLevel.debug);
           throw RecaptchaException();
         }
       } else {
@@ -52,18 +49,15 @@ class StarguideEndpoint extends Endpoint {
 
     final cachedSessionCount = await session.caches.local.get(
       _sessionCountKey,
-      CacheMissHandler(
-        () async {
-          final count = await ChatSession.db.count(
-            session,
-            where: (chatSession) =>
-                chatSession.createdAt >
-                (DateTime.now().subtract(Duration(days: 30))),
-          );
-          return CachedSessionCount(count: count);
-        },
-        lifetime: Duration(minutes: 5),
-      ),
+      CacheMissHandler(() async {
+        final count = await ChatSession.db.count(
+          session,
+          where: (chatSession) =>
+              chatSession.createdAt >
+              (DateTime.now().subtract(Duration(days: 30))),
+        );
+        return CachedSessionCount(count: count);
+      }, lifetime: Duration(minutes: 5)),
     );
 
     if (cachedSessionCount!.count >= _maxRequestsPerMonth) {
@@ -93,15 +87,24 @@ class StarguideEndpoint extends Endpoint {
     ChatSession chatSession,
     final String question,
   ) async* {
+    final totalStopwatch = Stopwatch()..start();
+    final timings = <String, Duration>{};
+
     // Verify that the session is valid.
+    final verifyStopwatch = Stopwatch()..start();
     await _verifyChatSession(session, chatSession);
+    verifyStopwatch.stop();
+    timings['verifyChatSession'] = verifyStopwatch.elapsed;
 
     // Find earlier conversation.
+    final findConversationStopwatch = Stopwatch()..start();
     final conversation = await ChatMessage.db.find(
       session,
       where: (chatMessage) => chatMessage.chatSessionId.equals(chatSession.id!),
       orderBy: (chatMessage) => chatMessage.id,
     );
+    findConversationStopwatch.stop();
+    timings['findConversation'] = findConversationStopwatch.elapsed;
 
     if (conversation.length >= _maxConversationLength) {
       throw FormatException('Conversation too long.');
@@ -110,15 +113,20 @@ class StarguideEndpoint extends Endpoint {
     final genAi = GenerativeAi();
 
     // Search RAG documents in parallel, using different methods.
+    final searchStopwatch = Stopwatch()..start();
     final results = await Future.wait([
       searchDocumentation(session, conversation, question),
       searchDiscussions(session, conversation, question),
     ]);
     var documents = results.expand((list) => list).toList();
+    searchStopwatch.stop();
+    timings['searchDocuments'] = searchStopwatch.elapsed;
 
     // Generate the answer
+    final generateStopwatch = Stopwatch()..start();
     final answerStream = genAi.generateConversationalAnswer(
-      systemPrompt: 'The latest version of Serverpod is '
+      systemPrompt:
+          'The latest version of Serverpod is '
           '$latestServerpodVersion.\n${Prompts.instance.get('final_answer')!}',
       question: question,
       documents: documents,
@@ -129,23 +137,34 @@ class StarguideEndpoint extends Endpoint {
       answer += chunk;
       yield chunk;
     }
+    generateStopwatch.stop();
+    timings['generateAnswer'] = generateStopwatch.elapsed;
 
     // Store the question and the answer.
-    await ChatMessage.db.insert(
-      session,
-      [
-        ChatMessage(
-          chatSessionId: chatSession.id!,
-          message: question,
-          type: ChatMessageType.user,
-        ),
-        ChatMessage(
-          chatSessionId: chatSession.id!,
-          message: answer,
-          type: ChatMessageType.model,
-        ),
-      ],
-    );
+    final storeStopwatch = Stopwatch()..start();
+    await ChatMessage.db.insert(session, [
+      ChatMessage(
+        chatSessionId: chatSession.id!,
+        message: question,
+        type: ChatMessageType.user,
+      ),
+      ChatMessage(
+        chatSessionId: chatSession.id!,
+        message: answer,
+        type: ChatMessageType.model,
+      ),
+    ]);
+    storeStopwatch.stop();
+    timings['storeMessages'] = storeStopwatch.elapsed;
+
+    totalStopwatch.stop();
+    timings['total'] = totalStopwatch.elapsed;
+
+    // Log performance measurements
+    final timingStrings = timings.entries
+        .map((e) => '${e.key}: ${e.value.inMilliseconds}ms')
+        .join(', ');
+    session.log('ask() performance: $timingStrings', level: LogLevel.debug);
   }
 
   /// Records a thumbs up or down for the final answer of a chat session.

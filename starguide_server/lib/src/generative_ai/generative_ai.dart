@@ -19,6 +19,7 @@ class GenerativeAi {
     required String systemPrompt,
     List<RAGDocument> documents = const [],
     List<ChatMessage> conversation = const [],
+    ModelQuality quality = ModelQuality.smart,
   }) async* {
     final messages = <ai.ChatMessage>[];
 
@@ -41,7 +42,7 @@ class GenerativeAi {
       );
     }
 
-    final agent = _createAgent();
+    final agent = _createAgent(quality: quality);
     try {
       final response = agent.sendStream(
         question,
@@ -96,13 +97,7 @@ class GenerativeAi {
       );
     }
 
-    final agent = Agent(
-      'google',
-      embeddingsModelOptions: const GoogleEmbeddingsModelOptions(
-        dimensions: 768,
-      ),
-    );
-    Agent.environment['GEMINI_API_KEY'] = _geminiAPIKey;
+    final agent = _createAgent();
 
     try {
       final response = await agent.sendFor<_UrlList>(
@@ -121,10 +116,10 @@ class GenerativeAi {
     return '<doc href="${document.sourceUrl}" type="${document.type.name}" title="${document.title}">\n${document.content}\n</doc>';
   }
 
-  Agent _createAgent() {
+  Agent _createAgent({final ModelQuality quality = ModelQuality.fast}) {
     Agent.environment['GEMINI_API_KEY'] = _geminiAPIKey;
     return Agent(
-      'google',
+      quality.model,
       embeddingsModelOptions: const GoogleEmbeddingsModelOptions(
         dimensions: 768,
       ),
@@ -175,4 +170,14 @@ extension RAGDocumentTypeName on RAGDocumentType {
         return 'GitHub Issue';
     }
   }
+}
+
+enum ModelQuality {
+  fast('google?chat=gemini-2.5-flash-lite&embeddings=text-embedding-004'),
+  smart('google?chat=gemini-2.5-flash&embeddings=text-embedding-004');
+
+  const ModelQuality(this.model);
+
+  /// Returns the concrete Google Gemini model that backs this quality level.
+  final String model;
 }
