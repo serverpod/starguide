@@ -20,14 +20,14 @@ import 'package:starguide_flutter/widgets/animated_gradient_border.dart';
 import 'package:syntax_highlight/syntax_highlight.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-final client = Client(
-  'http://$localhost:8080/',
-  authenticationKeyManager: FlutterAuthenticationKeyManager(),
-)
-// var client = Client(
-//   'https://starguide.api.serverpod.space/',
+// final client = Client(
+//   'http://$localhost:8080/',
 //   authenticationKeyManager: FlutterAuthenticationKeyManager(),
 // )
+var client = Client(
+  'https://starguide.api.serverpod.space/',
+  authenticationKeyManager: FlutterAuthenticationKeyManager(),
+)
 //
   ..connectivityMonitor = FlutterConnectivityMonitor();
 
@@ -193,6 +193,9 @@ class StarguideChatPageState extends State<StarguideChatPage> {
       await _chatController.insertMessage(_currentResponse!);
 
       await for (final chunk in responseStream) {
+        if (_currentResponse == null) {
+          return;
+        }
         accumulatedText += chunk;
         final newMessage = _currentResponse!.copyWith(text: accumulatedText);
         await _chatController.updateMessage(_currentResponse!, newMessage);
@@ -209,10 +212,11 @@ class StarguideChatPageState extends State<StarguideChatPage> {
         _connectionError = true;
       });
       return;
-    } catch (e) {
+    } catch (e, stackTrace) {
       setState(() {
         _connectionError = true;
         _connectionErrorMessage = 'Error: $e';
+        print('$e\n$stackTrace');
       });
       return;
     }
