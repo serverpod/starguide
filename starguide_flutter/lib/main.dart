@@ -213,10 +213,10 @@ class StarguideChatPageState extends State<StarguideChatPage> {
       });
       return;
     } catch (e, stackTrace) {
+      print('$e\n$stackTrace');
       setState(() {
         _connectionError = true;
-        _connectionErrorMessage = 'Error: $e';
-        print('$e\n$stackTrace');
+        _connectionErrorMessage = 'Error: $e $stackTrace';
       });
       return;
     }
