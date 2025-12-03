@@ -573,10 +573,10 @@ packages:
     dependency: transitive
     description:
       name: relic
-      sha256: "8e475983c9f033cc01fcf4a05d9cb525a7babc8eaa817ea4d9847f54b5df1acd"
+      sha256: "985e68519f81cb107272cc6956cfa0bbfe4c7a2a1ea23c67f1c894f53407ee6c"
       url: "https://pub.dev"
     source: hosted
-    version: "0.10.0"
+    version: "0.11.0"
   retry:
     dependency: transitive
     description:
@@ -605,50 +605,50 @@ packages:
     dependency: "direct main"
     description:
       name: serverpod
-      sha256: "4502cbce937a4f4ef7d3ddfdd23244bfbd93613769c95301eddb38dbb823e8e6"
+      sha256: b8327a58c8c545c37ca52273ebd030a95c3df04931f85d0c465271bc6497cf68
       url: "https://pub.dev"
     source: hosted
-    version: "3.0.0-rc.2"
+    version: "3.0.0-rc.3"
   serverpod_auth_server:
     dependency: "direct main"
     description:
       name: serverpod_auth_server
-      sha256: "2c1bb610a12dbe08dc93b0f07d32aa68043560d4a0d81c33f051f4ddfcd22cf5"
+      sha256: "05ce0a8c838dc427f1e0c8d351af2630e44b54146b9a510bc04b153f48dcad6d"
       url: "https://pub.dev"
     source: hosted
-    version: "3.0.0-rc.2"
+    version: "3.0.0-rc.3"
   serverpod_lints:
     dependency: transitive
     description:
       name: serverpod_lints
-      sha256: a2388cc7dafb92f46bc1fb98a724562e5c87117a6f9355cbcb46780f56598413
+      sha256: "9f1a9efc1de224d3c9542c3cfc611a99c5a80dc257c40435822b27a93d0c2f6d"
       url: "https://pub.dev"
     source: hosted
-    version: "3.0.0-rc.2"
+    version: "3.0.0-rc.3"
   serverpod_serialization:
     dependency: transitive
     description:
       name: serverpod_serialization
-      sha256: c9070c0075c6c7769f1483878ffba80454e7d2d9e240eed7cedd3b9c17054482
+      sha256: "63c692eefb8ffa33a23ef469d64742998ea371b80ddd3d77a7cd5986de1b393f"
       url: "https://pub.dev"
     source: hosted
-    version: "3.0.0-rc.2"
+    version: "3.0.0-rc.3"
   serverpod_shared:
     dependency: transitive
     description:
       name: serverpod_shared
-      sha256: "2fa42ff54da154bdc379f38a412ce4d480bc732b69f66d6e127e6a9046783b72"
+      sha256: c4bb034f8a59dd13de11af06cfd7d15be15be1c30238f97c04c05020e5f94e07
       url: "https://pub.dev"
     source: hosted
-    version: "3.0.0-rc.2"
+    version: "3.0.0-rc.3"
   serverpod_test:
     dependency: "direct dev"
     description:
       name: serverpod_test
-      sha256: ed2629bdc81337069f21fb140b3f92616e969cd6a0a4e39181ac3cd7426c7ba8
+      sha256: cb699f9a2223eced7b5163cfd510bfbc8a21a4601c8de93088f140140f58e1d7
       url: "https://pub.dev"
     source: hosted
-    version: "3.0.0-rc.2"
+    version: "3.0.0-rc.3"
   shelf:
     dependency: transitive
     description:
