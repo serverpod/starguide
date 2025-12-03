@@ -7,7 +7,7 @@ set -e
 cd starguide_flutter
 flutter clean
 flutter pub get
-flutter build web --release --source-maps --base-href /
+flutter build web --profile --source-maps --base-href /
 cd ..
 
 # Copy the build files into the web/app diretory.
