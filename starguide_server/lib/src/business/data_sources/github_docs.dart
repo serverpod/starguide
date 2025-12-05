@@ -153,10 +153,7 @@ class GithubDocsDataSource implements DataSource {
       final fileName = file['name'];
       final cleanedFileName = _cleanFileName(fileName);
       final url = referenceUrl.replace(
-        pathSegments: [
-          ...referenceUrl.pathSegments,
-          cleanedFileName,
-        ],
+        pathSegments: [...referenceUrl.pathSegments, cleanedFileName],
       );
 
       if (file['type'] == 'dir') {
@@ -174,19 +171,32 @@ class GithubDocsDataSource implements DataSource {
           (fileName.endsWith('.md') || fileName.endsWith('.mdx'))) {
         if (await fetcher.shouldFetchUrl(session, url)) {
           final fileUrl = Uri.parse(file['download_url']);
-          final fileResponse = await _githubApiGet(fileUrl);
-          if (fileResponse.statusCode == 200) {
-            yield RawRAGDocument(
-              sourceUrl: url,
-              document: fileResponse.body,
-              dataSourceType: DataSourceType.markdown,
-              documentType: RAGDocumentType.documentation,
-              title: _getTitle(fileResponse.body),
-              domain: domain,
-            );
+          final document = await _loadGithubDocument(fileUrl, domain);
+          if (document != null) {
+            yield document;
           }
         }
       }
+    }
+  }
+
+  Future<RawRAGDocument?> _loadGithubDocument(
+    Uri fileUrl,
+    String domain,
+  ) async {
+    // TODO: Render referenced examples.
+    final fileResponse = await _githubApiGet(fileUrl);
+    if (fileResponse.statusCode == 200) {
+      return RawRAGDocument(
+        sourceUrl: fileUrl,
+        document: fileResponse.body,
+        dataSourceType: DataSourceType.markdown,
+        documentType: RAGDocumentType.documentation,
+        title: _getTitle(fileResponse.body),
+        domain: domain,
+      );
+    } else {
+      return null;
     }
   }
 }
@@ -194,8 +204,9 @@ class GithubDocsDataSource implements DataSource {
 String _cleanFileName(String fileName) {
   final prefixRegex = RegExp(r'^\d+-');
   final suffixRegex = RegExp(r'\.(md|mdx)$');
-  final cleanedName =
-      fileName.replaceFirst(prefixRegex, '').replaceFirst(suffixRegex, '');
+  final cleanedName = fileName
+      .replaceFirst(prefixRegex, '')
+      .replaceFirst(suffixRegex, '');
 
   if (cleanedName == 'index') return '';
   return cleanedName;
