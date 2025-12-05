@@ -316,7 +316,7 @@ class Protocol extends _i1.SerializationManagerServer {
     t ??= T;
 
     final dataClassName = getClassNameFromObjectJson(data);
-    if (dataClassName != null && dataClassName != t.toString()) {
+    if (dataClassName != null && dataClassName != getClassNameForType(t)) {
       try {
         return deserializeByClassName({
           'className': dataClassName,
@@ -431,6 +431,25 @@ class Protocol extends _i1.SerializationManagerServer {
       return _i2.Protocol().deserialize<T>(data, t);
     } on _i1.DeserializationTypeNotFoundException catch (_) {}
     return super.deserialize<T>(data, t);
+  }
+
+  static String? getClassNameForType(Type type) {
+    return switch (type) {
+      _i4.CachedSessionCount => 'CachedSessionCount',
+      _i5.ChatMessage => 'ChatMessage',
+      _i6.ChatMessageType => 'ChatMessageType',
+      _i7.ChatSession => 'ChatSession',
+      _i8.DataFetcherTask => 'DataFetcherTask',
+      _i9.DataFetcherTaskType => 'DataFetcherTaskType',
+      _i10.GenerativeAiException => 'GenerativeAiException',
+      _i11.MarkdownResourceInfo => 'MarkdownResourceInfo',
+      _i12.MarkdownResourceList => 'MarkdownResourceList',
+      _i13.RAGDocument => 'RAGDocument',
+      _i14.RAGDocumentType => 'RAGDocumentType',
+      _i15.RecaptchaException => 'RecaptchaException',
+      _i16.TableOfContents => 'TableOfContents',
+      _ => null,
+    };
   }
 
   @override

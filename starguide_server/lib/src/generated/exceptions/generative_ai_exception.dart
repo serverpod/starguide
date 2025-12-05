@@ -54,7 +54,7 @@ abstract class GenerativeAiException
 
   @override
   String toString() {
-    return _i1.SerializationManager.encode(this);
+    return 'GenerativeAiException(message: $message)';
   }
 }
 

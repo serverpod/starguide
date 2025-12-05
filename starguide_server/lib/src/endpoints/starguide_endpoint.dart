@@ -24,7 +24,7 @@ class StarguideEndpoint extends Endpoint {
   ) async {
     final userId = session.authenticated?.userId;
     if (userId == null) {
-      if (false && Serverpod.instance.runMode != 'development') {
+      if (Serverpod.instance.runMode != 'development') {
         // Verify the reCAPTCHA token.
         final score = await verifyRecaptchaToken(
           session,
