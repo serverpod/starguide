@@ -7,7 +7,7 @@
   <style>
   .grecaptcha-badge { visibility: hidden !important; }
   
-  /* Loading spinner styles */
+  /* Loading styles */
   #loading {
     position: fixed;
     top: 0;
@@ -23,13 +23,9 @@
     transition: opacity 0.5s ease-out;
   }
 
-  .spinner {
-    width: 50px;
-    height: 50px;
-    border: 4px solid rgba(255, 255, 255, 0.3);
-    border-top: 4px solid #ffffff;
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
+  .loading-image {
+    width: 120px;
+    height: 120px;
     margin-bottom: 20px;
   }
 
@@ -40,12 +36,6 @@
     font-weight: 500;
     text-align: center;
     margin-bottom: 10px;
-  }
-
-
-  @keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
   }
 
   .fade-out {
@@ -70,9 +60,9 @@
   <link rel="manifest" href="manifest.json">
 </head>
 <body>
-  <!-- Loading spinner -->
+  <!-- Loading screen -->
   <div id="loading">
-    <div class="spinner"></div>
+    <img src="/assets/packages/made_with_serverpod/assets/nova-running.webp" alt="Loading" class="loading-image">
     <div class="loading-text">Loading Starguide</div>
   </div>
 

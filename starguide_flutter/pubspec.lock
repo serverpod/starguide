@@ -568,14 +568,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "5.1.1"
-  lottie:
-    dependency: transitive
-    description:
-      name: lottie
-      sha256: a93542cc2d60a7057255405f62252533f8e8956e7e06754955669fd32fb4b216
-      url: "https://pub.dev"
-    source: hosted
-    version: "2.7.0"
   lucide_icons_flutter:
     dependency: "direct main"
     description:
@@ -588,10 +580,10 @@ packages:
     dependency: "direct main"
     description:
       name: made_with_serverpod
-      sha256: f13e0b6e13ef8f86d1a408a0fd57f76466aa50001f9971ece9137b3a3b97c95b
+      sha256: e1d9b7126aa9d0725b1d7f39cf5399a7f8cad8552d72c1ab7797dd607a0712a0
       url: "https://pub.dev"
     source: hosted
-    version: "1.2.0"
+    version: "2.0.0"
   markdown:
     dependency: transitive
     description:
