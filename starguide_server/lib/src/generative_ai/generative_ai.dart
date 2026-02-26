@@ -174,7 +174,7 @@ extension RAGDocumentTypeName on RAGDocumentType {
 
 enum ModelQuality {
   fast('google?chat=gemini-2.5-flash-lite&embeddings=gemini-embedding-001'),
-  smart('google?chat=gemini-2.5-flash&embeddings=gemini-embedding-001');
+  smart('google?chat=gemini-3-flash&embeddings=gemini-embedding-001');
 
   const ModelQuality(this.model);
 
