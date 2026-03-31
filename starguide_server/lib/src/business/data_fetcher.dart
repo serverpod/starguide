@@ -48,9 +48,7 @@ class DataFetcher {
     // Kick off the data fetcher.
     pod.futureCallWithDelay(
       _futureCallName,
-      DataFetcherTask(
-        type: DataFetcherTaskType.startFetching,
-      ),
+      DataFetcherTask(type: DataFetcherTaskType.startFetching),
       const Duration(),
       identifier: _futureCallIdentifier,
     );
@@ -125,10 +123,7 @@ class DataFetcher {
       await RAGDocument.db.insertRow(session, ragDocument);
     } else {
       ragDocument.id = existingDocument.id;
-      await RAGDocument.db.updateRow(
-        session,
-        ragDocument,
-      );
+      await RAGDocument.db.updateRow(session, ragDocument);
     }
 
     if (ragDocument.type == RAGDocumentType.documentation) {
@@ -168,10 +163,7 @@ class _FetchDataFutureCall extends FutureCall<DataFetcherTask> {
 
     if (task.type == DataFetcherTaskType.startFetching) {
       // Spawn tasks for each data source.
-      session.log(
-        'Starting data fetcher.',
-        level: LogLevel.debug,
-      );
+      session.log('Starting data fetcher.', level: LogLevel.debug);
 
       for (var dataSource in dataFetcher.dataSources) {
         session.serverpod.futureCallWithDelay(
@@ -188,18 +180,13 @@ class _FetchDataFutureCall extends FutureCall<DataFetcherTask> {
       // Schedule cleanup.
       session.serverpod.futureCallWithDelay(
         _futureCallName,
-        DataFetcherTask(
-          type: DataFetcherTaskType.cleanUp,
-        ),
+        DataFetcherTask(type: DataFetcherTaskType.cleanUp),
         const Duration(),
         identifier: _futureCallIdentifier,
       );
     } else if (task.type == DataFetcherTaskType.dataSource) {
       // Fetch data from a specific data source.
-      session.log(
-        'Fetching data from ${task.name}.',
-        level: LogLevel.debug,
-      );
+      session.log('Fetching data from ${task.name}.', level: LogLevel.debug);
 
       bool success = false;
 
@@ -243,10 +230,7 @@ class _FetchDataFutureCall extends FutureCall<DataFetcherTask> {
       }
     } else if (task.type == DataFetcherTaskType.cleanUp) {
       // Remove old data.
-      session.log(
-        'Cleaning up data.',
-        level: LogLevel.debug,
-      );
+      session.log('Cleaning up data.', level: LogLevel.debug);
       bool success = false;
       try {
         await dataFetcher._cleanUp(session);

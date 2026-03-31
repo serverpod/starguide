@@ -1,4 +1,5 @@
 # Starguide
+
 Starguide is a full-stack application built with Serverpod, featuring a Dart server backend and a Flutter frontend. It allows you to ask any questions about Serverpod and uses AI to semantically search the documentation and GitHub discussions, which is stored in a vector database. Try it out here:
 
 __[Starguide app](https://starguide.serverpod.space)__
