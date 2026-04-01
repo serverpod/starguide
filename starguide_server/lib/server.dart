@@ -25,11 +25,16 @@ void run(List<String> args) async {
 
   // Setup a Google sign in route.
   pod.webServer.addRoute(auth.RouteGoogleSignIn(), '/googlesignin');
-  // Serve all files in the /static directory.
+
+  // Serve Flutter web app files if the build directory exists.
+  final webAppDir = Directory('web/app');
+  if (!webAppDir.existsSync()) {
+    webAppDir.createSync(recursive: true);
+  }
 
   pod.webServer.addRoute(
     StaticRoute.directory(
-      Directory('web/app'),
+      webAppDir,
       cacheControlFactory: (ctx, fileInfo) {
         if (fileInfo.file.path.endsWith('flutter_service_worker.js') ||
             fileInfo.file.path.endsWith('flutter_bootstrap.js') ||
