@@ -1,4 +1,0 @@
-class: DataFetcherTask
-fields:
-  type: DataFetcherTaskType
-  name: String?
