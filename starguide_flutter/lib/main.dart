@@ -20,15 +20,12 @@ import 'package:starguide_flutter/widgets/animated_gradient_border.dart';
 import 'package:syntax_highlight/syntax_highlight.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-// final client = Client(
-//   'http://$localhost:8080/',
-//   authenticationKeyManager: FlutterAuthenticationKeyManager(),
-// )
-var client = Client(
-  'https://starguide.api.serverpod.space/',
-  authenticationKeyManager: FlutterAuthenticationKeyManager(),
-)
-//
+// var client = Client('http://$localhost:8080/')
+//   ..authKeyProvider = FlutterAuthenticationKeyManager()
+//   ..connectivityMonitor = FlutterConnectivityMonitor();
+
+var client = Client('https://starguide.api.serverpod.space/')
+  ..authKeyProvider = FlutterAuthenticationKeyManager()
   ..connectivityMonitor = FlutterConnectivityMonitor();
 
 late SessionManager sessionManager;
@@ -50,24 +47,13 @@ void main() async {
   // Initialize the highlighter.
   await Highlighter.initialize(['dart', 'yaml', 'sql']);
   var theme = await HighlighterTheme.loadDarkTheme();
-  highlighterDart = Highlighter(
-    language: 'dart',
-    theme: theme,
-  );
-  highlighterYaml = Highlighter(
-    language: 'yaml',
-    theme: theme,
-  );
-  highlighterSql = Highlighter(
-    language: 'sql',
-    theme: theme,
-  );
+  highlighterDart = Highlighter(language: 'dart', theme: theme);
+  highlighterYaml = Highlighter(language: 'yaml', theme: theme);
+  highlighterSql = Highlighter(language: 'sql', theme: theme);
 
   if (kIsWeb) {
     await GRecaptchaV3.hideBadge();
-    await GRecaptchaV3.ready(
-      '6LcWhFMrAAAAAHvRY6kr9oc9B_KPeOT0T2SxFGJE',
-    );
+    await GRecaptchaV3.ready('6LcWhFMrAAAAAHvRY6kr9oc9B_KPeOT0T2SxFGJE');
   }
   runApp(const StarguideApp());
 }
@@ -86,9 +72,7 @@ class StarguideApp extends StatelessWidget {
 }
 
 class StarguideChatPage extends StatefulWidget {
-  const StarguideChatPage({
-    super.key,
-  });
+  const StarguideChatPage({super.key});
 
   @override
   StarguideChatPageState createState() => StarguideChatPageState();
@@ -101,12 +85,8 @@ class StarguideChatPageState extends State<StarguideChatPage> {
   static const _userId = 'user';
   static const _modelId = 'model';
 
-  final _user = const User(
-    id: _userId,
-  );
-  final _model = const User(
-    id: _modelId,
-  );
+  final _user = const User(id: _userId);
+  final _model = const User(id: _modelId);
 
   ChatSession? _chatSession;
   TextMessage? _currentResponse;
@@ -313,21 +293,22 @@ class StarguideChatPageState extends State<StarguideChatPage> {
                   left: 0,
                   child: SizedBox(),
                 ),
-                textMessageBuilder: (
-                  context,
-                  message,
-                  index, {
-                  isSentByMe = true,
-                  groupStatus,
-                }) {
-                  return StarguideTextMessage(
-                    message: message,
-                    index: index,
-                    onLinkTap: (url, title) {
-                      launchUrl(Uri.parse(url));
+                textMessageBuilder:
+                    (
+                      context,
+                      message,
+                      index, {
+                      isSentByMe = true,
+                      groupStatus,
+                    }) {
+                      return StarguideTextMessage(
+                        message: message,
+                        index: index,
+                        onLinkTap: (url, title) {
+                          launchUrl(Uri.parse(url));
+                        },
+                      );
                     },
-                  );
-                },
                 emptyChatListBuilder: (context) => StarguideEmptyChat(),
               ),
               resolveUser: (id) => Future.value(switch (id) {
@@ -382,23 +363,27 @@ class StarguideChatPageState extends State<StarguideChatPage> {
                           ),
                           Spacer(),
                           TextButton.icon(
-                            onPressed:
-                                _chatSession != null ? _handleUpvote : null,
+                            onPressed: _chatSession != null
+                                ? _handleUpvote
+                                : null,
                             label: Text('Got Help'),
                             icon: Icon(
                               LucideIcons.thumbsUp400,
-                              color:
-                                  _vote == true ? Colors.blue.shade600 : null,
+                              color: _vote == true
+                                  ? Colors.blue.shade600
+                                  : null,
                             ),
                           ),
                           TextButton.icon(
-                            onPressed:
-                                _chatSession != null ? _handleDownvote : null,
+                            onPressed: _chatSession != null
+                                ? _handleDownvote
+                                : null,
                             label: Text('Poor Answer'),
                             icon: Icon(
                               LucideIcons.thumbsDown400,
-                              color:
-                                  _vote == false ? Colors.blue.shade600 : null,
+                              color: _vote == false
+                                  ? Colors.blue.shade600
+                                  : null,
                             ),
                           ),
                         ],
@@ -414,7 +399,8 @@ class StarguideChatPageState extends State<StarguideChatPage> {
                       textController: _inputTextController,
                       focusNode: _inputFocusNode,
                       onSend: _handleMessageSend,
-                      enabled: _hasInputText &&
+                      enabled:
+                          _hasInputText &&
                           !_isGeneratingResponse &&
                           _numChatRequests < kMaxChatRequests,
                       isGeneratingResponse: _isGeneratingResponse,
@@ -443,7 +429,8 @@ class StarguideChatPageState extends State<StarguideChatPage> {
                 TextButton(
                   onPressed: () {
                     launchUrl(
-                        Uri.parse('https://github.com/serverpod/starguide'));
+                      Uri.parse('https://github.com/serverpod/starguide'),
+                    );
                   },
                   child: Text(
                     'View Source',
@@ -474,9 +461,11 @@ class StarguideChatPageState extends State<StarguideChatPage> {
                         child: Container(
                           constraints: const BoxConstraints(maxWidth: 500),
                           child: MarkdownBlock(
-                            config: MarkdownConfig(configs: [
-                              PConfig(textStyle: theme.textTheme.bodySmall!),
-                            ]),
+                            config: MarkdownConfig(
+                              configs: [
+                                PConfig(textStyle: theme.textTheme.bodySmall!),
+                              ],
+                            ),
                             data:
                                 'This site is protected by reCAPTCHA and the Google [Privacy Policy](https://policies.google.com/privacy) and [Terms of Service](https://policies.google.com/terms) apply.',
                           ),
