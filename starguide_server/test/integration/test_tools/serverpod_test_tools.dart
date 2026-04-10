@@ -8,7 +8,6 @@
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
 // ignore_for_file: invalid_use_of_internal_member
-
 // ignore_for_file: no_leading_underscores_for_local_identifiers
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
@@ -19,6 +18,9 @@ import 'package:starguide_server/src/generated/markdown_resource_info.dart'
     as _i4;
 import 'package:starguide_server/src/generated/chat_session.dart' as _i5;
 import 'dart:convert' as _i6;
+import 'package:starguide_server/src/generated/future_calls.dart' as _i7;
+import 'package:starguide_server/src/generated/future_calls_generated_models/data_fetcher_future_call_fetch_data_source_model.dart'
+    as _i8;
 import 'package:starguide_server/src/generated/protocol.dart';
 import 'package:starguide_server/src/generated/endpoints.dart';
 export 'package:serverpod_test/serverpod_test_public_exports.dart';
@@ -126,6 +128,8 @@ void withServerpod(
 }
 
 class TestEndpoints {
+  late final futureCalls = _FutureCalls();
+
   late final _McpEndpoint mcp;
 
   late final _StarguideEndpoint starguide;
@@ -147,6 +151,10 @@ class _InternalTestEndpoints extends TestEndpoints
       serializationManager,
     );
   }
+}
+
+class _FutureCalls {
+  late final dataFetcher = _DataFetcherFutureCall();
 }
 
 class _McpEndpoint {
@@ -367,5 +375,50 @@ class _StarguideEndpoint {
         await _localUniqueSession.close();
       }
     });
+  }
+}
+
+class _DataFetcherFutureCall {
+  Future<void> startFetching(_i1.TestSessionBuilder sessionBuilder) async {
+    var _localUniqueSession = (sessionBuilder as _i1.InternalTestSessionBuilder)
+        .internalBuild();
+    try {
+      await _i7.DataFetcherStartFetchingFutureCall().invoke(
+        _localUniqueSession,
+        null,
+      );
+    } finally {
+      await _localUniqueSession.close();
+    }
+  }
+
+  Future<void> fetchDataSource(
+    _i1.TestSessionBuilder sessionBuilder,
+    String name,
+  ) async {
+    var object = _i8.DataFetcherFutureCallFetchDataSourceModel(name: name);
+    var _localUniqueSession = (sessionBuilder as _i1.InternalTestSessionBuilder)
+        .internalBuild();
+    try {
+      await _i7.DataFetcherFetchDataSourceFutureCall().invoke(
+        _localUniqueSession,
+        object,
+      );
+    } finally {
+      await _localUniqueSession.close();
+    }
+  }
+
+  Future<void> cleanUp(_i1.TestSessionBuilder sessionBuilder) async {
+    var _localUniqueSession = (sessionBuilder as _i1.InternalTestSessionBuilder)
+        .internalBuild();
+    try {
+      await _i7.DataFetcherCleanUpFutureCall().invoke(
+        _localUniqueSession,
+        null,
+      );
+    } finally {
+      await _localUniqueSession.close();
+    }
   }
 }

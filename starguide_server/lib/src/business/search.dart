@@ -21,7 +21,7 @@ Future<List<RAGDocument>> searchDocumentation(
   getTocStopwatch.stop();
   timings['getTableOfContents'] = getTocStopwatch.elapsed;
 
-  print('TOC:\n$toc');
+  session.log('TOC:\n$toc', level: LogLevel.debug);
 
   final generateUrlsStopwatch = Stopwatch()..start();
   final urls = await genAi.generateUrlList(

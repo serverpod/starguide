@@ -15,24 +15,20 @@ import 'cached_session_count.dart' as _i2;
 import 'chat_message.dart' as _i3;
 import 'chat_message_type.dart' as _i4;
 import 'chat_session.dart' as _i5;
-import 'data_fetcher_task.dart' as _i6;
-import 'data_fetcher_task_type.dart' as _i7;
-import 'exceptions/generative_ai_exception.dart' as _i8;
-import 'markdown_resource_info.dart' as _i9;
-import 'markdown_resource_list.dart' as _i10;
-import 'rag_document.dart' as _i11;
-import 'rag_document_type.dart' as _i12;
-import 'recaptcha/recaptcha_exception.dart' as _i13;
-import 'table_of_contents.dart' as _i14;
+import 'exceptions/generative_ai_exception.dart' as _i6;
+import 'markdown_resource_info.dart' as _i7;
+import 'markdown_resource_list.dart' as _i8;
+import 'rag_document.dart' as _i9;
+import 'rag_document_type.dart' as _i10;
+import 'recaptcha/recaptcha_exception.dart' as _i11;
+import 'table_of_contents.dart' as _i12;
 import 'package:starguide_client/src/protocol/markdown_resource_info.dart'
-    as _i15;
-import 'package:serverpod_auth_client/serverpod_auth_client.dart' as _i16;
+    as _i13;
+import 'package:serverpod_auth_client/serverpod_auth_client.dart' as _i14;
 export 'cached_session_count.dart';
 export 'chat_message.dart';
 export 'chat_message_type.dart';
 export 'chat_session.dart';
-export 'data_fetcher_task.dart';
-export 'data_fetcher_task_type.dart';
 export 'exceptions/generative_ai_exception.dart';
 export 'markdown_resource_info.dart';
 export 'markdown_resource_list.dart';
@@ -88,32 +84,26 @@ class Protocol extends _i1.SerializationManager {
     if (t == _i5.ChatSession) {
       return _i5.ChatSession.fromJson(data) as T;
     }
-    if (t == _i6.DataFetcherTask) {
-      return _i6.DataFetcherTask.fromJson(data) as T;
+    if (t == _i6.GenerativeAiException) {
+      return _i6.GenerativeAiException.fromJson(data) as T;
     }
-    if (t == _i7.DataFetcherTaskType) {
-      return _i7.DataFetcherTaskType.fromJson(data) as T;
+    if (t == _i7.MarkdownResourceInfo) {
+      return _i7.MarkdownResourceInfo.fromJson(data) as T;
     }
-    if (t == _i8.GenerativeAiException) {
-      return _i8.GenerativeAiException.fromJson(data) as T;
+    if (t == _i8.MarkdownResourceList) {
+      return _i8.MarkdownResourceList.fromJson(data) as T;
     }
-    if (t == _i9.MarkdownResourceInfo) {
-      return _i9.MarkdownResourceInfo.fromJson(data) as T;
+    if (t == _i9.RAGDocument) {
+      return _i9.RAGDocument.fromJson(data) as T;
     }
-    if (t == _i10.MarkdownResourceList) {
-      return _i10.MarkdownResourceList.fromJson(data) as T;
+    if (t == _i10.RAGDocumentType) {
+      return _i10.RAGDocumentType.fromJson(data) as T;
     }
-    if (t == _i11.RAGDocument) {
-      return _i11.RAGDocument.fromJson(data) as T;
+    if (t == _i11.RecaptchaException) {
+      return _i11.RecaptchaException.fromJson(data) as T;
     }
-    if (t == _i12.RAGDocumentType) {
-      return _i12.RAGDocumentType.fromJson(data) as T;
-    }
-    if (t == _i13.RecaptchaException) {
-      return _i13.RecaptchaException.fromJson(data) as T;
-    }
-    if (t == _i14.TableOfContents) {
-      return _i14.TableOfContents.fromJson(data) as T;
+    if (t == _i12.TableOfContents) {
+      return _i12.TableOfContents.fromJson(data) as T;
     }
     if (t == _i1.getType<_i2.CachedSessionCount?>()) {
       return (data != null ? _i2.CachedSessionCount.fromJson(data) : null) as T;
@@ -127,52 +117,45 @@ class Protocol extends _i1.SerializationManager {
     if (t == _i1.getType<_i5.ChatSession?>()) {
       return (data != null ? _i5.ChatSession.fromJson(data) : null) as T;
     }
-    if (t == _i1.getType<_i6.DataFetcherTask?>()) {
-      return (data != null ? _i6.DataFetcherTask.fromJson(data) : null) as T;
-    }
-    if (t == _i1.getType<_i7.DataFetcherTaskType?>()) {
-      return (data != null ? _i7.DataFetcherTaskType.fromJson(data) : null)
+    if (t == _i1.getType<_i6.GenerativeAiException?>()) {
+      return (data != null ? _i6.GenerativeAiException.fromJson(data) : null)
           as T;
     }
-    if (t == _i1.getType<_i8.GenerativeAiException?>()) {
-      return (data != null ? _i8.GenerativeAiException.fromJson(data) : null)
+    if (t == _i1.getType<_i7.MarkdownResourceInfo?>()) {
+      return (data != null ? _i7.MarkdownResourceInfo.fromJson(data) : null)
           as T;
     }
-    if (t == _i1.getType<_i9.MarkdownResourceInfo?>()) {
-      return (data != null ? _i9.MarkdownResourceInfo.fromJson(data) : null)
+    if (t == _i1.getType<_i8.MarkdownResourceList?>()) {
+      return (data != null ? _i8.MarkdownResourceList.fromJson(data) : null)
           as T;
     }
-    if (t == _i1.getType<_i10.MarkdownResourceList?>()) {
-      return (data != null ? _i10.MarkdownResourceList.fromJson(data) : null)
+    if (t == _i1.getType<_i9.RAGDocument?>()) {
+      return (data != null ? _i9.RAGDocument.fromJson(data) : null) as T;
+    }
+    if (t == _i1.getType<_i10.RAGDocumentType?>()) {
+      return (data != null ? _i10.RAGDocumentType.fromJson(data) : null) as T;
+    }
+    if (t == _i1.getType<_i11.RecaptchaException?>()) {
+      return (data != null ? _i11.RecaptchaException.fromJson(data) : null)
           as T;
     }
-    if (t == _i1.getType<_i11.RAGDocument?>()) {
-      return (data != null ? _i11.RAGDocument.fromJson(data) : null) as T;
+    if (t == _i1.getType<_i12.TableOfContents?>()) {
+      return (data != null ? _i12.TableOfContents.fromJson(data) : null) as T;
     }
-    if (t == _i1.getType<_i12.RAGDocumentType?>()) {
-      return (data != null ? _i12.RAGDocumentType.fromJson(data) : null) as T;
-    }
-    if (t == _i1.getType<_i13.RecaptchaException?>()) {
-      return (data != null ? _i13.RecaptchaException.fromJson(data) : null)
-          as T;
-    }
-    if (t == _i1.getType<_i14.TableOfContents?>()) {
-      return (data != null ? _i14.TableOfContents.fromJson(data) : null) as T;
-    }
-    if (t == List<_i9.MarkdownResourceInfo>) {
+    if (t == List<_i7.MarkdownResourceInfo>) {
       return (data as List)
-              .map((e) => deserialize<_i9.MarkdownResourceInfo>(e))
+              .map((e) => deserialize<_i7.MarkdownResourceInfo>(e))
               .toList()
           as T;
     }
-    if (t == List<_i15.MarkdownResourceInfo>) {
+    if (t == List<_i13.MarkdownResourceInfo>) {
       return (data as List)
-              .map((e) => deserialize<_i15.MarkdownResourceInfo>(e))
+              .map((e) => deserialize<_i13.MarkdownResourceInfo>(e))
               .toList()
           as T;
     }
     try {
-      return _i16.Protocol().deserialize<T>(data, t);
+      return _i14.Protocol().deserialize<T>(data, t);
     } on _i1.DeserializationTypeNotFoundException catch (_) {}
     return super.deserialize<T>(data, t);
   }
@@ -183,15 +166,13 @@ class Protocol extends _i1.SerializationManager {
       _i3.ChatMessage => 'ChatMessage',
       _i4.ChatMessageType => 'ChatMessageType',
       _i5.ChatSession => 'ChatSession',
-      _i6.DataFetcherTask => 'DataFetcherTask',
-      _i7.DataFetcherTaskType => 'DataFetcherTaskType',
-      _i8.GenerativeAiException => 'GenerativeAiException',
-      _i9.MarkdownResourceInfo => 'MarkdownResourceInfo',
-      _i10.MarkdownResourceList => 'MarkdownResourceList',
-      _i11.RAGDocument => 'RAGDocument',
-      _i12.RAGDocumentType => 'RAGDocumentType',
-      _i13.RecaptchaException => 'RecaptchaException',
-      _i14.TableOfContents => 'TableOfContents',
+      _i6.GenerativeAiException => 'GenerativeAiException',
+      _i7.MarkdownResourceInfo => 'MarkdownResourceInfo',
+      _i8.MarkdownResourceList => 'MarkdownResourceList',
+      _i9.RAGDocument => 'RAGDocument',
+      _i10.RAGDocumentType => 'RAGDocumentType',
+      _i11.RecaptchaException => 'RecaptchaException',
+      _i12.TableOfContents => 'TableOfContents',
       _ => null,
     };
   }
@@ -214,26 +195,22 @@ class Protocol extends _i1.SerializationManager {
         return 'ChatMessageType';
       case _i5.ChatSession():
         return 'ChatSession';
-      case _i6.DataFetcherTask():
-        return 'DataFetcherTask';
-      case _i7.DataFetcherTaskType():
-        return 'DataFetcherTaskType';
-      case _i8.GenerativeAiException():
+      case _i6.GenerativeAiException():
         return 'GenerativeAiException';
-      case _i9.MarkdownResourceInfo():
+      case _i7.MarkdownResourceInfo():
         return 'MarkdownResourceInfo';
-      case _i10.MarkdownResourceList():
+      case _i8.MarkdownResourceList():
         return 'MarkdownResourceList';
-      case _i11.RAGDocument():
+      case _i9.RAGDocument():
         return 'RAGDocument';
-      case _i12.RAGDocumentType():
+      case _i10.RAGDocumentType():
         return 'RAGDocumentType';
-      case _i13.RecaptchaException():
+      case _i11.RecaptchaException():
         return 'RecaptchaException';
-      case _i14.TableOfContents():
+      case _i12.TableOfContents():
         return 'TableOfContents';
     }
-    className = _i16.Protocol().getClassNameForObject(data);
+    className = _i14.Protocol().getClassNameForObject(data);
     if (className != null) {
       return 'serverpod_auth.$className';
     }
@@ -258,37 +235,46 @@ class Protocol extends _i1.SerializationManager {
     if (dataClassName == 'ChatSession') {
       return deserialize<_i5.ChatSession>(data['data']);
     }
-    if (dataClassName == 'DataFetcherTask') {
-      return deserialize<_i6.DataFetcherTask>(data['data']);
-    }
-    if (dataClassName == 'DataFetcherTaskType') {
-      return deserialize<_i7.DataFetcherTaskType>(data['data']);
-    }
     if (dataClassName == 'GenerativeAiException') {
-      return deserialize<_i8.GenerativeAiException>(data['data']);
+      return deserialize<_i6.GenerativeAiException>(data['data']);
     }
     if (dataClassName == 'MarkdownResourceInfo') {
-      return deserialize<_i9.MarkdownResourceInfo>(data['data']);
+      return deserialize<_i7.MarkdownResourceInfo>(data['data']);
     }
     if (dataClassName == 'MarkdownResourceList') {
-      return deserialize<_i10.MarkdownResourceList>(data['data']);
+      return deserialize<_i8.MarkdownResourceList>(data['data']);
     }
     if (dataClassName == 'RAGDocument') {
-      return deserialize<_i11.RAGDocument>(data['data']);
+      return deserialize<_i9.RAGDocument>(data['data']);
     }
     if (dataClassName == 'RAGDocumentType') {
-      return deserialize<_i12.RAGDocumentType>(data['data']);
+      return deserialize<_i10.RAGDocumentType>(data['data']);
     }
     if (dataClassName == 'RecaptchaException') {
-      return deserialize<_i13.RecaptchaException>(data['data']);
+      return deserialize<_i11.RecaptchaException>(data['data']);
     }
     if (dataClassName == 'TableOfContents') {
-      return deserialize<_i14.TableOfContents>(data['data']);
+      return deserialize<_i12.TableOfContents>(data['data']);
     }
     if (dataClassName.startsWith('serverpod_auth.')) {
       data['className'] = dataClassName.substring(15);
-      return _i16.Protocol().deserializeByClassName(data);
+      return _i14.Protocol().deserializeByClassName(data);
     }
     return super.deserializeByClassName(data);
+  }
+
+  /// Maps any `Record`s known to this [Protocol] to their JSON representation
+  ///
+  /// Throws in case the record type is not known.
+  ///
+  /// This method will return `null` (only) for `null` inputs.
+  Map<String, dynamic>? mapRecordToJson(Record? record) {
+    if (record == null) {
+      return null;
+    }
+    try {
+      return _i14.Protocol().mapRecordToJson(record);
+    } catch (_) {}
+    throw Exception('Unsupported record type ${record.runtimeType}');
   }
 }

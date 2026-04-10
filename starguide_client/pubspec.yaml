@@ -4,9 +4,11 @@ version: 0.1.2
 repository: https://github.com/serverpod/starguide
 
 environment:
-  sdk: '>=3.3.0 <4.0.0'
+  sdk: '>=3.10.0 <4.0.0'
+
+resolution: workspace
 
 dependencies:
-  serverpod_client: 3.0.0-rc.4
-  serverpod_auth_client: 3.0.0-rc.4
+  serverpod_client: 3.4.5
+  serverpod_auth_client: 3.4.5
 

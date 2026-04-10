@@ -1,7 +1,5 @@
-import 'package:dartantic_ai/dartantic_ai.dart';
+import 'package:dartantic_ai/dartantic_ai.dart' as ai;
 
-import 'package:dartantic_interface/dartantic_interface.dart' as ai;
-import 'package:json_schema/json_schema.dart';
 import 'package:serverpod/serverpod.dart' hide Message;
 import 'package:starguide_server/src/extensions/chat_message_to_role.dart';
 import 'package:starguide_server/src/generated/protocol.dart';
@@ -10,7 +8,7 @@ class GenerativeAi {
   final String _geminiAPIKey;
 
   GenerativeAi()
-      : _geminiAPIKey = Serverpod.instance.getPassword('geminiAPIKey')!;
+    : _geminiAPIKey = Serverpod.instance.getPassword('geminiAPIKey')!;
 
   GenerativeAi.withAPIKey(String geminiAPIKey) : _geminiAPIKey = geminiAPIKey;
 
@@ -44,10 +42,7 @@ class GenerativeAi {
 
     final agent = _createAgent(quality: quality);
     try {
-      final response = agent.sendStream(
-        question,
-        history: messages,
-      );
+      final response = agent.sendStream(question, history: messages);
       await for (final chunk in response) {
         yield chunk.output;
       }
@@ -103,7 +98,7 @@ class GenerativeAi {
       final response = await agent.sendFor<_UrlList>(
         systemPrompt,
         history: messages,
-        outputSchema: JsonSchema.create(_UrlList.schemaMap),
+        outputSchema: ai.Schema.fromMap(_UrlList.schemaMap),
         outputFromJson: _UrlList.fromJson,
       );
       return response.output.urls.map((str) => Uri.parse(str)).toList();
@@ -116,11 +111,11 @@ class GenerativeAi {
     return '<doc href="${document.sourceUrl}" type="${document.type.name}" title="${document.title}">\n${document.content}\n</doc>';
   }
 
-  Agent _createAgent({final ModelQuality quality = ModelQuality.fast}) {
-    Agent.environment['GEMINI_API_KEY'] = _geminiAPIKey;
-    return Agent(
+  ai.Agent _createAgent({final ModelQuality quality = ModelQuality.fast}) {
+    ai.Agent.environment['GEMINI_API_KEY'] = _geminiAPIKey;
+    return ai.Agent(
       quality.model,
-      embeddingsModelOptions: const GoogleEmbeddingsModelOptions(
+      embeddingsModelOptions: const ai.GoogleEmbeddingsModelOptions(
         dimensions: 768,
       ),
     );
@@ -133,15 +128,11 @@ class _UrlList {
   _UrlList({required this.urls});
 
   factory _UrlList.fromJson(Map<String, dynamic> json) {
-    return _UrlList(
-      urls: List<String>.from(json['urls'] as List),
-    );
+    return _UrlList(urls: List<String>.from(json['urls'] as List));
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      'urls': urls,
-    };
+    return {'urls': urls};
   }
 
   static Map<String, dynamic> get schemaMap {
@@ -174,7 +165,7 @@ extension RAGDocumentTypeName on RAGDocumentType {
 
 enum ModelQuality {
   fast('google?chat=gemini-2.5-flash-lite&embeddings=gemini-embedding-001'),
-  smart('google?chat=gemini-3-flash&embeddings=gemini-embedding-001');
+  smart('google?chat=gemini-2.5-flash&embeddings=gemini-embedding-001');
 
   const ModelQuality(this.model);
 

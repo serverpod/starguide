@@ -414,7 +414,7 @@ class RAGDocumentRepository {
   /// );
   /// ```
   Future<List<RAGDocument>> find(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     _i1.WhereExpressionBuilder<RAGDocumentTable>? where,
     int? limit,
     int? offset,
@@ -422,6 +422,8 @@ class RAGDocumentRepository {
     bool orderDescending = false,
     _i1.OrderByListBuilder<RAGDocumentTable>? orderByList,
     _i1.Transaction? transaction,
+    _i1.LockMode? lockMode,
+    _i1.LockBehavior? lockBehavior,
   }) async {
     return session.db.find<RAGDocument>(
       where: where?.call(RAGDocument.t),
@@ -431,6 +433,8 @@ class RAGDocumentRepository {
       limit: limit,
       offset: offset,
       transaction: transaction,
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
     );
   }
 
@@ -452,13 +456,15 @@ class RAGDocumentRepository {
   /// );
   /// ```
   Future<RAGDocument?> findFirstRow(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     _i1.WhereExpressionBuilder<RAGDocumentTable>? where,
     int? offset,
     _i1.OrderByBuilder<RAGDocumentTable>? orderBy,
     bool orderDescending = false,
     _i1.OrderByListBuilder<RAGDocumentTable>? orderByList,
     _i1.Transaction? transaction,
+    _i1.LockMode? lockMode,
+    _i1.LockBehavior? lockBehavior,
   }) async {
     return session.db.findFirstRow<RAGDocument>(
       where: where?.call(RAGDocument.t),
@@ -467,18 +473,24 @@ class RAGDocumentRepository {
       orderDescending: orderDescending,
       offset: offset,
       transaction: transaction,
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
     );
   }
 
   /// Finds a single [RAGDocument] by its [id] or null if no such row exists.
   Future<RAGDocument?> findById(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     int id, {
     _i1.Transaction? transaction,
+    _i1.LockMode? lockMode,
+    _i1.LockBehavior? lockBehavior,
   }) async {
     return session.db.findById<RAGDocument>(
       id,
       transaction: transaction,
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
     );
   }
 
@@ -488,14 +500,20 @@ class RAGDocumentRepository {
   ///
   /// This is an atomic operation, meaning that if one of the rows fails to
   /// insert, none of the rows will be inserted.
+  ///
+  /// If [ignoreConflicts] is set to `true`, rows that conflict with existing
+  /// rows are silently skipped, and only the successfully inserted rows are
+  /// returned.
   Future<List<RAGDocument>> insert(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     List<RAGDocument> rows, {
     _i1.Transaction? transaction,
+    bool ignoreConflicts = false,
   }) async {
     return session.db.insert<RAGDocument>(
       rows,
       transaction: transaction,
+      ignoreConflicts: ignoreConflicts,
     );
   }
 
@@ -503,7 +521,7 @@ class RAGDocumentRepository {
   ///
   /// The returned [RAGDocument] will have its `id` field set.
   Future<RAGDocument> insertRow(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     RAGDocument row, {
     _i1.Transaction? transaction,
   }) async {
@@ -519,7 +537,7 @@ class RAGDocumentRepository {
   /// This is an atomic operation, meaning that if one of the rows fails to
   /// update, none of the rows will be updated.
   Future<List<RAGDocument>> update(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     List<RAGDocument> rows, {
     _i1.ColumnSelections<RAGDocumentTable>? columns,
     _i1.Transaction? transaction,
@@ -535,7 +553,7 @@ class RAGDocumentRepository {
   /// Optionally, a list of [columns] can be provided to only update those
   /// columns. Defaults to all columns.
   Future<RAGDocument> updateRow(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     RAGDocument row, {
     _i1.ColumnSelections<RAGDocumentTable>? columns,
     _i1.Transaction? transaction,
@@ -550,7 +568,7 @@ class RAGDocumentRepository {
   /// Updates a single [RAGDocument] by its [id] with the specified [columnValues].
   /// Returns the updated row or null if no row with the given id exists.
   Future<RAGDocument?> updateById(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     int id, {
     required _i1.ColumnValueListBuilder<RAGDocumentUpdateTable> columnValues,
     _i1.Transaction? transaction,
@@ -565,7 +583,7 @@ class RAGDocumentRepository {
   /// Updates all [RAGDocument]s matching the [where] expression with the specified [columnValues].
   /// Returns the list of updated rows.
   Future<List<RAGDocument>> updateWhere(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     required _i1.ColumnValueListBuilder<RAGDocumentUpdateTable> columnValues,
     required _i1.WhereExpressionBuilder<RAGDocumentTable> where,
     int? limit,
@@ -591,7 +609,7 @@ class RAGDocumentRepository {
   /// This is an atomic operation, meaning that if one of the rows fail to
   /// be deleted, none of the rows will be deleted.
   Future<List<RAGDocument>> delete(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     List<RAGDocument> rows, {
     _i1.Transaction? transaction,
   }) async {
@@ -603,7 +621,7 @@ class RAGDocumentRepository {
 
   /// Deletes a single [RAGDocument].
   Future<RAGDocument> deleteRow(
-    _i1.Session session,
+    _i1.DatabaseSession session,
     RAGDocument row, {
     _i1.Transaction? transaction,
   }) async {
@@ -615,7 +633,7 @@ class RAGDocumentRepository {
 
   /// Deletes all rows matching the [where] expression.
   Future<List<RAGDocument>> deleteWhere(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     required _i1.WhereExpressionBuilder<RAGDocumentTable> where,
     _i1.Transaction? transaction,
   }) async {
@@ -628,7 +646,7 @@ class RAGDocumentRepository {
   /// Counts the number of rows matching the [where] expression. If omitted,
   /// will return the count of all rows in the table.
   Future<int> count(
-    _i1.Session session, {
+    _i1.DatabaseSession session, {
     _i1.WhereExpressionBuilder<RAGDocumentTable>? where,
     int? limit,
     _i1.Transaction? transaction,
@@ -636,6 +654,22 @@ class RAGDocumentRepository {
     return session.db.count<RAGDocument>(
       where: where?.call(RAGDocument.t),
       limit: limit,
+      transaction: transaction,
+    );
+  }
+
+  /// Acquires row-level locks on [RAGDocument] rows matching the [where] expression.
+  Future<void> lockRows(
+    _i1.DatabaseSession session, {
+    required _i1.WhereExpressionBuilder<RAGDocumentTable> where,
+    required _i1.LockMode lockMode,
+    required _i1.Transaction transaction,
+    _i1.LockBehavior lockBehavior = _i1.LockBehavior.wait,
+  }) async {
+    return session.db.lockRows<RAGDocument>(
+      where: where(RAGDocument.t),
+      lockMode: lockMode,
+      lockBehavior: lockBehavior,
       transaction: transaction,
     );
   }
