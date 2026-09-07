@@ -1,5 +1,0 @@
-enum: DataFetcherTaskType
-values:
-  - dataSource
-  - cleanUp
-  - startFetching

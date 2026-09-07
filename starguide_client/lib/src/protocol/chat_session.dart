@@ -34,10 +34,12 @@ abstract class ChatSession implements _i1.SerializableModel {
       id: jsonSerialization['id'] as int?,
       userId: jsonSerialization['userId'] as int?,
       keyToken: jsonSerialization['keyToken'] as String,
-      goodAnswer: jsonSerialization['goodAnswer'] as bool?,
-      createdAt: _i1.DateTimeJsonExtension.fromJson(
-        jsonSerialization['createdAt'],
-      ),
+      goodAnswer: jsonSerialization['goodAnswer'] == null
+          ? null
+          : _i1.BoolJsonExtension.fromJson(jsonSerialization['goodAnswer']),
+      createdAt: jsonSerialization['createdAt'] == null
+          ? null
+          : _i1.DateTimeJsonExtension.fromJson(jsonSerialization['createdAt']),
     );
   }
 
