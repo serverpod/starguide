@@ -24,6 +24,7 @@ abstract class AdminSourceStatus
     this.lastFetchTime,
     this.oldestFetchTime,
     this.nextFetchTime,
+    this.runningSince,
     this.retryTime,
   });
 
@@ -35,6 +36,7 @@ abstract class AdminSourceStatus
     DateTime? lastFetchTime,
     DateTime? oldestFetchTime,
     DateTime? nextFetchTime,
+    DateTime? runningSince,
     DateTime? retryTime,
   }) = _AdminSourceStatusImpl;
 
@@ -61,6 +63,11 @@ abstract class AdminSourceStatus
           : _is.DateTimeJsonExtension.fromJson(
               jsonSerialization['nextFetchTime'],
             ),
+      runningSince: jsonSerialization['runningSince'] == null
+          ? null
+          : _is.DateTimeJsonExtension.fromJson(
+              jsonSerialization['runningSince'],
+            ),
       retryTime: jsonSerialization['retryTime'] == null
           ? null
           : _is.DateTimeJsonExtension.fromJson(jsonSerialization['retryTime']),
@@ -81,8 +88,13 @@ abstract class AdminSourceStatus
   /// When the least recently fetched document of the source was fetched.
   DateTime? oldestFetchTime;
 
-  /// When the next recurring fetch of the source is scheduled.
+  /// When the next recurring fetch of the source is scheduled. In the past
+  /// if the fetch is due but has not started yet.
   DateTime? nextFetchTime;
+
+  /// When the fetch that is currently running was due, or null if no fetch
+  /// of the source is running.
+  DateTime? runningSince;
 
   /// When a retry is scheduled after a failed fetch, if any.
   DateTime? retryTime;
@@ -98,6 +110,7 @@ abstract class AdminSourceStatus
     DateTime? lastFetchTime,
     DateTime? oldestFetchTime,
     DateTime? nextFetchTime,
+    DateTime? runningSince,
     DateTime? retryTime,
   });
   @override
@@ -111,6 +124,7 @@ abstract class AdminSourceStatus
       if (lastFetchTime != null) 'lastFetchTime': lastFetchTime?.toJson(),
       if (oldestFetchTime != null) 'oldestFetchTime': oldestFetchTime?.toJson(),
       if (nextFetchTime != null) 'nextFetchTime': nextFetchTime?.toJson(),
+      if (runningSince != null) 'runningSince': runningSince?.toJson(),
       if (retryTime != null) 'retryTime': retryTime?.toJson(),
     };
   }
@@ -126,6 +140,7 @@ abstract class AdminSourceStatus
       if (lastFetchTime != null) 'lastFetchTime': lastFetchTime?.toJson(),
       if (oldestFetchTime != null) 'oldestFetchTime': oldestFetchTime?.toJson(),
       if (nextFetchTime != null) 'nextFetchTime': nextFetchTime?.toJson(),
+      if (runningSince != null) 'runningSince': runningSince?.toJson(),
       if (retryTime != null) 'retryTime': retryTime?.toJson(),
     };
   }
@@ -147,6 +162,7 @@ class _AdminSourceStatusImpl extends AdminSourceStatus {
     DateTime? lastFetchTime,
     DateTime? oldestFetchTime,
     DateTime? nextFetchTime,
+    DateTime? runningSince,
     DateTime? retryTime,
   }) : super._(
          name: name,
@@ -156,6 +172,7 @@ class _AdminSourceStatusImpl extends AdminSourceStatus {
          lastFetchTime: lastFetchTime,
          oldestFetchTime: oldestFetchTime,
          nextFetchTime: nextFetchTime,
+         runningSince: runningSince,
          retryTime: retryTime,
        );
 
@@ -171,6 +188,7 @@ class _AdminSourceStatusImpl extends AdminSourceStatus {
     Object? lastFetchTime = _Undefined,
     Object? oldestFetchTime = _Undefined,
     Object? nextFetchTime = _Undefined,
+    Object? runningSince = _Undefined,
     Object? retryTime = _Undefined,
   }) {
     return AdminSourceStatus(
@@ -187,6 +205,9 @@ class _AdminSourceStatusImpl extends AdminSourceStatus {
       nextFetchTime: nextFetchTime is DateTime?
           ? nextFetchTime
           : this.nextFetchTime,
+      runningSince: runningSince is DateTime?
+          ? runningSince
+          : this.runningSince,
       retryTime: retryTime is DateTime? ? retryTime : this.retryTime,
     );
   }

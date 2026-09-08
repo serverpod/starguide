@@ -203,16 +203,8 @@ class _DocumentsTable extends StatelessWidget {
     return AdminTableCard(
       emptyMessage: 'No documents match the filters.',
       onRowTap: (row) => onTap(documents[row]),
-      columnSpanExtent: (column) => switch (column) {
-        0 => const MaxTableSpanExtent(
-          FixedTableSpanExtent(320),
-          RemainingTableSpanExtent(),
-        ),
-        1 => const FixedTableSpanExtent(140),
-        2 => const FixedTableSpanExtent(170),
-        3 => const FixedTableSpanExtent(150),
-        _ => const FixedTableSpanExtent(100),
-      },
+      columnWidths: const [null, 140, 170, 150, 100],
+      minFlexibleWidth: 280,
       header: const [
         ShadTableCell.header(child: Text('Title')),
         ShadTableCell.header(child: Text('Type')),
@@ -259,7 +251,7 @@ class _DocumentsTable extends StatelessWidget {
             ),
             ShadTableCell(
               alignment: Alignment.centerRight,
-              child: Text('${formatCount(document.contentLength)} ch'),
+              child: Text(formatCompactCount(document.contentLength)),
             ),
           ],
       ],

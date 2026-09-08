@@ -3,7 +3,6 @@ import 'package:shad/shad.dart';
 import 'package:starguide_flutter/admin/views/admin_overview_view.dart';
 import 'package:starguide_flutter/admin/views/admin_poor_answers_view.dart';
 import 'package:starguide_flutter/admin/views/admin_sources_view.dart';
-import 'package:starguide_flutter/main.dart';
 
 enum _AdminSection {
   overview('Overview', LucideIcons.chartColumn),
@@ -57,44 +56,21 @@ class _AdminPageState extends State<AdminPage> {
               ),
               const SizedBox(width: 8),
               Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      'Starguide',
-                      maxLines: 1,
-                      softWrap: false,
-                      overflow: TextOverflow.clip,
-                      style: theme.textTheme.small,
-                    ),
-                    Text(
-                      'Admin',
-                      maxLines: 1,
-                      softWrap: false,
-                      overflow: TextOverflow.clip,
-                      style: theme.textTheme.muted,
-                    ),
-                  ],
+                child: Text(
+                  'Admin',
+                  maxLines: 1,
+                  softWrap: false,
+                  overflow: TextOverflow.clip,
+                  style: theme.textTheme.small,
                 ),
               ),
             ],
           ),
-          footer: ShadSidebarMenu(
-            children: [
-              ShadSidebarMenuButton(
-                leading: const Icon(LucideIcons.arrowLeft),
-                tooltip: 'Back to chat',
-                onPressed: widget.onClose,
-                child: const Text('Back to chat'),
-              ),
-              ShadSidebarMenuButton(
-                leading: const Icon(LucideIcons.logOut),
-                tooltip: 'Sign out',
-                onPressed: () => sessionManager.signOutDevice(),
-                child: const Text('Sign out'),
-              ),
-            ],
+          footer: ShadSidebarMenuButton(
+            leading: const Icon(LucideIcons.arrowLeft),
+            tooltip: 'Back to chat',
+            onPressed: widget.onClose,
+            child: const Text('Back to chat'),
           ),
           children: [
             ShadSidebarGroup(

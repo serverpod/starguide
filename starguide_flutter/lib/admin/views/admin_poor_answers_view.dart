@@ -139,16 +139,8 @@ class _SessionsTable extends StatelessWidget {
     return AdminTableCard(
       emptyMessage: 'No conversations match the filter.',
       onRowTap: (row) => onTap(sessions[row]),
-      columnSpanExtent: (column) => switch (column) {
-        0 => const FixedTableSpanExtent(150),
-        1 => const MaxTableSpanExtent(
-          FixedTableSpanExtent(320),
-          RemainingTableSpanExtent(),
-        ),
-        2 => const FixedTableSpanExtent(100),
-        3 => const FixedTableSpanExtent(130),
-        _ => const FixedTableSpanExtent(110),
-      },
+      columnWidths: const [150, null, 100, 130, 110],
+      minFlexibleWidth: 280,
       header: const [
         ShadTableCell.header(child: Text('Started')),
         ShadTableCell.header(child: Text('First question')),

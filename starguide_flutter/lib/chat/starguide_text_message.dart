@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_chat_core/flutter_chat_core.dart';
 import 'package:gpt_markdown/gpt_markdown.dart';
 import 'package:provider/provider.dart';
+import 'package:shad/shad.dart' show LucideIcons;
 import 'package:starguide_flutter/chat/starguide_code_field.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -111,8 +112,9 @@ class StarguideTextMessage extends StatelessWidget {
       final gptResponse = GptResponse(message.text);
 
       content = Column(
-        crossAxisAlignment:
-            isSentByMe ? CrossAxisAlignment.center : CrossAxisAlignment.stretch,
+        crossAxisAlignment: isSentByMe
+            ? CrossAxisAlignment.center
+            : CrossAxisAlignment.stretch,
         children: [
           if (!isSentByMe) const SizedBox(width: double.infinity),
           SelectableRegion(
@@ -124,10 +126,8 @@ class StarguideTextMessage extends StatelessWidget {
                   ? paragraphStyle?.copyWith(fontSize: onlyEmojiFontSize)
                   : paragraphStyle,
               onLinkTap: onLinkTap,
-              codeBuilder: (context, name, codes, closed) => StarguideCodeField(
-                name: name,
-                codes: codes,
-              ),
+              codeBuilder: (context, name, codes, closed) =>
+                  StarguideCodeField(name: name, codes: codes),
               highlightBuilder: (context, text, style) {
                 return Container(
                   padding: const EdgeInsets.symmetric(horizontal: 2),
@@ -154,10 +154,10 @@ class StarguideTextMessage extends StatelessWidget {
 
     final linkPreviewWidget = linkPreviewPosition != LinkPreviewPosition.none
         ? context.read<Builders>().linkPreviewBuilder?.call(
-              context,
-              message,
-              isSentByMe,
-            )
+            context,
+            message,
+            isSentByMe,
+          )
         : null;
 
     return Container(
@@ -177,8 +177,9 @@ class StarguideTextMessage extends StatelessWidget {
                   linkPreviewPosition == LinkPreviewPosition.top)
                 linkPreviewWidget,
               Container(
-                padding:
-                    isSentByMe ? padding : EdgeInsets.symmetric(vertical: 16),
+                padding: isSentByMe
+                    ? padding
+                    : EdgeInsets.symmetric(vertical: 16),
                 child: _buildContentBasedOnPosition(
                   context: context,
                   textContent: content,
@@ -267,8 +268,9 @@ class StarguideTextMessage extends StatelessWidget {
     if (isSentByMe) {
       return timeStyle ??
           theme.typography.labelSmall.copyWith(
-            color:
-                _isOnlyEmoji ? theme.colors.onSurface : theme.colors.onPrimary,
+            color: _isOnlyEmoji
+                ? theme.colors.onSurface
+                : theme.colors.onPrimary,
           );
     }
     return timeStyle ??
@@ -372,15 +374,22 @@ class GptResponseLink {
   final String title;
 
   GptResponseLink({required this.url, required this.title});
+
+  /// Discussions are linked on GitHub; everything else is documentation.
+  bool get isDiscussion =>
+      url.host == 'github.com' && url.pathSegments.contains('discussions');
+
+  String get kindLabel => isDiscussion ? 'Discussion' : 'Docs';
+
+  /// The thickest Lucide stroke weight, as the icon is rendered very small.
+  IconData get kindIcon =>
+      isDiscussion ? LucideIcons.messagesSquare600 : LucideIcons.file600;
 }
 
 class LinkPreviewList extends StatelessWidget {
   final List<GptResponseLink> links;
 
-  const LinkPreviewList({
-    super.key,
-    required this.links,
-  });
+  const LinkPreviewList({super.key, required this.links});
 
   @override
   Widget build(BuildContext context) {
@@ -417,16 +426,16 @@ class LinkPreviewList extends StatelessWidget {
 class LinkPreview extends StatelessWidget {
   final GptResponseLink link;
 
-  const LinkPreview({
-    super.key,
-    required this.link,
-  });
+  const LinkPreview({super.key, required this.link});
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-
-    String domain = link.url.host;
+    // Semibold to match the heavy stroke of the icon next to it.
+    final kindStyle = theme.textTheme.labelSmall?.copyWith(
+      color: theme.disabledColor,
+      fontWeight: FontWeight.w600,
+    );
 
     return SizedBox(
       width: 220,
@@ -445,13 +454,24 @@ class LinkPreview extends StatelessWidget {
                 overflow: TextOverflow.ellipsis,
                 softWrap: false,
               ),
-              Text(
-                domain,
-                style: theme.textTheme.labelSmall
-                    ?.copyWith(color: theme.disabledColor),
-                maxLines: 1,
-                overflow: TextOverflow.clip,
-                softWrap: false,
+              Row(
+                spacing: 4,
+                children: [
+                  Icon(
+                    link.kindIcon,
+                    size: kindStyle?.fontSize,
+                    color: kindStyle?.color,
+                  ),
+                  Expanded(
+                    child: Text(
+                      link.kindLabel,
+                      style: kindStyle,
+                      maxLines: 1,
+                      overflow: TextOverflow.clip,
+                      softWrap: false,
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
@@ -492,8 +512,8 @@ class StarguideProgressIndicator extends StatelessWidget {
                 Text(
                   'Generating response...',
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: Theme.of(context).disabledColor,
-                      ),
+                    color: Theme.of(context).disabledColor,
+                  ),
                 ),
               ],
             ),

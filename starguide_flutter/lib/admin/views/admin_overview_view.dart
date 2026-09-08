@@ -71,6 +71,9 @@ class _OverviewContent extends StatelessWidget {
     final nextFetchTime = nextFetchTimes.isEmpty
         ? null
         : nextFetchTimes.reduce((a, b) => a.isBefore(b) ? a : b);
+    final runningCount = overview.sources
+        .where((source) => source.runningSince != null)
+        .length;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -114,9 +117,12 @@ class _OverviewContent extends StatelessWidget {
               value: overview.lastFetchTime == null
                   ? 'Never'
                   : formatRelative(overview.lastFetchTime!),
-              description: nextFetchTime == null
+              description: runningCount > 0
+                  ? 'Fetching $runningCount of ${overview.sources.length} '
+                        'sources now'
+                  : nextFetchTime == null
                   ? 'No fetch scheduled'
-                  : 'Next fetch ${formatRelative(nextFetchTime)}',
+                  : 'Next fetch ${_formatNextFetch(nextFetchTime)}',
             ),
           ],
         ),
@@ -200,6 +206,11 @@ class _OverviewContent extends StatelessWidget {
         '${formatCount(noVote)} no vote';
   }
 
+  /// A scheduled time in the past means the fetch is due but has not been
+  /// picked up yet.
+  static String _formatNextFetch(DateTime time) =>
+      time.isBefore(DateTime.now()) ? 'due now' : formatRelative(time);
+
   static String _timeWithRelative(DateTime? time) {
     if (time == null) return '–';
     return '${formatDateTime(time)} (${formatRelative(time)})';
@@ -217,19 +228,8 @@ class _SourcesTable extends StatelessWidget {
 
     return AdminTableCard(
       emptyMessage: 'No data sources are configured.',
-      columnSpanExtent: (column) => switch (column) {
-        0 => const MaxTableSpanExtent(
-          FixedTableSpanExtent(240),
-          RemainingTableSpanExtent(),
-        ),
-        1 => const FixedTableSpanExtent(170),
-        2 => const FixedTableSpanExtent(140),
-        3 => const FixedTableSpanExtent(110),
-        4 => const FixedTableSpanExtent(150),
-        _ => const FixedTableSpanExtent(220),
-      },
+      columnWidths: const [null, 140, 110, 150, 260],
       header: const [
-        ShadTableCell.header(child: Text('Source')),
         ShadTableCell.header(child: Text('Domain')),
         ShadTableCell.header(child: Text('Type')),
         ShadTableCell.header(
@@ -237,14 +237,11 @@ class _SourcesTable extends StatelessWidget {
           child: Text('Documents'),
         ),
         ShadTableCell.header(child: Text('Last fetched')),
-        ShadTableCell.header(child: Text('Next fetch')),
+        ShadTableCell.header(child: Text('Status')),
       ],
       rows: [
         for (final source in sources)
           [
-            ShadTableCell(
-              child: Text(source.name, overflow: TextOverflow.ellipsis),
-            ),
             ShadTableCell(
               child: Text(source.domain, overflow: TextOverflow.ellipsis),
             ),
@@ -264,11 +261,24 @@ class _SourcesTable extends StatelessWidget {
               child: Row(
                 spacing: 8,
                 children: [
+                  if (source.runningSince != null)
+                    ShadTooltip(
+                      builder: (context) => Text(
+                        'A fetch has been running since '
+                        '${formatDateTime(source.runningSince!)}.',
+                        style: theme.textTheme.small,
+                      ),
+                      child: const ShadBadge(child: Text('Running')),
+                    ),
                   Flexible(
                     child: Text(
-                      source.nextFetchTime == null
+                      source.runningSince != null
+                          ? 'started ${formatRelative(source.runningSince!)}'
+                          : source.nextFetchTime == null
                           ? 'Not scheduled'
-                          : formatRelative(source.nextFetchTime!),
+                          : _OverviewContent._formatNextFetch(
+                              source.nextFetchTime!,
+                            ),
                       overflow: TextOverflow.ellipsis,
                     ),
                   ),

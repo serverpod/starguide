@@ -20,6 +20,11 @@ class AdminStats {
   static const _fetchFutureCallName = 'DataFetcherFetchDataSourceFutureCall';
   static const _cleanUpFutureCallName = 'DataFetcherCleanUpFutureCall';
 
+  /// A running future call is claimed by its server, which refreshes the
+  /// claim's heartbeat every minute. Claims older than this are stale, e.g.
+  /// left behind by a crashed server, and the call is not considered running.
+  static const _staleClaimAge = Duration(minutes: 3);
+
   /// Builds the overview from the current state of the database.
   static Future<AdminOverview> overview(Session session) async {
     final dataFetcher = DataFetcher.instance;
@@ -84,25 +89,29 @@ class AdminStats {
             row,
     };
 
-    // Scheduled fetches and pending retries, keyed by data source name.
-    final scheduled = await session.db.unsafeQuery('''
-      SELECT identifier, "serializedObject", MIN(time)
-      FROM serverpod_future_call
-      WHERE name = @name
-      GROUP BY identifier, "serializedObject"
-      ''', parameters: QueryParameters.named({'name': _fetchFutureCallName}));
+    // Scheduled fetches, running fetches and pending retries, keyed by data
+    // source name.
     final nextFetchTimes = <String, DateTime>{};
+    final runningSince = <String, DateTime>{};
     final retryTimes = <String, DateTime>{};
-    for (final row in scheduled) {
-      final identifier = row[0] as String?;
-      final serializedObject = row[1] as String?;
-      final time = (row[2] as DateTime).toUtc();
-      if (serializedObject == null) continue;
-      final sourceName = _fetchDataSourceName(serializedObject);
-      if (identifier == dataFetcherIdentifier) {
-        nextFetchTimes[sourceName] = time;
-      } else if (identifier == dataFetcherRetryIdentifier(sourceName)) {
-        retryTimes[sourceName] = time;
+    for (final call in await _scheduledCalls(session, _fetchFutureCallName)) {
+      if (call.serializedObject == null) continue;
+      final sourceName = _fetchDataSourceName(call.serializedObject!);
+      if (call.identifier == dataFetcherIdentifier) {
+        if (call.isRunning) {
+          runningSince[sourceName] = call.time;
+        } else {
+          nextFetchTimes[sourceName] = _earliest(
+            nextFetchTimes[sourceName],
+            call.time,
+          );
+        }
+      } else if (call.identifier == dataFetcherRetryIdentifier(sourceName)) {
+        if (call.isRunning) {
+          runningSince[sourceName] = call.time;
+        } else {
+          retryTimes[sourceName] = call.time;
+        }
       }
     }
 
@@ -119,6 +128,7 @@ class AdminStats {
           lastFetchTime: (row?[3] as DateTime?)?.toUtc(),
           oldestFetchTime: (row?[4] as DateTime?)?.toUtc(),
           nextFetchTime: nextFetchTimes[dataSource.name],
+          runningSince: runningSince[dataSource.name],
           retryTime: retryTimes[dataSource.name],
         ),
       );
@@ -150,17 +160,49 @@ class AdminStats {
     return json['name'] as String;
   }
 
-  /// When the next future call with [name] is scheduled to run.
+  /// The scheduled future calls with [name], including whether each one is
+  /// currently running. A recurring call's entry stays in the table while it
+  /// runs, with its next occurrence scheduled alongside it, so the running
+  /// entries must be told apart from the upcoming ones.
+  static Future<List<_ScheduledCall>> _scheduledCalls(
+    Session session,
+    String name,
+  ) async {
+    final rows = await session.db.unsafeQuery('''
+      SELECT f.identifier, f."serializedObject", f.time, c."lastHeartbeatTime"
+      FROM serverpod_future_call f
+      LEFT JOIN serverpod_future_call_claim c ON c."futureCallId" = f.id
+      WHERE f.name = @name
+      ''', parameters: QueryParameters.named({'name': name}));
+    final staleBefore = DateTime.now().toUtc().subtract(_staleClaimAge);
+    return [
+      for (final row in rows)
+        _ScheduledCall(
+          identifier: row[0] as String?,
+          serializedObject: row[1] as String?,
+          time: (row[2] as DateTime).toUtc(),
+          isRunning:
+              row[3] != null &&
+              (row[3] as DateTime).toUtc().isAfter(staleBefore),
+        ),
+    ];
+  }
+
+  /// When the next future call with [name] is scheduled to run, not counting
+  /// calls that are currently running.
   static Future<DateTime?> _nextFutureCallTime(
     Session session, {
     required String name,
   }) async {
-    final rows = await session.db.unsafeQuery(
-      'SELECT MIN(time) FROM serverpod_future_call WHERE name = @name',
-      parameters: QueryParameters.named({'name': name}),
-    );
-    return (rows.first[0] as DateTime?)?.toUtc();
+    DateTime? next;
+    for (final call in await _scheduledCalls(session, name)) {
+      if (!call.isRunning) next = _earliest(next, call.time);
+    }
+    return next;
   }
+
+  static DateTime _earliest(DateTime? a, DateTime b) =>
+      a == null || b.isBefore(a) ? b : a;
 
   /// Vote counts for the sessions created during the past [period].
   static Future<VoteStats> _voteStats(Session session, Duration period) async {
@@ -303,4 +345,23 @@ class AdminStats {
       return stats;
     }
   }
+}
+
+/// A row of the future call table, joined with its claim if it is running.
+class _ScheduledCall {
+  const _ScheduledCall({
+    required this.identifier,
+    required this.serializedObject,
+    required this.time,
+    required this.isRunning,
+  });
+
+  final String? identifier;
+  final String? serializedObject;
+
+  /// When the call was, or is, due to run.
+  final DateTime time;
+
+  /// Whether a server holds a live claim on the call, i.e. is running it.
+  final bool isRunning;
 }

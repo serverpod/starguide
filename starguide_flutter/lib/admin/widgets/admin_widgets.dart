@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart' hide Table;
 import 'package:shad/shad.dart';
 import 'package:starguide_client/starguide_client.dart';
@@ -193,21 +195,31 @@ class DocumentTypeBadge extends StatelessWidget {
   }
 }
 
-/// A table in a card, sized to fit its header and rows exactly. Rows are
-/// indexed without the header in [onRowTap].
+/// A table in a card, sized to fit its header and rows exactly.
+///
+/// [columnWidths] gives the width of each column. Exactly one entry may be
+/// null: that column takes the width left over by the others, but never
+/// less than [minFlexibleWidth], so the table only scrolls horizontally
+/// when the card is too narrow for all columns. Rows are indexed without the
+/// header in [onRowTap].
 class AdminTableCard extends StatelessWidget {
   const AdminTableCard({
     super.key,
     required this.header,
     required this.rows,
-    required this.columnSpanExtent,
+    required this.columnWidths,
+    this.minFlexibleWidth = 200,
     this.onRowTap,
     this.emptyMessage = 'Nothing to show.',
-  });
+  }) : assert(
+         header.length == columnWidths.length,
+         'One width per header cell is required.',
+       );
 
   final List<ShadTableCell> header;
   final List<List<ShadTableCell>> rows;
-  final TableSpanExtent Function(int column) columnSpanExtent;
+  final List<double?> columnWidths;
+  final double minFlexibleWidth;
   final void Function(int row)? onRowTap;
   final String emptyMessage;
 
@@ -234,16 +246,26 @@ class AdminTableCard extends StatelessWidget {
       clipBehavior: Clip.antiAlias,
       child: SizedBox(
         height: rowHeight * (rows.length + 1),
-        child: ShadTable.list(
-          columnSpanExtent: columnSpanExtent,
-          header: header,
-          onRowTap: onRowTap == null
-              ? null
-              : (row) {
-                  // Row 0 is the header.
-                  if (row > 0) onRowTap!(row - 1);
-                },
-          children: rows,
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            final fixedTotal = columnWidths.nonNulls.fold(0.0, (a, b) => a + b);
+            final flexibleWidth = math.max(
+              minFlexibleWidth,
+              constraints.maxWidth - fixedTotal,
+            );
+            return ShadTable.list(
+              columnSpanExtent: (column) =>
+                  FixedTableSpanExtent(columnWidths[column] ?? flexibleWidth),
+              header: header,
+              onRowTap: onRowTap == null
+                  ? null
+                  : (row) {
+                      // Row 0 is the header.
+                      if (row > 0) onRowTap!(row - 1);
+                    },
+              children: rows,
+            );
+          },
         ),
       ),
     );

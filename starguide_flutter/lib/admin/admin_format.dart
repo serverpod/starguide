@@ -6,6 +6,7 @@ import 'package:starguide_client/starguide_client.dart';
 final _dateTimeFormat = DateFormat('yyyy-MM-dd HH:mm');
 final _dateFormat = DateFormat('d MMM');
 final _numberFormat = NumberFormat.decimalPattern();
+final _compactNumberFormat = NumberFormat.compact()..maximumFractionDigits = 1;
 
 /// A date and time in the local time zone, e.g. `2026-09-08 14:05`.
 String formatDateTime(DateTime time) => _dateTimeFormat.format(time.toLocal());
@@ -13,8 +14,12 @@ String formatDateTime(DateTime time) => _dateTimeFormat.format(time.toLocal());
 /// A short date, e.g. `8 Sep`.
 String formatShortDate(DateTime time) => _dateFormat.format(time.toLocal());
 
-/// An integer with thousands separators.
+/// An integer with thousands separators, e.g. `12,345`.
 String formatCount(int count) => _numberFormat.format(count);
+
+/// An integer in its shortest form, e.g. `1.2k` or `3.4M`, for table cells.
+String formatCompactCount(int count) =>
+    _compactNumberFormat.format(count).replaceAll('K', 'k');
 
 /// A time relative to now, e.g. `3 hours ago` or `in 2 days`.
 String formatRelative(DateTime time, {DateTime? now}) {
@@ -26,14 +31,15 @@ String formatRelative(DateTime time, {DateTime? now}) {
   return difference.isNegative ? '$text ago' : 'in $text';
 }
 
-/// A duration in its largest whole unit, e.g. `3 days` or `45 minutes`.
+/// A duration in its largest whole unit, e.g. `3 days`, `1 hour` or
+/// `45 min`.
 String formatDuration(Duration duration) {
   String plural(int count, String unit) =>
       '$count $unit${count == 1 ? '' : 's'}';
 
   if (duration.inDays >= 1) return plural(duration.inDays, 'day');
   if (duration.inHours >= 1) return plural(duration.inHours, 'hour');
-  return plural(duration.inMinutes, 'minute');
+  return '${duration.inMinutes} min';
 }
 
 /// The share of voted sessions that got help, as a percentage. Returns a

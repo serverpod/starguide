@@ -9,7 +9,11 @@ fields:
   lastFetchTime: DateTime?
   ### When the least recently fetched document of the source was fetched.
   oldestFetchTime: DateTime?
-  ### When the next recurring fetch of the source is scheduled.
+  ### When the next recurring fetch of the source is scheduled. In the past
+  ### if the fetch is due but has not started yet.
   nextFetchTime: DateTime?
+  ### When the fetch that is currently running was due, or null if no fetch
+  ### of the source is running.
+  runningSince: DateTime?
   ### When a retry is scheduled after a failed fetch, if any.
   retryTime: DateTime?

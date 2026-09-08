@@ -70,7 +70,7 @@ void main() {
         Scaffold(
           body: AdminTableCard(
             emptyMessage: 'Nothing here',
-            columnSpanExtent: (_) => const FixedTableSpanExtent(100),
+            columnWidths: const [null],
             header: const [ShadTableCell.header(child: Text('Column'))],
             rows: const [],
           ),
@@ -86,7 +86,7 @@ void main() {
       _app(
         Scaffold(
           body: AdminTableCard(
-            columnSpanExtent: (_) => const FixedTableSpanExtent(100),
+            columnWidths: const [null],
             header: const [ShadTableCell.header(child: Text('Column'))],
             rows: const [
               [ShadTableCell(child: Text('Row 1'))],

@@ -181,7 +181,11 @@ class GithubDocsDataSource implements DataSource {
           (fileName.endsWith('.md') || fileName.endsWith('.mdx'))) {
         if (await fetcher.shouldFetchUrl(session, url)) {
           final fileUrl = Uri.parse(file['download_url']);
-          final document = await _loadGithubDocument(fileUrl, domain);
+          final document = await _loadGithubDocument(
+            fileUrl,
+            sourceUrl: url,
+            domain: domain,
+          );
           if (document != null) {
             yield document;
           }
@@ -190,10 +194,14 @@ class GithubDocsDataSource implements DataSource {
     }
   }
 
+  /// Loads the markdown file at [fileUrl] on GitHub. The document is stored
+  /// under [sourceUrl], the URL of the published page, so that references in
+  /// answers point at the documentation site rather than the raw file.
   Future<RawRAGDocument?> _loadGithubDocument(
-    Uri fileUrl,
-    String domain,
-  ) async {
+    Uri fileUrl, {
+    required Uri sourceUrl,
+    required String domain,
+  }) async {
     // TODO: Render referenced examples.
     final markdown = await _loadMarkdown(fileUrl);
     if (markdown == null) return null;
@@ -204,7 +212,7 @@ class GithubDocsDataSource implements DataSource {
     );
 
     return RawRAGDocument(
-      sourceUrl: fileUrl,
+      sourceUrl: sourceUrl,
       document: document,
       dataSourceType: DataSourceType.markdown,
       documentType: RAGDocumentType.documentation,

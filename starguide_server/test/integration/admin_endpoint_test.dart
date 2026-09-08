@@ -1,4 +1,9 @@
+import 'dart:convert';
+
+import 'package:serverpod/protocol.dart'
+    show FutureCallClaimEntry, FutureCallEntry;
 import 'package:serverpod/serverpod.dart';
+import 'package:starguide_server/src/business/data_fetcher_scheduling.dart';
 import 'package:starguide_server/src/business/admin_stats.dart';
 import 'package:starguide_server/src/business/data_fetcher.dart';
 import 'package:starguide_server/src/business/data_source.dart';
@@ -326,6 +331,80 @@ void main() {
               ChatMessageType.model,
               ChatMessageType.user,
             ]);
+          },
+        );
+      });
+
+      group('with scheduled and running fetches', () {
+        final now = DateTime.now().toUtc();
+
+        setUp(() async {
+          final session = sessionBuilder.build();
+          String argument(String name) => jsonEncode({'name': name});
+          const callName = 'DataFetcherFetchDataSourceFutureCall';
+
+          // The docs fetch is running: its due entry is claimed with a live
+          // heartbeat, and its next occurrence is already scheduled.
+          final running = await FutureCallEntry.db.insertRow(
+            session,
+            FutureCallEntry(
+              name: callName,
+              time: now.subtract(Duration(minutes: 8)),
+              serializedObject: argument('docs'),
+              serverId: 'test',
+              identifier: dataFetcherIdentifier,
+            ),
+          );
+          await FutureCallClaimEntry.db.insertRow(
+            session,
+            FutureCallClaimEntry(
+              futureCallId: running.id,
+              lastHeartbeatTime: now.subtract(Duration(seconds: 30)),
+            ),
+          );
+          await FutureCallEntry.db.insertRow(
+            session,
+            FutureCallEntry(
+              name: callName,
+              time: now.add(Duration(hours: 23)),
+              serializedObject: argument('docs'),
+              serverId: 'test',
+              identifier: dataFetcherIdentifier,
+            ),
+          );
+
+          // The discussions fetch is only scheduled.
+          await FutureCallEntry.db.insertRow(
+            session,
+            FutureCallEntry(
+              name: callName,
+              time: now.add(Duration(hours: 1)),
+              serializedObject: argument('discussions'),
+              serverId: 'test',
+              identifier: dataFetcherIdentifier,
+            ),
+          );
+        });
+
+        test(
+          'when getting the overview then running fetches are told apart from scheduled ones',
+          () async {
+            final overview = await endpoints.admin.getOverview(admin);
+            final sourcesByName = {for (final s in overview.sources) s.name: s};
+
+            final docs = sourcesByName['docs']!;
+            expect(docs.runningSince, isNotNull);
+            expect(
+              docs.runningSince!
+                  .difference(now.subtract(Duration(minutes: 8)))
+                  .abs(),
+              lessThan(Duration(seconds: 1)),
+            );
+            expect(docs.nextFetchTime!.isAfter(now), isTrue);
+
+            final discussions = sourcesByName['discussions']!;
+            expect(discussions.runningSince, isNull);
+            expect(discussions.nextFetchTime!.isAfter(now), isTrue);
           },
         );
       });
