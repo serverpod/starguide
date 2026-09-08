@@ -11,6 +11,7 @@ class GithubDiscussionsDataSource implements DataSource {
   final String owner;
   final String repo;
   final String categoryName;
+  @override
   final String domain;
 
   GithubDiscussionsDataSource({
@@ -24,6 +25,9 @@ class GithubDiscussionsDataSource implements DataSource {
   String get name => 'GithubDiscussions';
 
   @override
+  RAGDocumentType get documentType => RAGDocumentType.discussion;
+
+  @override
   Stream<RawRAGDocument> fetch(
     Session session,
     DataFetcher fetcher, {
@@ -32,9 +36,7 @@ class GithubDiscussionsDataSource implements DataSource {
   }) async* {
     final githubToken = Serverpod.instance.getPassword('githubToken');
     if (githubToken == null) {
-      throw DataSourceException(
-        'GitHub token not configured',
-      );
+      throw DataSourceException('GitHub token not configured');
     }
 
     // Check GitHub API quota
@@ -98,7 +100,8 @@ class GithubDiscussionsDataSource implements DataSource {
     int totalFetched = 0;
 
     while (hasNextPage) {
-      final query = '''
+      final query =
+          '''
       query(\$cursor: String) {
         repository(owner: "$owner", name: "$repo") {
           discussions(first: 50, categoryId: "$categoryId", after: \$cursor) {
@@ -129,10 +132,7 @@ class GithubDiscussionsDataSource implements DataSource {
           'Authorization': 'Bearer $githubToken',
           'Content-Type': 'application/json',
         },
-        body: jsonEncode({
-          'query': query,
-          'variables': variables,
-        }),
+        body: jsonEncode({'query': query, 'variables': variables}),
       );
 
       if (response.statusCode != 200) {
@@ -145,9 +145,7 @@ class GithubDiscussionsDataSource implements DataSource {
       final data = jsonDecode(response.body);
 
       if (data['errors'] != null) {
-        throw DataSourceException(
-          'GraphQL query failed: ${data['errors']}',
-        );
+        throw DataSourceException('GraphQL query failed: ${data['errors']}');
       }
 
       final discussionsData = data['data']['repository']['discussions'];
@@ -203,12 +201,11 @@ class GithubDiscussionsDataSource implements DataSource {
   }) async {
     final githubToken = Serverpod.instance.getPassword('githubToken');
     if (githubToken == null) {
-      throw DataSourceException(
-        'GitHub token not configured',
-      );
+      throw DataSourceException('GitHub token not configured');
     }
 
-    final query = '''
+    final query =
+        '''
     query {
       repository(owner: "$owner", name: "$repo") {
         discussionCategories(first: 50) {

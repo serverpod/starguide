@@ -1,0 +1,7 @@
+### One page of chat sessions.
+class: AdminChatSessionPage
+fields:
+  sessions: List<AdminChatSessionSummary>
+  totalCount: int
+  page: int
+  pageSize: int

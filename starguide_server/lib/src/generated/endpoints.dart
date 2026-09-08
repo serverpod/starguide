@@ -17,6 +17,9 @@ import 'package:serverpod_auth_idp_server/serverpod_auth_idp_server.dart'
     as _iais;
 import 'package:starguide_server/src/generated/chat_session.dart' as _icpeorlm;
 import 'package:starguide_server/src/generated/future_calls.dart' as _inaozf8m;
+import 'package:starguide_server/src/generated/rag_document_type.dart'
+    as _id162qm6;
+import '../endpoints/admin_endpoint.dart' as _i5t1w2d2;
 import '../endpoints/google_idp_endpoint.dart' as _iiimk4ot;
 import '../endpoints/mcp_endpoint.dart' as _i7ut3egp;
 import '../endpoints/refresh_jwt_tokens_endpoint.dart' as _iaxm0zi1;
@@ -27,6 +30,7 @@ class Endpoints extends _is.EndpointDispatch {
   @override
   void initializeEndpoints(_is.Server server) {
     var endpoints = <String, _is.Endpoint>{
+      'admin': _i5t1w2d2.AdminEndpoint()..initialize(server, 'admin', null),
       'googleIdp': _iiimk4ot.GoogleIdpEndpoint()
         ..initialize(server, 'googleIdp', null),
       'mcp': _i7ut3egp.McpEndpoint()..initialize(server, 'mcp', null),
@@ -35,6 +39,129 @@ class Endpoints extends _is.EndpointDispatch {
       'starguide': _iaui8z7d.StarguideEndpoint()
         ..initialize(server, 'starguide', null),
     };
+    connectors['admin'] = _is.EndpointConnector(
+      name: 'admin',
+      endpoint: endpoints['admin']!,
+      methodConnectors: {
+        'getOverview': _is.MethodConnector(
+          name: 'getOverview',
+          params: {},
+          call: (_is.Session session, Map<String, dynamic> params) async =>
+              (endpoints['admin'] as _i5t1w2d2.AdminEndpoint).getOverview(
+                session,
+              ),
+        ),
+        'listDocuments': _is.MethodConnector(
+          name: 'listDocuments',
+          params: {
+            'page': _is.ParameterDescription(
+              name: 'page',
+              type: _is.getType<int>(),
+              nullable: false,
+            ),
+            'pageSize': _is.ParameterDescription(
+              name: 'pageSize',
+              type: _is.getType<int>(),
+              nullable: false,
+            ),
+            'type': _is.ParameterDescription(
+              name: 'type',
+              type: _is.getType<_id162qm6.RAGDocumentType?>(),
+              nullable: true,
+            ),
+            'domain': _is.ParameterDescription(
+              name: 'domain',
+              type: _is.getType<String?>(),
+              nullable: true,
+            ),
+            'search': _is.ParameterDescription(
+              name: 'search',
+              type: _is.getType<String?>(),
+              nullable: true,
+            ),
+          },
+          call: (_is.Session session, Map<String, dynamic> params) async =>
+              (endpoints['admin'] as _i5t1w2d2.AdminEndpoint).listDocuments(
+                session,
+                page: params['page'],
+                pageSize: params['pageSize'],
+                type: params['type'],
+                domain: params['domain'],
+                search: params['search'],
+              ),
+        ),
+        'listDocumentDomains': _is.MethodConnector(
+          name: 'listDocumentDomains',
+          params: {},
+          call: (_is.Session session, Map<String, dynamic> params) async =>
+              (endpoints['admin'] as _i5t1w2d2.AdminEndpoint)
+                  .listDocumentDomains(session),
+        ),
+        'getDocument': _is.MethodConnector(
+          name: 'getDocument',
+          params: {
+            'id': _is.ParameterDescription(
+              name: 'id',
+              type: _is.getType<int>(),
+              nullable: false,
+            ),
+          },
+          call: (_is.Session session, Map<String, dynamic> params) async =>
+              (endpoints['admin'] as _i5t1w2d2.AdminEndpoint).getDocument(
+                session,
+                params['id'],
+              ),
+        ),
+        'listChatSessions': _is.MethodConnector(
+          name: 'listChatSessions',
+          params: {
+            'page': _is.ParameterDescription(
+              name: 'page',
+              type: _is.getType<int>(),
+              nullable: false,
+            ),
+            'pageSize': _is.ParameterDescription(
+              name: 'pageSize',
+              type: _is.getType<int>(),
+              nullable: false,
+            ),
+            'goodAnswer': _is.ParameterDescription(
+              name: 'goodAnswer',
+              type: _is.getType<bool?>(),
+              nullable: true,
+            ),
+            'votedOnly': _is.ParameterDescription(
+              name: 'votedOnly',
+              type: _is.getType<bool>(),
+              nullable: false,
+            ),
+          },
+          call: (_is.Session session, Map<String, dynamic> params) async =>
+              (endpoints['admin'] as _i5t1w2d2.AdminEndpoint).listChatSessions(
+                session,
+                page: params['page'],
+                pageSize: params['pageSize'],
+                goodAnswer: params['goodAnswer'],
+                votedOnly: params['votedOnly'],
+              ),
+        ),
+        'getChatSession': _is.MethodConnector(
+          name: 'getChatSession',
+          params: {
+            'id': _is.ParameterDescription(
+              name: 'id',
+              type: _is.getType<int>(),
+              nullable: false,
+            ),
+          },
+          call: (_is.Session session, Map<String, dynamic> params) async =>
+              (endpoints['admin'] as _i5t1w2d2.AdminEndpoint).getChatSession(
+                session,
+                params['id'],
+              ),
+        ),
+      },
+    );
     connectors['googleIdp'] = _is.EndpointConnector(
       name: 'googleIdp',
       endpoint: endpoints['googleIdp']!,

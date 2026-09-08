@@ -19,6 +19,16 @@ import 'package:serverpod_auth_idp_server/serverpod_auth_idp_server.dart'
     as _iais;
 import 'package:starguide_server/src/generated/markdown_resource_info.dart'
     as _iwjynyqq;
+import 'admin/admin_chat_session_detail.dart' as _ivo4zckc;
+import 'admin/admin_chat_session_page.dart' as _i3zfrlvg;
+import 'admin/admin_chat_session_summary.dart' as _iv6n96x1;
+import 'admin/admin_document_detail.dart' as _i7rng5on;
+import 'admin/admin_document_page.dart' as _ip2h1oy2;
+import 'admin/admin_document_summary.dart' as _i71m5mgs;
+import 'admin/admin_overview.dart' as _ihz32ruq;
+import 'admin/admin_source_status.dart' as _i9jun6dq;
+import 'admin/daily_stats.dart' as _i9f4s87t;
+import 'admin/vote_stats.dart' as _in6jcx54;
 import 'cached_session_count.dart' as _iubbw449;
 import 'chat_message.dart' as _ivuncx2e;
 import 'chat_message_type.dart' as _itrf31vi;
@@ -32,6 +42,16 @@ import 'rag_document.dart' as _i8io6bl4;
 import 'rag_document_type.dart' as _i19rymhs;
 import 'recaptcha/recaptcha_exception.dart' as _i2oyqbrq;
 import 'table_of_contents.dart' as _ikwqo0g2;
+export 'admin/admin_chat_session_detail.dart';
+export 'admin/admin_chat_session_page.dart';
+export 'admin/admin_chat_session_summary.dart';
+export 'admin/admin_document_detail.dart';
+export 'admin/admin_document_page.dart';
+export 'admin/admin_document_summary.dart';
+export 'admin/admin_overview.dart';
+export 'admin/admin_source_status.dart';
+export 'admin/daily_stats.dart';
+export 'admin/vote_stats.dart';
 export 'cached_session_count.dart';
 export 'chat_message.dart';
 export 'chat_message_type.dart';
@@ -140,6 +160,62 @@ class Protocol extends _is.DatabaseSerializationManager {
           ],
           type: 'btree',
           isUnique: false,
+          isPrimary: false,
+        ),
+      ],
+      managed: true,
+    ),
+    _isp.TableDefinition(
+      name: 'daily_stats',
+      dartName: 'DailyStats',
+      schema: 'public',
+      module: 'starguide',
+      columns: [
+        _isp.ColumnDefinition(
+          name: 'id',
+          columnType: _isp.ColumnType.bigint,
+          isNullable: false,
+          dartType: 'int?',
+          columnDefault: 'serial',
+        ),
+        _isp.ColumnDefinition(
+          name: 'day',
+          columnType: _isp.ColumnType.timestampWithoutTimeZone,
+          isNullable: false,
+          dartType: 'DateTime',
+        ),
+        _isp.ColumnDefinition(
+          name: 'sessionCount',
+          columnType: _isp.ColumnType.bigint,
+          isNullable: false,
+          dartType: 'int',
+        ),
+        _isp.ColumnDefinition(
+          name: 'goodAnswerCount',
+          columnType: _isp.ColumnType.bigint,
+          isNullable: false,
+          dartType: 'int',
+        ),
+        _isp.ColumnDefinition(
+          name: 'poorAnswerCount',
+          columnType: _isp.ColumnType.bigint,
+          isNullable: false,
+          dartType: 'int',
+        ),
+      ],
+      foreignKeys: [],
+      indexes: [
+        _isp.IndexDefinition(
+          indexName: 'daily_stats_day',
+          tableSpace: null,
+          elements: [
+            _isp.IndexElementDefinition(
+              type: _isp.IndexElementDefinitionType.column,
+              definition: 'day',
+            ),
+          ],
+          type: 'btree',
+          isUnique: true,
           isPrimary: false,
         ),
       ],
@@ -289,6 +365,36 @@ class Protocol extends _is.DatabaseSerializationManager {
       }
     }
 
+    if (t == _ivo4zckc.AdminChatSessionDetail) {
+      return _ivo4zckc.AdminChatSessionDetail.fromJson(data) as T;
+    }
+    if (t == _i3zfrlvg.AdminChatSessionPage) {
+      return _i3zfrlvg.AdminChatSessionPage.fromJson(data) as T;
+    }
+    if (t == _iv6n96x1.AdminChatSessionSummary) {
+      return _iv6n96x1.AdminChatSessionSummary.fromJson(data) as T;
+    }
+    if (t == _i7rng5on.AdminDocumentDetail) {
+      return _i7rng5on.AdminDocumentDetail.fromJson(data) as T;
+    }
+    if (t == _ip2h1oy2.AdminDocumentPage) {
+      return _ip2h1oy2.AdminDocumentPage.fromJson(data) as T;
+    }
+    if (t == _i71m5mgs.AdminDocumentSummary) {
+      return _i71m5mgs.AdminDocumentSummary.fromJson(data) as T;
+    }
+    if (t == _ihz32ruq.AdminOverview) {
+      return _ihz32ruq.AdminOverview.fromJson(data) as T;
+    }
+    if (t == _i9jun6dq.AdminSourceStatus) {
+      return _i9jun6dq.AdminSourceStatus.fromJson(data) as T;
+    }
+    if (t == _i9f4s87t.DailyStats) {
+      return _i9f4s87t.DailyStats.fromJson(data) as T;
+    }
+    if (t == _in6jcx54.VoteStats) {
+      return _in6jcx54.VoteStats.fromJson(data) as T;
+    }
     if (t == _iubbw449.CachedSessionCount) {
       return _iubbw449.CachedSessionCount.fromJson(data) as T;
     }
@@ -325,6 +431,54 @@ class Protocol extends _is.DatabaseSerializationManager {
     }
     if (t == _ikwqo0g2.TableOfContents) {
       return _ikwqo0g2.TableOfContents.fromJson(data) as T;
+    }
+    if (t == _is.getType<_ivo4zckc.AdminChatSessionDetail?>()) {
+      return (data != null
+              ? _ivo4zckc.AdminChatSessionDetail.fromJson(data)
+              : null)
+          as T;
+    }
+    if (t == _is.getType<_i3zfrlvg.AdminChatSessionPage?>()) {
+      return (data != null
+              ? _i3zfrlvg.AdminChatSessionPage.fromJson(data)
+              : null)
+          as T;
+    }
+    if (t == _is.getType<_iv6n96x1.AdminChatSessionSummary?>()) {
+      return (data != null
+              ? _iv6n96x1.AdminChatSessionSummary.fromJson(data)
+              : null)
+          as T;
+    }
+    if (t == _is.getType<_i7rng5on.AdminDocumentDetail?>()) {
+      return (data != null
+              ? _i7rng5on.AdminDocumentDetail.fromJson(data)
+              : null)
+          as T;
+    }
+    if (t == _is.getType<_ip2h1oy2.AdminDocumentPage?>()) {
+      return (data != null ? _ip2h1oy2.AdminDocumentPage.fromJson(data) : null)
+          as T;
+    }
+    if (t == _is.getType<_i71m5mgs.AdminDocumentSummary?>()) {
+      return (data != null
+              ? _i71m5mgs.AdminDocumentSummary.fromJson(data)
+              : null)
+          as T;
+    }
+    if (t == _is.getType<_ihz32ruq.AdminOverview?>()) {
+      return (data != null ? _ihz32ruq.AdminOverview.fromJson(data) : null)
+          as T;
+    }
+    if (t == _is.getType<_i9jun6dq.AdminSourceStatus?>()) {
+      return (data != null ? _i9jun6dq.AdminSourceStatus.fromJson(data) : null)
+          as T;
+    }
+    if (t == _is.getType<_i9f4s87t.DailyStats?>()) {
+      return (data != null ? _i9f4s87t.DailyStats.fromJson(data) : null) as T;
+    }
+    if (t == _is.getType<_in6jcx54.VoteStats?>()) {
+      return (data != null ? _in6jcx54.VoteStats.fromJson(data) : null) as T;
     }
     if (t == _is.getType<_iubbw449.CachedSessionCount?>()) {
       return (data != null ? _iubbw449.CachedSessionCount.fromJson(data) : null)
@@ -382,11 +536,44 @@ class Protocol extends _is.DatabaseSerializationManager {
       return (data != null ? _ikwqo0g2.TableOfContents.fromJson(data) : null)
           as T;
     }
+    if (t == List<_ivuncx2e.ChatMessage>) {
+      return (data as List)
+              .map((e) => deserialize<_ivuncx2e.ChatMessage>(e))
+              .toList()
+          as T;
+    }
+    if (t == List<_iv6n96x1.AdminChatSessionSummary>) {
+      return (data as List)
+              .map((e) => deserialize<_iv6n96x1.AdminChatSessionSummary>(e))
+              .toList()
+          as T;
+    }
+    if (t == List<_i71m5mgs.AdminDocumentSummary>) {
+      return (data as List)
+              .map((e) => deserialize<_i71m5mgs.AdminDocumentSummary>(e))
+              .toList()
+          as T;
+    }
+    if (t == List<_i9jun6dq.AdminSourceStatus>) {
+      return (data as List)
+              .map((e) => deserialize<_i9jun6dq.AdminSourceStatus>(e))
+              .toList()
+          as T;
+    }
+    if (t == List<_i9f4s87t.DailyStats>) {
+      return (data as List)
+              .map((e) => deserialize<_i9f4s87t.DailyStats>(e))
+              .toList()
+          as T;
+    }
     if (t == List<_i8dvauvz.MarkdownResourceInfo>) {
       return (data as List)
               .map((e) => deserialize<_i8dvauvz.MarkdownResourceInfo>(e))
               .toList()
           as T;
+    }
+    if (t == List<String>) {
+      return (data as List).map((e) => deserialize<String>(e)).toList() as T;
     }
     if (t == List<_iwjynyqq.MarkdownResourceInfo>) {
       return (data as List)
@@ -408,6 +595,16 @@ class Protocol extends _is.DatabaseSerializationManager {
 
   static String? getClassNameForType(Type type) {
     return switch (type) {
+      _ivo4zckc.AdminChatSessionDetail => 'AdminChatSessionDetail',
+      _i3zfrlvg.AdminChatSessionPage => 'AdminChatSessionPage',
+      _iv6n96x1.AdminChatSessionSummary => 'AdminChatSessionSummary',
+      _i7rng5on.AdminDocumentDetail => 'AdminDocumentDetail',
+      _ip2h1oy2.AdminDocumentPage => 'AdminDocumentPage',
+      _i71m5mgs.AdminDocumentSummary => 'AdminDocumentSummary',
+      _ihz32ruq.AdminOverview => 'AdminOverview',
+      _i9jun6dq.AdminSourceStatus => 'AdminSourceStatus',
+      _i9f4s87t.DailyStats => 'DailyStats',
+      _in6jcx54.VoteStats => 'VoteStats',
       _iubbw449.CachedSessionCount => 'CachedSessionCount',
       _ivuncx2e.ChatMessage => 'ChatMessage',
       _itrf31vi.ChatMessageType => 'ChatMessageType',
@@ -435,6 +632,26 @@ class Protocol extends _is.DatabaseSerializationManager {
     }
 
     switch (data) {
+      case _ivo4zckc.AdminChatSessionDetail():
+        return 'AdminChatSessionDetail';
+      case _i3zfrlvg.AdminChatSessionPage():
+        return 'AdminChatSessionPage';
+      case _iv6n96x1.AdminChatSessionSummary():
+        return 'AdminChatSessionSummary';
+      case _i7rng5on.AdminDocumentDetail():
+        return 'AdminDocumentDetail';
+      case _ip2h1oy2.AdminDocumentPage():
+        return 'AdminDocumentPage';
+      case _i71m5mgs.AdminDocumentSummary():
+        return 'AdminDocumentSummary';
+      case _ihz32ruq.AdminOverview():
+        return 'AdminOverview';
+      case _i9jun6dq.AdminSourceStatus():
+        return 'AdminSourceStatus';
+      case _i9f4s87t.DailyStats():
+        return 'DailyStats';
+      case _in6jcx54.VoteStats():
+        return 'VoteStats';
       case _iubbw449.CachedSessionCount():
         return 'CachedSessionCount';
       case _ivuncx2e.ChatMessage():
@@ -484,6 +701,36 @@ class Protocol extends _is.DatabaseSerializationManager {
     var dataClassName = data['className'];
     if (dataClassName is! String) {
       return super.deserializeByClassName(data);
+    }
+    if (dataClassName == 'AdminChatSessionDetail') {
+      return deserialize<_ivo4zckc.AdminChatSessionDetail>(data['data']);
+    }
+    if (dataClassName == 'AdminChatSessionPage') {
+      return deserialize<_i3zfrlvg.AdminChatSessionPage>(data['data']);
+    }
+    if (dataClassName == 'AdminChatSessionSummary') {
+      return deserialize<_iv6n96x1.AdminChatSessionSummary>(data['data']);
+    }
+    if (dataClassName == 'AdminDocumentDetail') {
+      return deserialize<_i7rng5on.AdminDocumentDetail>(data['data']);
+    }
+    if (dataClassName == 'AdminDocumentPage') {
+      return deserialize<_ip2h1oy2.AdminDocumentPage>(data['data']);
+    }
+    if (dataClassName == 'AdminDocumentSummary') {
+      return deserialize<_i71m5mgs.AdminDocumentSummary>(data['data']);
+    }
+    if (dataClassName == 'AdminOverview') {
+      return deserialize<_ihz32ruq.AdminOverview>(data['data']);
+    }
+    if (dataClassName == 'AdminSourceStatus') {
+      return deserialize<_i9jun6dq.AdminSourceStatus>(data['data']);
+    }
+    if (dataClassName == 'DailyStats') {
+      return deserialize<_i9f4s87t.DailyStats>(data['data']);
+    }
+    if (dataClassName == 'VoteStats') {
+      return deserialize<_in6jcx54.VoteStats>(data['data']);
     }
     if (dataClassName == 'CachedSessionCount') {
       return deserialize<_iubbw449.CachedSessionCount>(data['data']);
@@ -564,6 +811,8 @@ class Protocol extends _is.DatabaseSerializationManager {
       }
     }
     switch (t) {
+      case _i9f4s87t.DailyStats:
+        return _i9f4s87t.DailyStats.t;
       case _ivuncx2e.ChatMessage:
         return _ivuncx2e.ChatMessage.t;
       case _i3zhwn74.ChatSession:

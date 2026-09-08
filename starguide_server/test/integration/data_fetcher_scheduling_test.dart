@@ -4,6 +4,8 @@ import 'package:serverpod/serverpod.dart';
 import 'package:starguide_server/src/business/data_fetcher.dart';
 import 'package:starguide_server/src/business/data_fetcher_scheduling.dart';
 import 'package:starguide_server/src/business/data_source.dart';
+import 'package:starguide_server/src/generated/protocol.dart'
+    show RAGDocumentType;
 import 'package:test/test.dart';
 
 import 'test_tools/serverpod_test_tools.dart';
@@ -13,6 +15,12 @@ class _FakeDataSource implements DataSource {
 
   @override
   final String name;
+
+  @override
+  String get domain => 'Test';
+
+  @override
+  RAGDocumentType get documentType => RAGDocumentType.documentation;
 
   @override
   Stream<RawRAGDocument> fetch(Session session, DataFetcher fetcher) =>

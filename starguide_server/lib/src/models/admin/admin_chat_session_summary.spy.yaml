@@ -1,0 +1,10 @@
+### A chat session with the first question asked, for listing.
+class: AdminChatSessionSummary
+fields:
+  id: int
+  createdAt: DateTime
+  goodAnswer: bool?
+  authUserId: UuidValue?
+  messageCount: int
+  ### The first question of the conversation, truncated.
+  firstQuestion: String

@@ -1,0 +1,7 @@
+### One page of RAG documents.
+class: AdminDocumentPage
+fields:
+  documents: List<AdminDocumentSummary>
+  totalCount: int
+  page: int
+  pageSize: int

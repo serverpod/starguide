@@ -63,6 +63,8 @@ production:
   jwtHmacSha512PrivateKey: '<random string of at least 64 bytes>'
 ```
 
+Users who sign in with a Google account on the serverpod.dev domain are granted the admin scope. For them, an _Admin_ button appears next to _View Source_ in the app. It opens the admin interface, which shows an overview of the loaded sources and how answers are rated, lets you inspect every document used to answer questions, and lists the conversations where the answer was rated poor. Note that the scope is included in the token from the second sign-in on, as it is granted when the account is created.
+
 With the passwords in place, you should be able to start the server, its embedded Postgres database, and the Flutter app by running:
 
 ```bash

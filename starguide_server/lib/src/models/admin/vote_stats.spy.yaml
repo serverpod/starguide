@@ -1,0 +1,6 @@
+### Chat session and vote counts over a period of time.
+class: VoteStats
+fields:
+  sessionCount: int
+  goodAnswerCount: int
+  poorAnswerCount: int

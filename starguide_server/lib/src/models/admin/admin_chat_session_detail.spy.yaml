@@ -1,0 +1,8 @@
+### A chat session with its full conversation.
+class: AdminChatSessionDetail
+fields:
+  id: int
+  createdAt: DateTime
+  goodAnswer: bool?
+  authUserId: UuidValue?
+  messages: List<ChatMessage>

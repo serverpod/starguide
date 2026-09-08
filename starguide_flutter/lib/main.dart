@@ -9,6 +9,9 @@ import 'package:serverpod_auth_idp_flutter/serverpod_auth_idp_flutter.dart';
 import 'package:starguide_client/starguide_client.dart';
 import 'package:flutter/material.dart';
 import 'package:serverpod_flutter/serverpod_flutter.dart';
+import 'package:shad/shad.dart'
+    show GlobalShadLocalizations, ShadApp, ShadAppBuilder, ShadThemeData;
+import 'package:starguide_flutter/admin/admin_page.dart';
 import 'package:starguide_flutter/chat/starguide_chat_input.dart';
 import 'package:starguide_flutter/chat/starguide_disconnected.dart';
 import 'package:starguide_flutter/chat/starguide_empty_chat.dart';
@@ -122,10 +125,17 @@ class StarguideApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Serverpod Starguide',
-      theme: createTheme(),
-      home: const StarguideChatPage(),
+    // The chat is built with Material widgets and the admin interface with
+    // shad, so the shad theme is installed around the Material app.
+    return ShadApp.custom(
+      theme: ShadThemeData(),
+      appBuilder: (context) => MaterialApp(
+        title: 'Serverpod Starguide',
+        theme: createTheme(),
+        localizationsDelegates: const [GlobalShadLocalizations.delegate],
+        builder: (context, child) => ShadAppBuilder(child: child!),
+        home: const StarguideChatPage(),
+      ),
     );
   }
 }
@@ -162,6 +172,14 @@ class StarguideChatPageState extends State<StarguideChatPage> {
   bool _connectionError = false;
   String? _connectionErrorMessage;
   bool _recaptchaError = false;
+
+  /// Whether the admin interface is shown instead of the chat.
+  bool _showAdmin = false;
+
+  /// Whether the signed in user has the admin scope. The scope is granted by
+  /// the server to serverpod.dev accounts.
+  bool get _isAdmin =>
+      sessionManager.authInfo?.scopeNames.contains(kAdminScopeName) ?? false;
 
   late final GoogleAuthController _googleAuthController;
 
@@ -333,6 +351,12 @@ class StarguideChatPageState extends State<StarguideChatPage> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+
+    // The admin interface replaces the chat. Signing out drops the scope,
+    // which brings the chat back.
+    if (_showAdmin && _isAdmin) {
+      return AdminPage(onClose: () => setState(() => _showAdmin = false));
+    }
 
     if (_connectionError) {
       return StarguideDisconnected(
@@ -523,6 +547,16 @@ class StarguideChatPageState extends State<StarguideChatPage> {
                     ),
                   ),
                 ),
+                if (_isAdmin)
+                  TextButton(
+                    onPressed: () => setState(() => _showAdmin = true),
+                    child: Text(
+                      'Admin',
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: Colors.blue.shade600,
+                      ),
+                    ),
+                  ),
                 if (!sessionManager.isAuthenticated)
                   ListenableBuilder(
                     listenable: _googleAuthController,

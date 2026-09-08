@@ -5,14 +5,19 @@ import 'package:starguide_server/src/generated/protocol.dart';
 abstract class DataSource {
   Stream<RawRAGDocument> fetch(Session session, DataFetcher fetcher);
 
+  /// Unique name of the data source, used to schedule its fetching.
   String get name;
+
+  /// The domain of the documents produced by this source, e.g. the product
+  /// they document. Together with [documentType] it identifies the source's
+  /// documents in the database.
+  String get domain;
+
+  /// The type of the documents produced by this source.
+  RAGDocumentType get documentType;
 }
 
-enum DataSourceType {
-  html,
-  markdown,
-  text,
-}
+enum DataSourceType { html, markdown, text }
 
 class RawRAGDocument {
   final Uri sourceUrl;

@@ -18,12 +18,24 @@ import 'package:serverpod/serverpod.dart' as _is;
 import 'package:serverpod_auth_core_server/serverpod_auth_core_server.dart'
     as _iacs;
 import 'package:serverpod_test/serverpod_test.dart' as _ist;
+import 'package:starguide_server/src/generated/admin/admin_chat_session_detail.dart'
+    as _id5eoozz;
+import 'package:starguide_server/src/generated/admin/admin_chat_session_page.dart'
+    as _iwsqb2sk;
+import 'package:starguide_server/src/generated/admin/admin_document_detail.dart'
+    as _irbn54lf;
+import 'package:starguide_server/src/generated/admin/admin_document_page.dart'
+    as _i69agvdg;
+import 'package:starguide_server/src/generated/admin/admin_overview.dart'
+    as _ill1l5ed;
 import 'package:starguide_server/src/generated/chat_session.dart' as _icpeorlm;
 import 'package:starguide_server/src/generated/future_calls.dart' as _inaozf8m;
 import 'package:starguide_server/src/generated/future_calls_generated_models/data_fetcher_future_call_fetch_data_source_model.dart'
     as _ign3lwir;
 import 'package:starguide_server/src/generated/markdown_resource_info.dart'
     as _iwjynyqq;
+import 'package:starguide_server/src/generated/rag_document_type.dart'
+    as _id162qm6;
 import 'package:starguide_server/src/generated/protocol.dart';
 import 'package:starguide_server/src/generated/endpoints.dart';
 export 'package:serverpod_test/serverpod_test_public_exports.dart';
@@ -154,6 +166,8 @@ void withServerpod(
 class TestEndpoints {
   late final futureCalls = _FutureCalls();
 
+  late final _AdminEndpoint admin;
+
   late final _GoogleIdpEndpoint googleIdp;
 
   late final _McpEndpoint mcp;
@@ -170,6 +184,7 @@ class _InternalTestEndpoints extends TestEndpoints
     _is.SerializationManager serializationManager,
     _is.EndpointDispatch endpoints,
   ) {
+    admin = _AdminEndpoint(endpoints, serializationManager);
     googleIdp = _GoogleIdpEndpoint(endpoints, serializationManager);
     mcp = _McpEndpoint(endpoints, serializationManager);
     refreshJwtTokens = _RefreshJwtTokensEndpoint(
@@ -182,6 +197,216 @@ class _InternalTestEndpoints extends TestEndpoints
 
 class _FutureCalls {
   late final dataFetcher = _DataFetcherFutureCall();
+}
+
+class _AdminEndpoint {
+  _AdminEndpoint(this._endpointDispatch, this._serializationManager);
+
+  final _is.EndpointDispatch _endpointDispatch;
+
+  final _is.SerializationManager _serializationManager;
+
+  _ida.Future<_ill1l5ed.AdminOverview> getOverview(
+    _ist.TestSessionBuilder sessionBuilder,
+  ) async {
+    return _ist.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _ist.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'admin',
+            method: 'getOverview',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'admin',
+          methodName: 'getOverview',
+          parameters: _ist.testObjectToJson({}),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _ida.Future<_ill1l5ed.AdminOverview>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+
+  _ida.Future<_i69agvdg.AdminDocumentPage> listDocuments(
+    _ist.TestSessionBuilder sessionBuilder, {
+    required int page,
+    required int pageSize,
+    _id162qm6.RAGDocumentType? type,
+    String? domain,
+    String? search,
+  }) async {
+    return _ist.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _ist.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'admin',
+            method: 'listDocuments',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'admin',
+          methodName: 'listDocuments',
+          parameters: _ist.testObjectToJson({
+            'page': page,
+            'pageSize': pageSize,
+            'type': type,
+            'domain': domain,
+            'search': search,
+          }),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _ida.Future<_i69agvdg.AdminDocumentPage>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+
+  _ida.Future<List<String>> listDocumentDomains(
+    _ist.TestSessionBuilder sessionBuilder,
+  ) async {
+    return _ist.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _ist.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'admin',
+            method: 'listDocumentDomains',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'admin',
+          methodName: 'listDocumentDomains',
+          parameters: _ist.testObjectToJson({}),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _ida.Future<List<String>>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+
+  _ida.Future<_irbn54lf.AdminDocumentDetail> getDocument(
+    _ist.TestSessionBuilder sessionBuilder,
+    int id,
+  ) async {
+    return _ist.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _ist.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'admin',
+            method: 'getDocument',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'admin',
+          methodName: 'getDocument',
+          parameters: _ist.testObjectToJson({'id': id}),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _ida.Future<_irbn54lf.AdminDocumentDetail>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+
+  _ida.Future<_iwsqb2sk.AdminChatSessionPage> listChatSessions(
+    _ist.TestSessionBuilder sessionBuilder, {
+    required int page,
+    required int pageSize,
+    bool? goodAnswer,
+    required bool votedOnly,
+  }) async {
+    return _ist.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _ist.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'admin',
+            method: 'listChatSessions',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'admin',
+          methodName: 'listChatSessions',
+          parameters: _ist.testObjectToJson({
+            'page': page,
+            'pageSize': pageSize,
+            'goodAnswer': goodAnswer,
+            'votedOnly': votedOnly,
+          }),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _ida.Future<_iwsqb2sk.AdminChatSessionPage>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+
+  _ida.Future<_id5eoozz.AdminChatSessionDetail> getChatSession(
+    _ist.TestSessionBuilder sessionBuilder,
+    int id,
+  ) async {
+    return _ist.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _ist.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'admin',
+            method: 'getChatSession',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'admin',
+          methodName: 'getChatSession',
+          parameters: _ist.testObjectToJson({'id': id}),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _ida.Future<_id5eoozz.AdminChatSessionDetail>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
 }
 
 class _GoogleIdpEndpoint {

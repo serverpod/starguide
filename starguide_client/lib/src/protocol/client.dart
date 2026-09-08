@@ -17,10 +17,97 @@ import 'package:serverpod_auth_core_client/serverpod_auth_core_client.dart'
 import 'package:serverpod_auth_idp_client/serverpod_auth_idp_client.dart'
     as _iaic;
 import 'package:serverpod_client/serverpod_client.dart' as _isc;
+import 'package:starguide_client/src/protocol/admin/admin_chat_session_detail.dart'
+    as _i3n6ccym;
+import 'package:starguide_client/src/protocol/admin/admin_chat_session_page.dart'
+    as _i7oyhwe3;
+import 'package:starguide_client/src/protocol/admin/admin_document_detail.dart'
+    as _i6xgjezv;
+import 'package:starguide_client/src/protocol/admin/admin_document_page.dart'
+    as _iiofeiuw;
+import 'package:starguide_client/src/protocol/admin/admin_overview.dart'
+    as _i9ubmg82;
 import 'package:starguide_client/src/protocol/chat_session.dart' as _ioqsfhvv;
 import 'package:starguide_client/src/protocol/markdown_resource_info.dart'
     as _i1vbny65;
+import 'package:starguide_client/src/protocol/rag_document_type.dart'
+    as _iarkej47;
 import 'protocol.dart' as _il2as5qe;
+
+/// Endpoint backing the admin interface. Only users with the admin scope,
+/// which is granted to serverpod.dev accounts, can call it.
+/// {@category Endpoint}
+class EndpointAdmin extends _isc.EndpointRef {
+  EndpointAdmin(_isc.EndpointCaller caller) : super(caller);
+
+  @override
+  String get name => 'admin';
+
+  /// Returns the statistics shown on the overview.
+  _ida.Future<_i9ubmg82.AdminOverview> getOverview() => caller
+      .callServerEndpoint<_i9ubmg82.AdminOverview>('admin', 'getOverview', {});
+
+  /// Lists the RAG documents used to answer questions, most recently fetched
+  /// first. The optional filters narrow the list by document type, domain,
+  /// and a case-insensitive search of the title.
+  _ida.Future<_iiofeiuw.AdminDocumentPage> listDocuments({
+    required int page,
+    required int pageSize,
+    _iarkej47.RAGDocumentType? type,
+    String? domain,
+    String? search,
+  }) => caller.callServerEndpoint<_iiofeiuw.AdminDocumentPage>(
+    'admin',
+    'listDocuments',
+    {
+      'page': page,
+      'pageSize': pageSize,
+      'type': type,
+      'domain': domain,
+      'search': search,
+    },
+  );
+
+  /// Lists the distinct domains of the stored documents, for filtering.
+  _ida.Future<List<String>> listDocumentDomains() => caller
+      .callServerEndpoint<List<String>>('admin', 'listDocumentDomains', {});
+
+  /// Returns a document with its content. Throws if it does not exist.
+  _ida.Future<_i6xgjezv.AdminDocumentDetail> getDocument(int id) =>
+      caller.callServerEndpoint<_i6xgjezv.AdminDocumentDetail>(
+        'admin',
+        'getDocument',
+        {'id': id},
+      );
+
+  /// Lists chat sessions, newest first. With [goodAnswer] set, only sessions
+  /// with that vote are listed. With [votedOnly], unvoted sessions are
+  /// skipped. The default lists sessions where the answer was voted poor.
+  _ida.Future<_i7oyhwe3.AdminChatSessionPage> listChatSessions({
+    required int page,
+    required int pageSize,
+    bool? goodAnswer,
+    required bool votedOnly,
+  }) => caller.callServerEndpoint<_i7oyhwe3.AdminChatSessionPage>(
+    'admin',
+    'listChatSessions',
+    {
+      'page': page,
+      'pageSize': pageSize,
+      'goodAnswer': goodAnswer,
+      'votedOnly': votedOnly,
+    },
+  );
+
+  /// Returns a chat session with its full conversation. Throws if it does
+  /// not exist.
+  _ida.Future<_i3n6ccym.AdminChatSessionDetail> getChatSession(int id) =>
+      caller.callServerEndpoint<_i3n6ccym.AdminChatSessionDetail>(
+        'admin',
+        'getChatSession',
+        {'id': id},
+      );
+}
 
 /// Exposes the Google sign-in endpoints of the auth module.
 /// {@category Endpoint}
@@ -247,12 +334,15 @@ class Client extends _isc.ServerpodClientShared {
              disconnectStreamsOnLostInternetConnection,
          httpClientOverride: httpClientOverride,
        ) {
+    admin = EndpointAdmin(this);
     googleIdp = EndpointGoogleIdp(this);
     mcp = EndpointMcp(this);
     refreshJwtTokens = EndpointRefreshJwtTokens(this);
     starguide = EndpointStarguide(this);
     modules = Modules(this);
   }
+
+  late final EndpointAdmin admin;
 
   late final EndpointGoogleIdp googleIdp;
 
@@ -266,6 +356,7 @@ class Client extends _isc.ServerpodClientShared {
 
   @override
   Map<String, _isc.EndpointRef> get endpointRefLookup => {
+    'admin': admin,
     'googleIdp': googleIdp,
     'mcp': mcp,
     'refreshJwtTokens': refreshJwtTokens,

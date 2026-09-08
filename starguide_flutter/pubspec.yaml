@@ -36,6 +36,7 @@ dependencies:
   serverpod_auth_core_client: 4.0.0-rc.2
   serverpod_auth_idp_flutter: 4.0.0-rc.2
   serverpod_flutter: 4.0.0-rc.2
+  shad: ^0.99.4
   starguide_client: ^0.1.2
   syntax_highlight: ^0.4.0
   provider: ^6.1.4

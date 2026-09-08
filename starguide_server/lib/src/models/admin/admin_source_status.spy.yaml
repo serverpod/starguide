@@ -1,0 +1,15 @@
+### The state of one configured data source.
+class: AdminSourceStatus
+fields:
+  name: String
+  domain: String
+  type: RAGDocumentType
+  documentCount: int
+  ### When the most recently fetched document of the source was fetched.
+  lastFetchTime: DateTime?
+  ### When the least recently fetched document of the source was fetched.
+  oldestFetchTime: DateTime?
+  ### When the next recurring fetch of the source is scheduled.
+  nextFetchTime: DateTime?
+  ### When a retry is scheduled after a failed fetch, if any.
+  retryTime: DateTime?

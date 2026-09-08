@@ -1,0 +1,11 @@
+### A RAG document without its content and embedding, for listing.
+class: AdminDocumentSummary
+fields:
+  id: int
+  title: String
+  sourceUrl: Uri
+  type: RAGDocumentType
+  domain: String
+  fetchTime: DateTime
+  shortDescription: String
+  contentLength: int

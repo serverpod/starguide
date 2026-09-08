@@ -1,0 +1,12 @@
+### A RAG document with its content, but without the embedding vector.
+class: AdminDocumentDetail
+fields:
+  id: int
+  title: String
+  sourceUrl: Uri
+  type: RAGDocumentType
+  domain: String
+  fetchTime: DateTime
+  shortDescription: String
+  embeddingSummary: String
+  content: String

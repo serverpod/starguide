@@ -1,0 +1,22 @@
+### Statistics shown on the admin overview.
+class: AdminOverview
+fields:
+  computedAt: DateTime
+  documentCount: int
+  lastFetchTime: DateTime?
+  oldestFetchTime: DateTime?
+  ### When the next clean up of stale documents is scheduled.
+  nextCleanUpTime: DateTime?
+  ### How often each data source is fetched.
+  fetchInterval: Duration
+  ### Documents that have not been re-fetched for this long are removed.
+  removeOldDataAfter: Duration
+  sources: List<AdminSourceStatus>
+  totalSessionCount: int
+  totalMessageCount: int
+  ### Sessions created during the past 7 days.
+  lastWeek: VoteStats
+  ### Sessions created during the past 30 days.
+  lastMonth: VoteStats
+  ### One entry per day, oldest first.
+  dailyStats: List<DailyStats>

@@ -1,0 +1,15 @@
+### Chat session and vote counts for one day, cached in the database so that
+### the admin overview does not have to aggregate the full session history on
+### every request. Computed by `AdminStats`.
+class: DailyStats
+table: daily_stats
+fields:
+  ### Start of the day in UTC.
+  day: DateTime
+  sessionCount: int
+  goodAnswerCount: int
+  poorAnswerCount: int
+indexes:
+  daily_stats_day:
+    fields: day
+    unique: true

@@ -1,3 +1,10 @@
+admin:
+  - getOverview:
+  - listDocuments:
+  - listDocumentDomains:
+  - getDocument:
+  - listChatSessions:
+  - getChatSession:
 googleIdp:
   - login:
   - loginWithCode:

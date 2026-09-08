@@ -13,6 +13,7 @@ class GithubDocsDataSource implements DataSource {
   final String branch;
   final String basePath;
   final Uri referenceUrl;
+  @override
   final String domain;
 
   /// Latest version, if known.
@@ -124,6 +125,9 @@ class GithubDocsDataSource implements DataSource {
 
   @override
   String get name => 'GithubDocs:$owner/$repo:$basePath';
+
+  @override
+  RAGDocumentType get documentType => RAGDocumentType.documentation;
 
   @override
   Stream<RawRAGDocument> fetch(
