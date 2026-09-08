@@ -11,16 +11,19 @@
 // ignore_for_file: no_leading_underscores_for_local_identifiers
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
-import 'package:serverpod_test/serverpod_test.dart' as _i1;
-import 'package:serverpod/serverpod.dart' as _i2;
-import 'dart:async' as _i3;
-import 'package:starguide_server/src/generated/markdown_resource_info.dart'
-    as _i4;
-import 'package:starguide_server/src/generated/chat_session.dart' as _i5;
-import 'dart:convert' as _i6;
-import 'package:starguide_server/src/generated/future_calls.dart' as _i7;
+import 'dart:async' as _ida;
+import 'dart:convert' as _idc;
+import 'dart:io' as _idi;
+import 'package:serverpod/serverpod.dart' as _is;
+import 'package:serverpod_auth_core_server/serverpod_auth_core_server.dart'
+    as _iacs;
+import 'package:serverpod_test/serverpod_test.dart' as _ist;
+import 'package:starguide_server/src/generated/chat_session.dart' as _icpeorlm;
+import 'package:starguide_server/src/generated/future_calls.dart' as _inaozf8m;
 import 'package:starguide_server/src/generated/future_calls_generated_models/data_fetcher_future_call_fetch_data_source_model.dart'
-    as _i8;
+    as _ign3lwir;
+import 'package:starguide_server/src/generated/markdown_resource_info.dart'
+    as _iwjynyqq;
 import 'package:starguide_server/src/generated/protocol.dart';
 import 'package:starguide_server/src/generated/endpoints.dart';
 export 'package:serverpod_test/serverpod_test_public_exports.dart';
@@ -65,7 +68,7 @@ export 'package:serverpod_test/serverpod_test_public_exports.dart';
 ///
 /// [serverpodLoggingMode] The logging mode used when creating Serverpod. Defaults to `ServerpodLoggingMode.normal`
 ///
-/// [serverpodStartTimeout] The timeout to use when starting Serverpod, which connects to the database among other things. Defaults to `Duration(seconds: 30)`.
+/// [serverpodStartTimeout] The timeout to use when starting Serverpod, which connects to the database among other things. Defaults to `Duration(seconds: 120)`.
 ///
 /// [testServerOutputMode] Options for controlling test server output during test execution. Defaults to `TestServerOutputMode.normal`.
 /// ```dart
@@ -85,29 +88,47 @@ export 'package:serverpod_test/serverpod_test_public_exports.dart';
 /// }
 /// ```
 ///
+/// [configOverride] A function to override the server configuration. This function is called with
+/// the default server configuration after it is loaded from the config/ directory
+/// and before it is used to start the server. Use this to override particular
+/// settings in the server configuration.
+///
+/// [databaseInterceptor] Optional interceptor that replaces the default database for each session.
+/// See [Serverpod.databaseInterceptor] for more information.
+///
 /// [testGroupTagsOverride] By default Serverpod test tools tags the `withServerpod` test group with `"integration"`.
 /// This is to provide a simple way to only run unit or integration tests.
 /// This property allows this tag to be overridden to something else. Defaults to `['integration']`.
 ///
 /// [experimentalFeatures] Optionally specify experimental features. See [Serverpod] for more information.
-@_i1.isTestGroup
+///
+/// [serverDirectory] The server package directory `config/<runMode>.yaml`, `config/passwords.yaml`,
+/// and `migrations/<module>/...` are resolved against. Defaults to
+/// [Directory.current] at the time the test boots. Pass this when the test
+/// isolate's cwd is not the server package root (e.g. running tests from a
+/// workspace parent directory) so config and migrations are still loaded
+/// from the right place.
+@_ist.isTestGroup
 void withServerpod(
   String testGroupName,
-  _i1.TestClosure<TestEndpoints> testClosure, {
+  _ist.TestClosure<TestEndpoints> testClosure, {
   bool? applyMigrations,
+  _is.ServerpodConfig Function(_is.ServerpodConfig)? configOverride,
+  _is.DatabaseInterceptor? databaseInterceptor,
   bool? enableSessionLogging,
-  _i2.ExperimentalFeatures? experimentalFeatures,
-  _i1.RollbackDatabase? rollbackDatabase,
+  _is.ExperimentalFeatures? experimentalFeatures,
+  _ist.RollbackDatabase? rollbackDatabase,
   String? runMode,
-  _i2.RuntimeParametersListBuilder? runtimeParametersBuilder,
-  _i2.ServerpodLoggingMode? serverpodLoggingMode,
+  _is.RuntimeParametersListBuilder? runtimeParametersBuilder,
+  _idi.Directory? serverDirectory,
+  _is.ServerpodLoggingMode? serverpodLoggingMode,
   Duration? serverpodStartTimeout,
   List<String>? testGroupTagsOverride,
-  _i1.TestServerOutputMode? testServerOutputMode,
+  _ist.TestServerOutputMode? testServerOutputMode,
 }) {
-  _i1.buildWithServerpod<_InternalTestEndpoints>(
+  _ist.buildWithServerpod<_InternalTestEndpoints>(
     testGroupName,
-    _i1.TestServerpod(
+    _ist.TestServerpod(
       testEndpoints: _InternalTestEndpoints(),
       endpoints: Endpoints(),
       serializationManager: Protocol(),
@@ -116,8 +137,11 @@ void withServerpod(
       isDatabaseEnabled: true,
       serverpodLoggingMode: serverpodLoggingMode,
       testServerOutputMode: testServerOutputMode,
+      serverDirectory: serverDirectory,
       experimentalFeatures: experimentalFeatures,
+      configOverride: configOverride,
       runtimeParametersBuilder: runtimeParametersBuilder,
+      databaseInterceptor: databaseInterceptor,
     ),
     maybeRollbackDatabase: rollbackDatabase,
     maybeEnableSessionLogging: enableSessionLogging,
@@ -130,26 +154,29 @@ void withServerpod(
 class TestEndpoints {
   late final futureCalls = _FutureCalls();
 
+  late final _GoogleIdpEndpoint googleIdp;
+
   late final _McpEndpoint mcp;
+
+  late final _RefreshJwtTokensEndpoint refreshJwtTokens;
 
   late final _StarguideEndpoint starguide;
 }
 
 class _InternalTestEndpoints extends TestEndpoints
-    implements _i1.InternalTestEndpoints {
+    implements _ist.InternalTestEndpoints {
   @override
   void initialize(
-    _i2.SerializationManager serializationManager,
-    _i2.EndpointDispatch endpoints,
+    _is.SerializationManager serializationManager,
+    _is.EndpointDispatch endpoints,
   ) {
-    mcp = _McpEndpoint(
+    googleIdp = _GoogleIdpEndpoint(endpoints, serializationManager);
+    mcp = _McpEndpoint(endpoints, serializationManager);
+    refreshJwtTokens = _RefreshJwtTokensEndpoint(
       endpoints,
       serializationManager,
     );
-    starguide = _StarguideEndpoint(
-      endpoints,
-      serializationManager,
-    );
+    starguide = _StarguideEndpoint(endpoints, serializationManager);
   }
 }
 
@@ -157,22 +184,127 @@ class _FutureCalls {
   late final dataFetcher = _DataFetcherFutureCall();
 }
 
-class _McpEndpoint {
-  _McpEndpoint(
-    this._endpointDispatch,
-    this._serializationManager,
-  );
+class _GoogleIdpEndpoint {
+  _GoogleIdpEndpoint(this._endpointDispatch, this._serializationManager);
 
-  final _i2.EndpointDispatch _endpointDispatch;
+  final _is.EndpointDispatch _endpointDispatch;
 
-  final _i2.SerializationManager _serializationManager;
+  final _is.SerializationManager _serializationManager;
 
-  _i3.Future<String> mcpInstructions(
-    _i1.TestSessionBuilder sessionBuilder,
-  ) async {
-    return _i1.callAwaitableFunctionAndHandleExceptions(() async {
+  _ida.Future<_iacs.AuthSuccess> login(
+    _ist.TestSessionBuilder sessionBuilder, {
+    required String idToken,
+    required String? accessToken,
+  }) async {
+    return _ist.callAwaitableFunctionAndHandleExceptions(() async {
       var _localUniqueSession =
-          (sessionBuilder as _i1.InternalTestSessionBuilder).internalBuild(
+          (sessionBuilder as _ist.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'googleIdp',
+            method: 'login',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'googleIdp',
+          methodName: 'login',
+          parameters: _ist.testObjectToJson({
+            'idToken': idToken,
+            'accessToken': accessToken,
+          }),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _ida.Future<_iacs.AuthSuccess>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+
+  _ida.Future<_iacs.AuthSuccess> loginWithCode(
+    _ist.TestSessionBuilder sessionBuilder, {
+    required String code,
+    required String codeVerifier,
+    required String redirectUri,
+  }) async {
+    return _ist.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _ist.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'googleIdp',
+            method: 'loginWithCode',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'googleIdp',
+          methodName: 'loginWithCode',
+          parameters: _ist.testObjectToJson({
+            'code': code,
+            'codeVerifier': codeVerifier,
+            'redirectUri': redirectUri,
+          }),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _ida.Future<_iacs.AuthSuccess>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+
+  _ida.Future<bool> hasAccount(_ist.TestSessionBuilder sessionBuilder) async {
+    return _ist.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _ist.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'googleIdp',
+            method: 'hasAccount',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'googleIdp',
+          methodName: 'hasAccount',
+          parameters: _ist.testObjectToJson({}),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _ida.Future<bool>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+}
+
+class _McpEndpoint {
+  _McpEndpoint(this._endpointDispatch, this._serializationManager);
+
+  final _is.EndpointDispatch _endpointDispatch;
+
+  final _is.SerializationManager _serializationManager;
+
+  _ida.Future<String> mcpInstructions(
+    _ist.TestSessionBuilder sessionBuilder,
+  ) async {
+    return _ist.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _ist.InternalTestSessionBuilder).internalBuild(
             endpoint: 'mcp',
             method: 'mcpInstructions',
           );
@@ -181,7 +313,7 @@ class _McpEndpoint {
           createSessionCallback: (_) => _localUniqueSession,
           endpointPath: 'mcp',
           methodName: 'mcpInstructions',
-          parameters: _i1.testObjectToJson({}),
+          parameters: _ist.testObjectToJson({}),
           serializationManager: _serializationManager,
         );
         var _localReturnValue =
@@ -189,7 +321,7 @@ class _McpEndpoint {
                   _localUniqueSession,
                   _localCallContext.arguments,
                 )
-                as _i3.Future<String>);
+                as _ida.Future<String>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();
@@ -197,12 +329,12 @@ class _McpEndpoint {
     });
   }
 
-  _i3.Future<List<_i4.MarkdownResourceInfo>> getAllResources(
-    _i1.TestSessionBuilder sessionBuilder,
+  _ida.Future<List<_iwjynyqq.MarkdownResourceInfo>> getAllResources(
+    _ist.TestSessionBuilder sessionBuilder,
   ) async {
-    return _i1.callAwaitableFunctionAndHandleExceptions(() async {
+    return _ist.callAwaitableFunctionAndHandleExceptions(() async {
       var _localUniqueSession =
-          (sessionBuilder as _i1.InternalTestSessionBuilder).internalBuild(
+          (sessionBuilder as _ist.InternalTestSessionBuilder).internalBuild(
             endpoint: 'mcp',
             method: 'getAllResources',
           );
@@ -211,7 +343,7 @@ class _McpEndpoint {
           createSessionCallback: (_) => _localUniqueSession,
           endpointPath: 'mcp',
           methodName: 'getAllResources',
-          parameters: _i1.testObjectToJson({}),
+          parameters: _ist.testObjectToJson({}),
           serializationManager: _serializationManager,
         );
         var _localReturnValue =
@@ -219,7 +351,7 @@ class _McpEndpoint {
                   _localUniqueSession,
                   _localCallContext.arguments,
                 )
-                as _i3.Future<List<_i4.MarkdownResourceInfo>>);
+                as _ida.Future<List<_iwjynyqq.MarkdownResourceInfo>>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();
@@ -227,14 +359,14 @@ class _McpEndpoint {
     });
   }
 
-  _i3.Future<String> ask(
-    _i1.TestSessionBuilder sessionBuilder,
+  _ida.Future<String> ask(
+    _ist.TestSessionBuilder sessionBuilder,
     String question,
     String geminiAPIKey,
   ) async {
-    return _i1.callAwaitableFunctionAndHandleExceptions(() async {
+    return _ist.callAwaitableFunctionAndHandleExceptions(() async {
       var _localUniqueSession =
-          (sessionBuilder as _i1.InternalTestSessionBuilder).internalBuild(
+          (sessionBuilder as _ist.InternalTestSessionBuilder).internalBuild(
             endpoint: 'mcp',
             method: 'ask',
           );
@@ -243,7 +375,7 @@ class _McpEndpoint {
           createSessionCallback: (_) => _localUniqueSession,
           endpointPath: 'mcp',
           methodName: 'ask',
-          parameters: _i1.testObjectToJson({
+          parameters: _ist.testObjectToJson({
             'question': question,
             'geminiAPIKey': geminiAPIKey,
           }),
@@ -254,7 +386,46 @@ class _McpEndpoint {
                   _localUniqueSession,
                   _localCallContext.arguments,
                 )
-                as _i3.Future<String>);
+                as _ida.Future<String>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+}
+
+class _RefreshJwtTokensEndpoint {
+  _RefreshJwtTokensEndpoint(this._endpointDispatch, this._serializationManager);
+
+  final _is.EndpointDispatch _endpointDispatch;
+
+  final _is.SerializationManager _serializationManager;
+
+  _ida.Future<_iacs.AuthSuccess> refreshAccessToken(
+    _ist.TestSessionBuilder sessionBuilder, {
+    String? refreshToken,
+  }) async {
+    return _ist.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _ist.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'refreshJwtTokens',
+            method: 'refreshAccessToken',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'refreshJwtTokens',
+          methodName: 'refreshAccessToken',
+          parameters: _ist.testObjectToJson({'refreshToken': refreshToken}),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _ida.Future<_iacs.AuthSuccess>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();
@@ -264,22 +435,19 @@ class _McpEndpoint {
 }
 
 class _StarguideEndpoint {
-  _StarguideEndpoint(
-    this._endpointDispatch,
-    this._serializationManager,
-  );
+  _StarguideEndpoint(this._endpointDispatch, this._serializationManager);
 
-  final _i2.EndpointDispatch _endpointDispatch;
+  final _is.EndpointDispatch _endpointDispatch;
 
-  final _i2.SerializationManager _serializationManager;
+  final _is.SerializationManager _serializationManager;
 
-  _i3.Future<_i5.ChatSession> createChatSession(
-    _i1.TestSessionBuilder sessionBuilder,
+  _ida.Future<_icpeorlm.ChatSession> createChatSession(
+    _ist.TestSessionBuilder sessionBuilder,
     String reCaptchaToken,
   ) async {
-    return _i1.callAwaitableFunctionAndHandleExceptions(() async {
+    return _ist.callAwaitableFunctionAndHandleExceptions(() async {
       var _localUniqueSession =
-          (sessionBuilder as _i1.InternalTestSessionBuilder).internalBuild(
+          (sessionBuilder as _ist.InternalTestSessionBuilder).internalBuild(
             endpoint: 'starguide',
             method: 'createChatSession',
           );
@@ -288,7 +456,7 @@ class _StarguideEndpoint {
           createSessionCallback: (_) => _localUniqueSession,
           endpointPath: 'starguide',
           methodName: 'createChatSession',
-          parameters: _i1.testObjectToJson({'reCaptchaToken': reCaptchaToken}),
+          parameters: _ist.testObjectToJson({'reCaptchaToken': reCaptchaToken}),
           serializationManager: _serializationManager,
         );
         var _localReturnValue =
@@ -296,7 +464,7 @@ class _StarguideEndpoint {
                   _localUniqueSession,
                   _localCallContext.arguments,
                 )
-                as _i3.Future<_i5.ChatSession>);
+                as _ida.Future<_icpeorlm.ChatSession>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();
@@ -304,52 +472,49 @@ class _StarguideEndpoint {
     });
   }
 
-  _i3.Stream<String> ask(
-    _i1.TestSessionBuilder sessionBuilder,
-    _i5.ChatSession chatSession,
+  _ida.Stream<String> ask(
+    _ist.TestSessionBuilder sessionBuilder,
+    _icpeorlm.ChatSession chatSession,
     String question,
   ) {
-    var _localTestStreamManager = _i1.TestStreamManager<String>();
-    _i1.callStreamFunctionAndHandleExceptions(
-      () async {
-        var _localUniqueSession =
-            (sessionBuilder as _i1.InternalTestSessionBuilder).internalBuild(
-              endpoint: 'starguide',
-              method: 'ask',
-            );
-        var _localCallContext = await _endpointDispatch
-            .getMethodStreamCallContext(
-              createSessionCallback: (_) => _localUniqueSession,
-              endpointPath: 'starguide',
-              methodName: 'ask',
-              arguments: {
-                'chatSession': _i6.jsonDecode(
-                  _i2.SerializationManager.encode(chatSession),
-                ),
-                'question': question,
-              },
-              requestedInputStreams: [],
-              serializationManager: _serializationManager,
-            );
-        await _localTestStreamManager.callStreamMethod(
-          _localCallContext,
-          _localUniqueSession,
-          {},
-        );
-      },
-      _localTestStreamManager.outputStreamController,
-    );
+    var _localTestStreamManager = _ist.TestStreamManager<String>();
+    _ist.callStreamFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _ist.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'starguide',
+            method: 'ask',
+          );
+      var _localCallContext = await _endpointDispatch
+          .getMethodStreamCallContext(
+            createSessionCallback: (_) => _localUniqueSession,
+            endpointPath: 'starguide',
+            methodName: 'ask',
+            arguments: {
+              'chatSession': _idc.jsonDecode(
+                _is.SerializationManager.encode(chatSession),
+              ),
+              'question': question,
+            },
+            requestedInputStreams: [],
+            serializationManager: _serializationManager,
+          );
+      await _localTestStreamManager.callStreamMethod(
+        _localCallContext,
+        _localUniqueSession,
+        {},
+      );
+    }, _localTestStreamManager.outputStreamController);
     return _localTestStreamManager.outputStreamController.stream;
   }
 
-  _i3.Future<void> vote(
-    _i1.TestSessionBuilder sessionBuilder,
-    _i5.ChatSession chatSession,
+  _ida.Future<void> vote(
+    _ist.TestSessionBuilder sessionBuilder,
+    _icpeorlm.ChatSession chatSession,
     bool goodAnswer,
   ) async {
-    return _i1.callAwaitableFunctionAndHandleExceptions(() async {
+    return _ist.callAwaitableFunctionAndHandleExceptions(() async {
       var _localUniqueSession =
-          (sessionBuilder as _i1.InternalTestSessionBuilder).internalBuild(
+          (sessionBuilder as _ist.InternalTestSessionBuilder).internalBuild(
             endpoint: 'starguide',
             method: 'vote',
           );
@@ -358,7 +523,7 @@ class _StarguideEndpoint {
           createSessionCallback: (_) => _localUniqueSession,
           endpointPath: 'starguide',
           methodName: 'vote',
-          parameters: _i1.testObjectToJson({
+          parameters: _ist.testObjectToJson({
             'chatSession': chatSession,
             'goodAnswer': goodAnswer,
           }),
@@ -369,7 +534,7 @@ class _StarguideEndpoint {
                   _localUniqueSession,
                   _localCallContext.arguments,
                 )
-                as _i3.Future<void>);
+                as _ida.Future<void>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();
@@ -379,28 +544,17 @@ class _StarguideEndpoint {
 }
 
 class _DataFetcherFutureCall {
-  Future<void> startFetching(_i1.TestSessionBuilder sessionBuilder) async {
-    var _localUniqueSession = (sessionBuilder as _i1.InternalTestSessionBuilder)
-        .internalBuild();
-    try {
-      await _i7.DataFetcherStartFetchingFutureCall().invoke(
-        _localUniqueSession,
-        null,
-      );
-    } finally {
-      await _localUniqueSession.close();
-    }
-  }
-
   Future<void> fetchDataSource(
-    _i1.TestSessionBuilder sessionBuilder,
+    _ist.TestSessionBuilder sessionBuilder,
     String name,
   ) async {
-    var object = _i8.DataFetcherFutureCallFetchDataSourceModel(name: name);
-    var _localUniqueSession = (sessionBuilder as _i1.InternalTestSessionBuilder)
-        .internalBuild();
+    var object = _ign3lwir.DataFetcherFutureCallFetchDataSourceModel(
+      name: name,
+    );
+    var _localUniqueSession =
+        (sessionBuilder as _ist.InternalTestSessionBuilder).internalBuild();
     try {
-      await _i7.DataFetcherFetchDataSourceFutureCall().invoke(
+      await _inaozf8m.DataFetcherFetchDataSourceFutureCall().invoke(
         _localUniqueSession,
         object,
       );
@@ -409,11 +563,11 @@ class _DataFetcherFutureCall {
     }
   }
 
-  Future<void> cleanUp(_i1.TestSessionBuilder sessionBuilder) async {
-    var _localUniqueSession = (sessionBuilder as _i1.InternalTestSessionBuilder)
-        .internalBuild();
+  Future<void> cleanUp(_ist.TestSessionBuilder sessionBuilder) async {
+    var _localUniqueSession =
+        (sessionBuilder as _ist.InternalTestSessionBuilder).internalBuild();
     try {
-      await _i7.DataFetcherCleanUpFutureCall().invoke(
+      await _inaozf8m.DataFetcherCleanUpFutureCall().invoke(
         _localUniqueSession,
         null,
       );

@@ -10,12 +10,13 @@
 // ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
-import 'package:serverpod_client/serverpod_client.dart' as _i1;
+import 'package:serverpod_client/serverpod_client.dart' as _isc;
 
-abstract class ChatSession implements _i1.SerializableModel {
+abstract class ChatSession
+    implements _isc.SerializableModel, _isc.ProtocolSerialization {
   ChatSession._({
     this.id,
-    this.userId,
+    this.authUserId,
     required this.keyToken,
     this.goodAnswer,
     DateTime? createdAt,
@@ -23,7 +24,7 @@ abstract class ChatSession implements _i1.SerializableModel {
 
   factory ChatSession({
     int? id,
-    int? userId,
+    _isc.UuidValue? authUserId,
     required String keyToken,
     bool? goodAnswer,
     DateTime? createdAt,
@@ -32,14 +33,18 @@ abstract class ChatSession implements _i1.SerializableModel {
   factory ChatSession.fromJson(Map<String, dynamic> jsonSerialization) {
     return ChatSession(
       id: jsonSerialization['id'] as int?,
-      userId: jsonSerialization['userId'] as int?,
+      authUserId: jsonSerialization['authUserId'] == null
+          ? null
+          : _isc.UuidValueJsonExtension.fromJson(
+              jsonSerialization['authUserId'],
+            ),
       keyToken: jsonSerialization['keyToken'] as String,
       goodAnswer: jsonSerialization['goodAnswer'] == null
           ? null
-          : _i1.BoolJsonExtension.fromJson(jsonSerialization['goodAnswer']),
+          : _isc.BoolJsonExtension.fromJson(jsonSerialization['goodAnswer']),
       createdAt: jsonSerialization['createdAt'] == null
           ? null
-          : _i1.DateTimeJsonExtension.fromJson(jsonSerialization['createdAt']),
+          : _isc.DateTimeJsonExtension.fromJson(jsonSerialization['createdAt']),
     );
   }
 
@@ -48,7 +53,7 @@ abstract class ChatSession implements _i1.SerializableModel {
   /// the id will be null.
   int? id;
 
-  int? userId;
+  _isc.UuidValue? authUserId;
 
   String keyToken;
 
@@ -58,10 +63,10 @@ abstract class ChatSession implements _i1.SerializableModel {
 
   /// Returns a shallow copy of this [ChatSession]
   /// with some or all fields replaced by the given arguments.
-  @_i1.useResult
+  @_isc.useResult
   ChatSession copyWith({
     int? id,
-    int? userId,
+    _isc.UuidValue? authUserId,
     String? keyToken,
     bool? goodAnswer,
     DateTime? createdAt,
@@ -71,7 +76,19 @@ abstract class ChatSession implements _i1.SerializableModel {
     return {
       '__className__': 'ChatSession',
       if (id != null) 'id': id,
-      if (userId != null) 'userId': userId,
+      if (authUserId != null) 'authUserId': authUserId?.toJson(),
+      'keyToken': keyToken,
+      if (goodAnswer != null) 'goodAnswer': goodAnswer,
+      'createdAt': createdAt.toJson(),
+    };
+  }
+
+  @override
+  Map<String, dynamic> toJsonForProtocol() {
+    return {
+      '__className__': 'ChatSession',
+      if (id != null) 'id': id,
+      if (authUserId != null) 'authUserId': authUserId?.toJson(),
       'keyToken': keyToken,
       if (goodAnswer != null) 'goodAnswer': goodAnswer,
       'createdAt': createdAt.toJson(),
@@ -80,7 +97,7 @@ abstract class ChatSession implements _i1.SerializableModel {
 
   @override
   String toString() {
-    return _i1.SerializationManager.encode(this);
+    return _isc.SerializationManager.encode(this);
   }
 }
 
@@ -89,13 +106,13 @@ class _Undefined {}
 class _ChatSessionImpl extends ChatSession {
   _ChatSessionImpl({
     int? id,
-    int? userId,
+    _isc.UuidValue? authUserId,
     required String keyToken,
     bool? goodAnswer,
     DateTime? createdAt,
   }) : super._(
          id: id,
-         userId: userId,
+         authUserId: authUserId,
          keyToken: keyToken,
          goodAnswer: goodAnswer,
          createdAt: createdAt,
@@ -103,18 +120,18 @@ class _ChatSessionImpl extends ChatSession {
 
   /// Returns a shallow copy of this [ChatSession]
   /// with some or all fields replaced by the given arguments.
-  @_i1.useResult
+  @_isc.useResult
   @override
   ChatSession copyWith({
     Object? id = _Undefined,
-    Object? userId = _Undefined,
+    Object? authUserId = _Undefined,
     String? keyToken,
     Object? goodAnswer = _Undefined,
     DateTime? createdAt,
   }) {
     return ChatSession(
       id: id is int? ? id : this.id,
-      userId: userId is int? ? userId : this.userId,
+      authUserId: authUserId is _isc.UuidValue? ? authUserId : this.authUserId,
       keyToken: keyToken ?? this.keyToken,
       goodAnswer: goodAnswer is bool? ? goodAnswer : this.goodAnswer,
       createdAt: createdAt ?? this.createdAt,

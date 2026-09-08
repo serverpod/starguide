@@ -2,10 +2,10 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_chat_core/flutter_chat_core.dart';
 import 'package:flutter_chat_ui/flutter_chat_ui.dart';
 import 'package:g_recaptcha_v3/g_recaptcha_v3.dart';
-import 'package:lucide_icons_flutter/lucide_icons.dart';
+import 'package:flutter_lucide/flutter_lucide.dart';
 import 'package:markdown_widget/markdown_widget.dart';
 import 'package:package_info_plus/package_info_plus.dart';
-import 'package:serverpod_auth_shared_flutter/serverpod_auth_shared_flutter.dart';
+import 'package:serverpod_auth_idp_flutter/serverpod_auth_idp_flutter.dart';
 import 'package:starguide_client/starguide_client.dart';
 import 'package:flutter/material.dart';
 import 'package:serverpod_flutter/serverpod_flutter.dart';
@@ -13,6 +13,7 @@ import 'package:starguide_flutter/chat/starguide_chat_input.dart';
 import 'package:starguide_flutter/chat/starguide_disconnected.dart';
 import 'package:starguide_flutter/chat/starguide_empty_chat.dart';
 import 'package:starguide_flutter/chat/starguide_text_message.dart';
+import 'package:starguide_flutter/config/app_config.dart';
 import 'package:starguide_flutter/config/chat_theme.dart';
 import 'package:starguide_flutter/config/constants.dart';
 import 'package:starguide_flutter/config/theme.dart';
@@ -20,15 +21,38 @@ import 'package:starguide_flutter/widgets/animated_gradient_border.dart';
 import 'package:syntax_highlight/syntax_highlight.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-// var client = Client('http://$localhost:8080/')
-//   ..authKeyProvider = FlutterAuthenticationKeyManager()
-//   ..connectivityMonitor = FlutterConnectivityMonitor();
+/// Client used to talk to the server from anywhere in the app. It is created
+/// in [main] once the server URL is known.
+late final Client client;
 
-var client = Client('https://starguide.api.serverpod.space/')
-  ..authKeyProvider = FlutterAuthenticationKeyManager()
-  ..connectivityMonitor = FlutterConnectivityMonitor();
+late FlutterAuthSessionManager sessionManager;
 
-late SessionManager sessionManager;
+/// Client id of the web application OAuth client used by the server.
+const _googleClientId =
+    '228196660760-93k92hcfke8ettcokvm7hdtm2uq19je0.apps.googleusercontent.com';
+
+/// Redirect URI for the Google sign-in flow on web. The callback page must be
+/// served on the same origin as this app, as it posts the result back to the
+/// app window.
+///
+/// Release builds are served by the Serverpod web server, which serves the
+/// callback page at `/googlesignin`. Debug builds are typically run with
+/// `flutter run -d chrome`, where the Flutter dev server is the app's origin
+/// and serves the callback page from `web/auth.html`. Run on a fixed port and
+/// register `http://localhost:8888/auth.html` (with the port you use) as an
+/// authorized redirect URI on the OAuth client in the Google Cloud console:
+///
+/// flutter run -d chrome --web-port 8888
+///
+/// The URI can also be overridden with the `GOOGLE_WEB_REDIRECT_URI` dart
+/// define.
+String get _googleWebRedirectUri {
+  const override = String.fromEnvironment('GOOGLE_WEB_REDIRECT_URI');
+  if (override.isNotEmpty) return override;
+
+  final callbackPage = kDebugMode ? 'auth.html' : 'googlesignin';
+  return '${Uri.base.origin}/$callbackPage';
+}
 
 late final Highlighter highlighterDart;
 late final Highlighter highlighterYaml;
@@ -41,8 +65,26 @@ void main() async {
   PackageInfo packageInfo = await PackageInfo.fromPlatform();
   starguideVersion = packageInfo.version;
 
-  sessionManager = SessionManager(caller: client.modules.auth);
+  // The API server URL comes from the `assets/config.json` asset. When the app
+  // is served by the Serverpod web server, the server provides that file with
+  // the URL of its own API server. When running the app with `flutter run`,
+  // the bundled file points at a local server. Both can be overridden with a
+  // dart define, e.g. to run against production:
+  //
+  // flutter run --dart-define=SERVER_URL=https://starguide.api.serverpod.space/
+  const serverUrlFromEnv = String.fromEnvironment('SERVER_URL');
+  final config = await AppConfig.loadConfig();
+  final serverUrl = serverUrlFromEnv.isEmpty
+      ? config.apiUrl ?? 'http://$localhost:8080/'
+      : serverUrlFromEnv;
+
+  client = Client(serverUrl)
+    ..connectivityMonitor = FlutterConnectivityMonitor();
+
+  sessionManager = FlutterAuthSessionManager();
+  client.authSessionManager = sessionManager;
   await sessionManager.initialize();
+  await _initializeGoogleSignIn();
 
   // Initialize the highlighter.
   await Highlighter.initialize(['dart', 'yaml', 'sql']);
@@ -56,6 +98,25 @@ void main() async {
     await GRecaptchaV3.ready('6LcWhFMrAAAAAHvRY6kr9oc9B_KPeOT0T2SxFGJE');
   }
   runApp(const StarguideApp());
+}
+
+Future<void> _initializeGoogleSignIn() async {
+  try {
+    if (kIsWeb) {
+      await client.auth.initializeGoogleSignIn(
+        clientId: _googleClientId,
+        redirectUri: _googleWebRedirectUri,
+      );
+    } else {
+      await client.auth.initializeGoogleSignIn(
+        serverClientId: _googleClientId,
+      );
+    }
+  } catch (e) {
+    // Sign-in is only a fallback for failed reCAPTCHA checks, so a missing
+    // platform configuration must not prevent the app from starting.
+    debugPrint('Google sign-in is unavailable: $e');
+  }
 }
 
 class StarguideApp extends StatelessWidget {
@@ -129,9 +190,9 @@ class StarguideChatPageState extends State<StarguideChatPage> {
       _inputTextController.clear();
     }
 
-    sessionManager.addListener(() {
+    sessionManager.authInfoListenable.addListener(() {
       setState(() {
-        if (sessionManager.isSignedIn) {
+        if (sessionManager.isAuthenticated) {
           _recaptchaError = false;
           _connectionError = false;
           _connectionErrorMessage = null;
@@ -359,7 +420,7 @@ class StarguideChatPageState extends State<StarguideChatPage> {
                           TextButton.icon(
                             onPressed: _handleClearChat,
                             label: Text('Clear Chat'),
-                            icon: Icon(LucideIcons.refreshCw400),
+                            icon: Icon(LucideIcons.refresh_cw),
                           ),
                           Spacer(),
                           TextButton.icon(
@@ -368,7 +429,7 @@ class StarguideChatPageState extends State<StarguideChatPage> {
                                 : null,
                             label: Text('Got Help'),
                             icon: Icon(
-                              LucideIcons.thumbsUp400,
+                              LucideIcons.thumbs_up,
                               color: _vote == true
                                   ? Colors.blue.shade600
                                   : null,
@@ -380,7 +441,7 @@ class StarguideChatPageState extends State<StarguideChatPage> {
                                 : null,
                             label: Text('Poor Answer'),
                             icon: Icon(
-                              LucideIcons.thumbsDown400,
+                              LucideIcons.thumbs_down,
                               color: _vote == false
                                   ? Colors.blue.shade600
                                   : null,
@@ -440,14 +501,14 @@ class StarguideChatPageState extends State<StarguideChatPage> {
                   ),
                 ),
                 Spacer(),
-                if (!sessionManager.isSignedIn)
+                if (!sessionManager.isAuthenticated)
                   Text(
                     'Protected by ',
                     style: theme.textTheme.bodySmall?.copyWith(
                       color: theme.disabledColor,
                     ),
                   ),
-                if (!sessionManager.isSignedIn)
+                if (!sessionManager.isAuthenticated)
                   PopupMenuButton<String>(
                     tooltip: '',
                     color: Colors.white,
@@ -479,7 +540,7 @@ class StarguideChatPageState extends State<StarguideChatPage> {
                       ),
                     ),
                   ),
-                if (sessionManager.isSignedIn)
+                if (sessionManager.isAuthenticated)
                   TextButton(
                     onPressed: () {
                       sessionManager.signOutDevice();

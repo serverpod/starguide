@@ -10,34 +10,37 @@
 // ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
-import 'package:serverpod/serverpod.dart' as _i1;
-import 'markdown_resource_info.dart' as _i2;
-import 'package:starguide_server/src/generated/protocol.dart' as _i3;
+import 'package:serverpod/serverpod.dart' as _is;
+import 'package:starguide_server/src/generated/protocol.dart' as _ih7yasqo;
+import 'markdown_resource_info.dart' as _i8dvauvz;
 
 abstract class MarkdownResourceList
-    implements _i1.SerializableModel, _i1.ProtocolSerialization {
+    implements _is.SerializableModel, _is.ProtocolSerialization {
   MarkdownResourceList._({required this.resources});
 
   factory MarkdownResourceList({
-    required List<_i2.MarkdownResourceInfo> resources,
+    required List<_i8dvauvz.MarkdownResourceInfo> resources,
   }) = _MarkdownResourceListImpl;
 
   factory MarkdownResourceList.fromJson(
     Map<String, dynamic> jsonSerialization,
   ) {
     return MarkdownResourceList(
-      resources: _i3.Protocol().deserialize<List<_i2.MarkdownResourceInfo>>(
-        jsonSerialization['resources'],
-      ),
+      resources: _ih7yasqo.Protocol()
+          .deserialize<List<_i8dvauvz.MarkdownResourceInfo>>(
+            jsonSerialization['resources'],
+          ),
     );
   }
 
-  List<_i2.MarkdownResourceInfo> resources;
+  List<_i8dvauvz.MarkdownResourceInfo> resources;
 
   /// Returns a shallow copy of this [MarkdownResourceList]
   /// with some or all fields replaced by the given arguments.
-  @_i1.useResult
-  MarkdownResourceList copyWith({List<_i2.MarkdownResourceInfo>? resources});
+  @_is.useResult
+  MarkdownResourceList copyWith({
+    List<_i8dvauvz.MarkdownResourceInfo>? resources,
+  });
   @override
   Map<String, dynamic> toJson() {
     return {
@@ -56,19 +59,22 @@ abstract class MarkdownResourceList
 
   @override
   String toString() {
-    return _i1.SerializationManager.encode(this);
+    return _is.SerializationManager.encode(this);
   }
 }
 
 class _MarkdownResourceListImpl extends MarkdownResourceList {
-  _MarkdownResourceListImpl({required List<_i2.MarkdownResourceInfo> resources})
-    : super._(resources: resources);
+  _MarkdownResourceListImpl({
+    required List<_i8dvauvz.MarkdownResourceInfo> resources,
+  }) : super._(resources: resources);
 
   /// Returns a shallow copy of this [MarkdownResourceList]
   /// with some or all fields replaced by the given arguments.
-  @_i1.useResult
+  @_is.useResult
   @override
-  MarkdownResourceList copyWith({List<_i2.MarkdownResourceInfo>? resources}) {
+  MarkdownResourceList copyWith({
+    List<_i8dvauvz.MarkdownResourceInfo>? resources,
+  }) {
     return MarkdownResourceList(
       resources:
           resources ?? this.resources.map((e0) => e0.copyWith()).toList(),

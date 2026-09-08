@@ -10,10 +10,10 @@
 // ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
-import 'package:serverpod/serverpod.dart' as _i1;
+import 'package:serverpod/serverpod.dart' as _is;
 
 abstract class TableOfContents
-    implements _i1.SerializableModel, _i1.ProtocolSerialization {
+    implements _is.SerializableModel, _is.ProtocolSerialization {
   TableOfContents._({required this.contents});
 
   factory TableOfContents({required String contents}) = _TableOfContentsImpl;
@@ -26,27 +26,21 @@ abstract class TableOfContents
 
   /// Returns a shallow copy of this [TableOfContents]
   /// with some or all fields replaced by the given arguments.
-  @_i1.useResult
+  @_is.useResult
   TableOfContents copyWith({String? contents});
   @override
   Map<String, dynamic> toJson() {
-    return {
-      '__className__': 'TableOfContents',
-      'contents': contents,
-    };
+    return {'__className__': 'TableOfContents', 'contents': contents};
   }
 
   @override
   Map<String, dynamic> toJsonForProtocol() {
-    return {
-      '__className__': 'TableOfContents',
-      'contents': contents,
-    };
+    return {'__className__': 'TableOfContents', 'contents': contents};
   }
 
   @override
   String toString() {
-    return _i1.SerializationManager.encode(this);
+    return _is.SerializationManager.encode(this);
   }
 }
 
@@ -56,7 +50,7 @@ class _TableOfContentsImpl extends TableOfContents {
 
   /// Returns a shallow copy of this [TableOfContents]
   /// with some or all fields replaced by the given arguments.
-  @_i1.useResult
+  @_is.useResult
   @override
   TableOfContents copyWith({String? contents}) {
     return TableOfContents(contents: contents ?? this.contents);

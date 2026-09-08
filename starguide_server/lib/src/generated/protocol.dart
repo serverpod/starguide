@@ -8,26 +8,30 @@
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
 // ignore_for_file: invalid_use_of_internal_member
+// ignore_for_file: dead_code, unnecessary_type_check
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
-import 'package:serverpod/serverpod.dart' as _i1;
-import 'package:serverpod/protocol.dart' as _i2;
-import 'package:serverpod_auth_server/serverpod_auth_server.dart' as _i3;
-import 'cached_session_count.dart' as _i4;
-import 'chat_message.dart' as _i5;
-import 'chat_message_type.dart' as _i6;
-import 'chat_session.dart' as _i7;
-import 'exceptions/generative_ai_exception.dart' as _i8;
-import 'future_calls_generated_models/data_fetcher_future_call_fetch_data_source_model.dart'
-    as _i9;
-import 'markdown_resource_info.dart' as _i10;
-import 'markdown_resource_list.dart' as _i11;
-import 'rag_document.dart' as _i12;
-import 'rag_document_type.dart' as _i13;
-import 'recaptcha/recaptcha_exception.dart' as _i14;
-import 'table_of_contents.dart' as _i15;
+import 'package:serverpod/protocol.dart' as _isp;
+import 'package:serverpod/serverpod.dart' as _is;
+import 'package:serverpod_auth_core_server/serverpod_auth_core_server.dart'
+    as _iacs;
+import 'package:serverpod_auth_idp_server/serverpod_auth_idp_server.dart'
+    as _iais;
 import 'package:starguide_server/src/generated/markdown_resource_info.dart'
-    as _i16;
+    as _iwjynyqq;
+import 'cached_session_count.dart' as _iubbw449;
+import 'chat_message.dart' as _ivuncx2e;
+import 'chat_message_type.dart' as _itrf31vi;
+import 'chat_session.dart' as _i3zhwn74;
+import 'exceptions/generative_ai_exception.dart' as _i3yrs0ae;
+import 'future_calls_generated_models/data_fetcher_future_call_fetch_data_source_model.dart'
+    as _iz53h8dc;
+import 'markdown_resource_info.dart' as _i8dvauvz;
+import 'markdown_resource_list.dart' as _ihj0qgwk;
+import 'rag_document.dart' as _i8io6bl4;
+import 'rag_document_type.dart' as _i19rymhs;
+import 'recaptcha/recaptcha_exception.dart' as _i2oyqbrq;
+import 'table_of_contents.dart' as _ikwqo0g2;
 export 'cached_session_count.dart';
 export 'chat_message.dart';
 export 'chat_message_type.dart';
@@ -40,124 +44,97 @@ export 'rag_document_type.dart';
 export 'recaptcha/recaptcha_exception.dart';
 export 'table_of_contents.dart';
 
-class Protocol extends _i1.SerializationManagerServer {
+class Protocol extends _is.DatabaseSerializationManager {
   Protocol._();
 
   factory Protocol() => _instance;
 
-  static final Protocol _instance = Protocol._();
+  static final Protocol _instance = Protocol._().._registerHostProtocols();
 
-  static final List<_i2.TableDefinition> targetTableDefinitions = [
-    _i2.TableDefinition(
+  static List<_isp.TableDefinition> get targetTableDefinitions => [
+    _isp.TableDefinition(
       name: 'chat_message',
       dartName: 'ChatMessage',
       schema: 'public',
       module: 'starguide',
       columns: [
-        _i2.ColumnDefinition(
+        _isp.ColumnDefinition(
           name: 'id',
-          columnType: _i2.ColumnType.bigint,
+          columnType: _isp.ColumnType.bigint,
           isNullable: false,
           dartType: 'int?',
-          columnDefault: 'nextval(\'chat_message_id_seq\'::regclass)',
+          columnDefault: 'serial',
         ),
-        _i2.ColumnDefinition(
+        _isp.ColumnDefinition(
           name: 'chatSessionId',
-          columnType: _i2.ColumnType.bigint,
+          columnType: _isp.ColumnType.bigint,
           isNullable: false,
           dartType: 'int',
         ),
-        _i2.ColumnDefinition(
+        _isp.ColumnDefinition(
           name: 'message',
-          columnType: _i2.ColumnType.text,
+          columnType: _isp.ColumnType.text,
           isNullable: false,
           dartType: 'String',
         ),
-        _i2.ColumnDefinition(
+        _isp.ColumnDefinition(
           name: 'type',
-          columnType: _i2.ColumnType.text,
+          columnType: _isp.ColumnType.text,
           isNullable: false,
           dartType: 'protocol:ChatMessageType',
         ),
       ],
       foreignKeys: [],
-      indexes: [
-        _i2.IndexDefinition(
-          indexName: 'chat_message_pkey',
-          tableSpace: null,
-          elements: [
-            _i2.IndexElementDefinition(
-              type: _i2.IndexElementDefinitionType.column,
-              definition: 'id',
-            ),
-          ],
-          type: 'btree',
-          isUnique: true,
-          isPrimary: true,
-        ),
-      ],
+      indexes: [],
       managed: true,
     ),
-    _i2.TableDefinition(
+    _isp.TableDefinition(
       name: 'chat_session',
       dartName: 'ChatSession',
       schema: 'public',
       module: 'starguide',
       columns: [
-        _i2.ColumnDefinition(
+        _isp.ColumnDefinition(
           name: 'id',
-          columnType: _i2.ColumnType.bigint,
+          columnType: _isp.ColumnType.bigint,
           isNullable: false,
           dartType: 'int?',
-          columnDefault: 'nextval(\'chat_session_id_seq\'::regclass)',
+          columnDefault: 'serial',
         ),
-        _i2.ColumnDefinition(
-          name: 'userId',
-          columnType: _i2.ColumnType.bigint,
+        _isp.ColumnDefinition(
+          name: 'authUserId',
+          columnType: _isp.ColumnType.uuid,
           isNullable: true,
-          dartType: 'int?',
+          dartType: 'UuidValue?',
         ),
-        _i2.ColumnDefinition(
+        _isp.ColumnDefinition(
           name: 'keyToken',
-          columnType: _i2.ColumnType.text,
+          columnType: _isp.ColumnType.text,
           isNullable: false,
           dartType: 'String',
         ),
-        _i2.ColumnDefinition(
+        _isp.ColumnDefinition(
           name: 'goodAnswer',
-          columnType: _i2.ColumnType.boolean,
+          columnType: _isp.ColumnType.boolean,
           isNullable: true,
           dartType: 'bool?',
         ),
-        _i2.ColumnDefinition(
+        _isp.ColumnDefinition(
           name: 'createdAt',
-          columnType: _i2.ColumnType.timestampWithoutTimeZone,
+          columnType: _isp.ColumnType.timestampWithoutTimeZone,
           isNullable: false,
           dartType: 'DateTime',
-          columnDefault: 'CURRENT_TIMESTAMP',
+          columnDefault: 'now',
         ),
       ],
       foreignKeys: [],
       indexes: [
-        _i2.IndexDefinition(
-          indexName: 'chat_session_pkey',
-          tableSpace: null,
-          elements: [
-            _i2.IndexElementDefinition(
-              type: _i2.IndexElementDefinitionType.column,
-              definition: 'id',
-            ),
-          ],
-          type: 'btree',
-          isUnique: true,
-          isPrimary: true,
-        ),
-        _i2.IndexDefinition(
+        _isp.IndexDefinition(
           indexName: 'createdAt',
           tableSpace: null,
           elements: [
-            _i2.IndexElementDefinition(
-              type: _i2.IndexElementDefinitionType.column,
+            _isp.IndexElementDefinition(
+              type: _isp.IndexElementDefinitionType.column,
               definition: 'createdAt',
             ),
           ],
@@ -168,96 +145,83 @@ class Protocol extends _i1.SerializationManagerServer {
       ],
       managed: true,
     ),
-    _i2.TableDefinition(
+    _isp.TableDefinition(
       name: 'rag_document',
       dartName: 'RAGDocument',
       schema: 'public',
       module: 'starguide',
       columns: [
-        _i2.ColumnDefinition(
+        _isp.ColumnDefinition(
           name: 'id',
-          columnType: _i2.ColumnType.bigint,
+          columnType: _isp.ColumnType.bigint,
           isNullable: false,
           dartType: 'int?',
-          columnDefault: 'nextval(\'rag_document_id_seq\'::regclass)',
+          columnDefault: 'serial',
         ),
-        _i2.ColumnDefinition(
+        _isp.ColumnDefinition(
           name: 'embedding',
-          columnType: _i2.ColumnType.vector,
+          columnType: _isp.ColumnType.vector,
           isNullable: false,
           dartType: 'Vector(768)',
           vectorDimension: 768,
         ),
-        _i2.ColumnDefinition(
+        _isp.ColumnDefinition(
           name: 'fetchTime',
-          columnType: _i2.ColumnType.timestampWithoutTimeZone,
+          columnType: _isp.ColumnType.timestampWithoutTimeZone,
           isNullable: false,
           dartType: 'DateTime',
         ),
-        _i2.ColumnDefinition(
+        _isp.ColumnDefinition(
           name: 'sourceUrl',
-          columnType: _i2.ColumnType.text,
+          columnType: _isp.ColumnType.text,
           isNullable: false,
           dartType: 'Uri',
         ),
-        _i2.ColumnDefinition(
+        _isp.ColumnDefinition(
           name: 'content',
-          columnType: _i2.ColumnType.text,
+          columnType: _isp.ColumnType.text,
           isNullable: false,
           dartType: 'String',
         ),
-        _i2.ColumnDefinition(
+        _isp.ColumnDefinition(
           name: 'title',
-          columnType: _i2.ColumnType.text,
+          columnType: _isp.ColumnType.text,
           isNullable: false,
           dartType: 'String',
         ),
-        _i2.ColumnDefinition(
+        _isp.ColumnDefinition(
           name: 'embeddingSummary',
-          columnType: _i2.ColumnType.text,
+          columnType: _isp.ColumnType.text,
           isNullable: false,
           dartType: 'String',
         ),
-        _i2.ColumnDefinition(
+        _isp.ColumnDefinition(
           name: 'shortDescription',
-          columnType: _i2.ColumnType.text,
+          columnType: _isp.ColumnType.text,
           isNullable: false,
           dartType: 'String',
         ),
-        _i2.ColumnDefinition(
+        _isp.ColumnDefinition(
           name: 'type',
-          columnType: _i2.ColumnType.text,
+          columnType: _isp.ColumnType.text,
           isNullable: false,
           dartType: 'protocol:RAGDocumentType',
         ),
-        _i2.ColumnDefinition(
+        _isp.ColumnDefinition(
           name: 'domain',
-          columnType: _i2.ColumnType.text,
+          columnType: _isp.ColumnType.text,
           isNullable: false,
           dartType: 'String',
         ),
       ],
       foreignKeys: [],
       indexes: [
-        _i2.IndexDefinition(
-          indexName: 'rag_document_pkey',
-          tableSpace: null,
-          elements: [
-            _i2.IndexElementDefinition(
-              type: _i2.IndexElementDefinitionType.column,
-              definition: 'id',
-            ),
-          ],
-          type: 'btree',
-          isUnique: true,
-          isPrimary: true,
-        ),
-        _i2.IndexDefinition(
+        _isp.IndexDefinition(
           indexName: 'rag_document_sourceUrl',
           tableSpace: null,
           elements: [
-            _i2.IndexElementDefinition(
-              type: _i2.IndexElementDefinitionType.column,
+            _isp.IndexElementDefinition(
+              type: _isp.IndexElementDefinitionType.column,
               definition: 'sourceUrl',
             ),
           ],
@@ -265,27 +229,27 @@ class Protocol extends _i1.SerializationManagerServer {
           isUnique: true,
           isPrimary: false,
         ),
-        _i2.IndexDefinition(
+        _isp.IndexDefinition(
           indexName: 'rag_document_vector',
           tableSpace: null,
           elements: [
-            _i2.IndexElementDefinition(
-              type: _i2.IndexElementDefinitionType.column,
+            _isp.IndexElementDefinition(
+              type: _isp.IndexElementDefinitionType.column,
               definition: 'embedding',
             ),
           ],
           type: 'hnsw',
           isUnique: false,
           isPrimary: false,
-          vectorDistanceFunction: _i2.VectorDistanceFunction.cosine,
-          vectorColumnType: _i2.ColumnType.vector,
+          vectorDistanceFunction: _isp.VectorDistanceFunction.cosine,
+          vectorColumnType: _isp.ColumnType.vector,
         ),
-        _i2.IndexDefinition(
+        _isp.IndexDefinition(
           indexName: 'rag_document_type',
           tableSpace: null,
           elements: [
-            _i2.IndexElementDefinition(
-              type: _i2.IndexElementDefinitionType.column,
+            _isp.IndexElementDefinition(
+              type: _isp.IndexElementDefinitionType.column,
               definition: 'type',
             ),
           ],
@@ -296,8 +260,9 @@ class Protocol extends _i1.SerializationManagerServer {
       ],
       managed: true,
     ),
-    ..._i3.Protocol.targetTableDefinitions,
-    ..._i2.Protocol.targetTableDefinitions,
+    ..._iacs.Protocol.targetTableDefinitions,
+    ..._iais.Protocol.targetTableDefinitions,
+    ..._isp.Protocol.targetTableDefinitions,
   ];
 
   static String? getClassNameFromObjectJson(dynamic data) {
@@ -307,10 +272,7 @@ class Protocol extends _i1.SerializationManagerServer {
   }
 
   @override
-  T deserialize<T>(
-    dynamic data, [
-    Type? t,
-  ]) {
+  T deserialize<T>(dynamic data, [Type? t]) {
     t ??= T;
 
     final dataClassName = getClassNameFromObjectJson(data);
@@ -320,128 +282,145 @@ class Protocol extends _i1.SerializationManagerServer {
           'className': dataClassName,
           'data': data,
         });
-      } on FormatException catch (_) {
+      } on _is.DeserializationClassNameNotFoundException catch (_) {
         // If the className is not recognized (e.g., older client receiving
         // data with a new subtype), fall back to deserializing without the
         // className, using the expected type T.
       }
     }
 
-    if (t == _i4.CachedSessionCount) {
-      return _i4.CachedSessionCount.fromJson(data) as T;
+    if (t == _iubbw449.CachedSessionCount) {
+      return _iubbw449.CachedSessionCount.fromJson(data) as T;
     }
-    if (t == _i5.ChatMessage) {
-      return _i5.ChatMessage.fromJson(data) as T;
+    if (t == _ivuncx2e.ChatMessage) {
+      return _ivuncx2e.ChatMessage.fromJson(data) as T;
     }
-    if (t == _i6.ChatMessageType) {
-      return _i6.ChatMessageType.fromJson(data) as T;
+    if (t == _itrf31vi.ChatMessageType) {
+      return _itrf31vi.ChatMessageType.fromJson(data) as T;
     }
-    if (t == _i7.ChatSession) {
-      return _i7.ChatSession.fromJson(data) as T;
+    if (t == _i3zhwn74.ChatSession) {
+      return _i3zhwn74.ChatSession.fromJson(data) as T;
     }
-    if (t == _i8.GenerativeAiException) {
-      return _i8.GenerativeAiException.fromJson(data) as T;
+    if (t == _i3yrs0ae.GenerativeAiException) {
+      return _i3yrs0ae.GenerativeAiException.fromJson(data) as T;
     }
-    if (t == _i9.DataFetcherFutureCallFetchDataSourceModel) {
-      return _i9.DataFetcherFutureCallFetchDataSourceModel.fromJson(data) as T;
-    }
-    if (t == _i10.MarkdownResourceInfo) {
-      return _i10.MarkdownResourceInfo.fromJson(data) as T;
-    }
-    if (t == _i11.MarkdownResourceList) {
-      return _i11.MarkdownResourceList.fromJson(data) as T;
-    }
-    if (t == _i12.RAGDocument) {
-      return _i12.RAGDocument.fromJson(data) as T;
-    }
-    if (t == _i13.RAGDocumentType) {
-      return _i13.RAGDocumentType.fromJson(data) as T;
-    }
-    if (t == _i14.RecaptchaException) {
-      return _i14.RecaptchaException.fromJson(data) as T;
-    }
-    if (t == _i15.TableOfContents) {
-      return _i15.TableOfContents.fromJson(data) as T;
-    }
-    if (t == _i1.getType<_i4.CachedSessionCount?>()) {
-      return (data != null ? _i4.CachedSessionCount.fromJson(data) : null) as T;
-    }
-    if (t == _i1.getType<_i5.ChatMessage?>()) {
-      return (data != null ? _i5.ChatMessage.fromJson(data) : null) as T;
-    }
-    if (t == _i1.getType<_i6.ChatMessageType?>()) {
-      return (data != null ? _i6.ChatMessageType.fromJson(data) : null) as T;
-    }
-    if (t == _i1.getType<_i7.ChatSession?>()) {
-      return (data != null ? _i7.ChatSession.fromJson(data) : null) as T;
-    }
-    if (t == _i1.getType<_i8.GenerativeAiException?>()) {
-      return (data != null ? _i8.GenerativeAiException.fromJson(data) : null)
+    if (t == _iz53h8dc.DataFetcherFutureCallFetchDataSourceModel) {
+      return _iz53h8dc.DataFetcherFutureCallFetchDataSourceModel.fromJson(data)
           as T;
     }
-    if (t == _i1.getType<_i9.DataFetcherFutureCallFetchDataSourceModel?>()) {
+    if (t == _i8dvauvz.MarkdownResourceInfo) {
+      return _i8dvauvz.MarkdownResourceInfo.fromJson(data) as T;
+    }
+    if (t == _ihj0qgwk.MarkdownResourceList) {
+      return _ihj0qgwk.MarkdownResourceList.fromJson(data) as T;
+    }
+    if (t == _i8io6bl4.RAGDocument) {
+      return _i8io6bl4.RAGDocument.fromJson(data) as T;
+    }
+    if (t == _i19rymhs.RAGDocumentType) {
+      return _i19rymhs.RAGDocumentType.fromJson(data) as T;
+    }
+    if (t == _i2oyqbrq.RecaptchaException) {
+      return _i2oyqbrq.RecaptchaException.fromJson(data) as T;
+    }
+    if (t == _ikwqo0g2.TableOfContents) {
+      return _ikwqo0g2.TableOfContents.fromJson(data) as T;
+    }
+    if (t == _is.getType<_iubbw449.CachedSessionCount?>()) {
+      return (data != null ? _iubbw449.CachedSessionCount.fromJson(data) : null)
+          as T;
+    }
+    if (t == _is.getType<_ivuncx2e.ChatMessage?>()) {
+      return (data != null ? _ivuncx2e.ChatMessage.fromJson(data) : null) as T;
+    }
+    if (t == _is.getType<_itrf31vi.ChatMessageType?>()) {
+      return (data != null ? _itrf31vi.ChatMessageType.fromJson(data) : null)
+          as T;
+    }
+    if (t == _is.getType<_i3zhwn74.ChatSession?>()) {
+      return (data != null ? _i3zhwn74.ChatSession.fromJson(data) : null) as T;
+    }
+    if (t == _is.getType<_i3yrs0ae.GenerativeAiException?>()) {
       return (data != null
-              ? _i9.DataFetcherFutureCallFetchDataSourceModel.fromJson(data)
+              ? _i3yrs0ae.GenerativeAiException.fromJson(data)
               : null)
           as T;
     }
-    if (t == _i1.getType<_i10.MarkdownResourceInfo?>()) {
-      return (data != null ? _i10.MarkdownResourceInfo.fromJson(data) : null)
+    if (t ==
+        _is.getType<_iz53h8dc.DataFetcherFutureCallFetchDataSourceModel?>()) {
+      return (data != null
+              ? _iz53h8dc.DataFetcherFutureCallFetchDataSourceModel.fromJson(
+                  data,
+                )
+              : null)
           as T;
     }
-    if (t == _i1.getType<_i11.MarkdownResourceList?>()) {
-      return (data != null ? _i11.MarkdownResourceList.fromJson(data) : null)
+    if (t == _is.getType<_i8dvauvz.MarkdownResourceInfo?>()) {
+      return (data != null
+              ? _i8dvauvz.MarkdownResourceInfo.fromJson(data)
+              : null)
           as T;
     }
-    if (t == _i1.getType<_i12.RAGDocument?>()) {
-      return (data != null ? _i12.RAGDocument.fromJson(data) : null) as T;
-    }
-    if (t == _i1.getType<_i13.RAGDocumentType?>()) {
-      return (data != null ? _i13.RAGDocumentType.fromJson(data) : null) as T;
-    }
-    if (t == _i1.getType<_i14.RecaptchaException?>()) {
-      return (data != null ? _i14.RecaptchaException.fromJson(data) : null)
+    if (t == _is.getType<_ihj0qgwk.MarkdownResourceList?>()) {
+      return (data != null
+              ? _ihj0qgwk.MarkdownResourceList.fromJson(data)
+              : null)
           as T;
     }
-    if (t == _i1.getType<_i15.TableOfContents?>()) {
-      return (data != null ? _i15.TableOfContents.fromJson(data) : null) as T;
+    if (t == _is.getType<_i8io6bl4.RAGDocument?>()) {
+      return (data != null ? _i8io6bl4.RAGDocument.fromJson(data) : null) as T;
     }
-    if (t == List<_i10.MarkdownResourceInfo>) {
+    if (t == _is.getType<_i19rymhs.RAGDocumentType?>()) {
+      return (data != null ? _i19rymhs.RAGDocumentType.fromJson(data) : null)
+          as T;
+    }
+    if (t == _is.getType<_i2oyqbrq.RecaptchaException?>()) {
+      return (data != null ? _i2oyqbrq.RecaptchaException.fromJson(data) : null)
+          as T;
+    }
+    if (t == _is.getType<_ikwqo0g2.TableOfContents?>()) {
+      return (data != null ? _ikwqo0g2.TableOfContents.fromJson(data) : null)
+          as T;
+    }
+    if (t == List<_i8dvauvz.MarkdownResourceInfo>) {
       return (data as List)
-              .map((e) => deserialize<_i10.MarkdownResourceInfo>(e))
+              .map((e) => deserialize<_i8dvauvz.MarkdownResourceInfo>(e))
               .toList()
           as T;
     }
-    if (t == List<_i16.MarkdownResourceInfo>) {
+    if (t == List<_iwjynyqq.MarkdownResourceInfo>) {
       return (data as List)
-              .map((e) => deserialize<_i16.MarkdownResourceInfo>(e))
+              .map((e) => deserialize<_iwjynyqq.MarkdownResourceInfo>(e))
               .toList()
           as T;
     }
     try {
-      return _i3.Protocol().deserialize<T>(data, t);
-    } on _i1.DeserializationTypeNotFoundException catch (_) {}
+      return _iacs.Protocol().deserialize<T>(data, t);
+    } on _is.DeserializationTypeNotFoundException catch (_) {}
     try {
-      return _i2.Protocol().deserialize<T>(data, t);
-    } on _i1.DeserializationTypeNotFoundException catch (_) {}
+      return _iais.Protocol().deserialize<T>(data, t);
+    } on _is.DeserializationTypeNotFoundException catch (_) {}
+    try {
+      return _isp.Protocol().deserialize<T>(data, t);
+    } on _is.DeserializationTypeNotFoundException catch (_) {}
     return super.deserialize<T>(data, t);
   }
 
   static String? getClassNameForType(Type type) {
     return switch (type) {
-      _i4.CachedSessionCount => 'CachedSessionCount',
-      _i5.ChatMessage => 'ChatMessage',
-      _i6.ChatMessageType => 'ChatMessageType',
-      _i7.ChatSession => 'ChatSession',
-      _i8.GenerativeAiException => 'GenerativeAiException',
-      _i9.DataFetcherFutureCallFetchDataSourceModel =>
+      _iubbw449.CachedSessionCount => 'CachedSessionCount',
+      _ivuncx2e.ChatMessage => 'ChatMessage',
+      _itrf31vi.ChatMessageType => 'ChatMessageType',
+      _i3zhwn74.ChatSession => 'ChatSession',
+      _i3yrs0ae.GenerativeAiException => 'GenerativeAiException',
+      _iz53h8dc.DataFetcherFutureCallFetchDataSourceModel =>
         'DataFetcherFutureCallFetchDataSourceModel',
-      _i10.MarkdownResourceInfo => 'MarkdownResourceInfo',
-      _i11.MarkdownResourceList => 'MarkdownResourceList',
-      _i12.RAGDocument => 'RAGDocument',
-      _i13.RAGDocumentType => 'RAGDocumentType',
-      _i14.RecaptchaException => 'RecaptchaException',
-      _i15.TableOfContents => 'TableOfContents',
+      _i8dvauvz.MarkdownResourceInfo => 'MarkdownResourceInfo',
+      _ihj0qgwk.MarkdownResourceList => 'MarkdownResourceList',
+      _i8io6bl4.RAGDocument => 'RAGDocument',
+      _i19rymhs.RAGDocumentType => 'RAGDocumentType',
+      _i2oyqbrq.RecaptchaException => 'RecaptchaException',
+      _ikwqo0g2.TableOfContents => 'TableOfContents',
       _ => null,
     };
   }
@@ -456,38 +435,46 @@ class Protocol extends _i1.SerializationManagerServer {
     }
 
     switch (data) {
-      case _i4.CachedSessionCount():
+      case _iubbw449.CachedSessionCount():
         return 'CachedSessionCount';
-      case _i5.ChatMessage():
+      case _ivuncx2e.ChatMessage():
         return 'ChatMessage';
-      case _i6.ChatMessageType():
+      case _itrf31vi.ChatMessageType():
         return 'ChatMessageType';
-      case _i7.ChatSession():
+      case _i3zhwn74.ChatSession():
         return 'ChatSession';
-      case _i8.GenerativeAiException():
+      case _i3yrs0ae.GenerativeAiException():
         return 'GenerativeAiException';
-      case _i9.DataFetcherFutureCallFetchDataSourceModel():
+      case _iz53h8dc.DataFetcherFutureCallFetchDataSourceModel():
         return 'DataFetcherFutureCallFetchDataSourceModel';
-      case _i10.MarkdownResourceInfo():
+      case _i8dvauvz.MarkdownResourceInfo():
         return 'MarkdownResourceInfo';
-      case _i11.MarkdownResourceList():
+      case _ihj0qgwk.MarkdownResourceList():
         return 'MarkdownResourceList';
-      case _i12.RAGDocument():
+      case _i8io6bl4.RAGDocument():
         return 'RAGDocument';
-      case _i13.RAGDocumentType():
+      case _i19rymhs.RAGDocumentType():
         return 'RAGDocumentType';
-      case _i14.RecaptchaException():
+      case _i2oyqbrq.RecaptchaException():
         return 'RecaptchaException';
-      case _i15.TableOfContents():
+      case _ikwqo0g2.TableOfContents():
         return 'TableOfContents';
     }
-    className = _i2.Protocol().getClassNameForObject(data);
+    className = _iacs.Protocol().getClassNameForObject(data);
     if (className != null) {
-      return 'serverpod.$className';
+      return className.contains('.')
+          ? className
+          : 'serverpod_auth_core.$className';
     }
-    className = _i3.Protocol().getClassNameForObject(data);
+    className = _iais.Protocol().getClassNameForObject(data);
     if (className != null) {
-      return 'serverpod_auth.$className';
+      return className.contains('.')
+          ? className
+          : 'serverpod_auth_idp.$className';
+    }
+    className = _isp.Protocol().getClassNameForObject(data);
+    if (className != null) {
+      return className.contains('.') ? className : 'serverpod.$className';
     }
     return null;
   }
@@ -499,81 +486,96 @@ class Protocol extends _i1.SerializationManagerServer {
       return super.deserializeByClassName(data);
     }
     if (dataClassName == 'CachedSessionCount') {
-      return deserialize<_i4.CachedSessionCount>(data['data']);
+      return deserialize<_iubbw449.CachedSessionCount>(data['data']);
     }
     if (dataClassName == 'ChatMessage') {
-      return deserialize<_i5.ChatMessage>(data['data']);
+      return deserialize<_ivuncx2e.ChatMessage>(data['data']);
     }
     if (dataClassName == 'ChatMessageType') {
-      return deserialize<_i6.ChatMessageType>(data['data']);
+      return deserialize<_itrf31vi.ChatMessageType>(data['data']);
     }
     if (dataClassName == 'ChatSession') {
-      return deserialize<_i7.ChatSession>(data['data']);
+      return deserialize<_i3zhwn74.ChatSession>(data['data']);
     }
     if (dataClassName == 'GenerativeAiException') {
-      return deserialize<_i8.GenerativeAiException>(data['data']);
+      return deserialize<_i3yrs0ae.GenerativeAiException>(data['data']);
     }
     if (dataClassName == 'DataFetcherFutureCallFetchDataSourceModel') {
-      return deserialize<_i9.DataFetcherFutureCallFetchDataSourceModel>(
+      return deserialize<_iz53h8dc.DataFetcherFutureCallFetchDataSourceModel>(
         data['data'],
       );
     }
     if (dataClassName == 'MarkdownResourceInfo') {
-      return deserialize<_i10.MarkdownResourceInfo>(data['data']);
+      return deserialize<_i8dvauvz.MarkdownResourceInfo>(data['data']);
     }
     if (dataClassName == 'MarkdownResourceList') {
-      return deserialize<_i11.MarkdownResourceList>(data['data']);
+      return deserialize<_ihj0qgwk.MarkdownResourceList>(data['data']);
     }
     if (dataClassName == 'RAGDocument') {
-      return deserialize<_i12.RAGDocument>(data['data']);
+      return deserialize<_i8io6bl4.RAGDocument>(data['data']);
     }
     if (dataClassName == 'RAGDocumentType') {
-      return deserialize<_i13.RAGDocumentType>(data['data']);
+      return deserialize<_i19rymhs.RAGDocumentType>(data['data']);
     }
     if (dataClassName == 'RecaptchaException') {
-      return deserialize<_i14.RecaptchaException>(data['data']);
+      return deserialize<_i2oyqbrq.RecaptchaException>(data['data']);
     }
     if (dataClassName == 'TableOfContents') {
-      return deserialize<_i15.TableOfContents>(data['data']);
+      return deserialize<_ikwqo0g2.TableOfContents>(data['data']);
+    }
+    if (dataClassName.startsWith('serverpod_auth_core.')) {
+      data['className'] = dataClassName.substring(20);
+      return _iacs.Protocol().deserializeByClassName(data);
+    }
+    if (dataClassName.startsWith('serverpod_auth_idp.')) {
+      data['className'] = dataClassName.substring(19);
+      return _iais.Protocol().deserializeByClassName(data);
     }
     if (dataClassName.startsWith('serverpod.')) {
       data['className'] = dataClassName.substring(10);
-      return _i2.Protocol().deserializeByClassName(data);
-    }
-    if (dataClassName.startsWith('serverpod_auth.')) {
-      data['className'] = dataClassName.substring(15);
-      return _i3.Protocol().deserializeByClassName(data);
+      return _isp.Protocol().deserializeByClassName(data);
     }
     return super.deserializeByClassName(data);
   }
 
+  void _registerHostProtocols() {
+    _iacs.Protocol().registerHostProtocol('starguide', this);
+    _iais.Protocol().registerHostProtocol('starguide', this);
+  }
+
   @override
-  _i1.Table? getTableForType(Type t) {
+  _is.Table? getTableForType(Type t) {
     {
-      var table = _i3.Protocol().getTableForType(t);
+      var table = _iacs.Protocol().getTableForType(t);
       if (table != null) {
         return table;
       }
     }
     {
-      var table = _i2.Protocol().getTableForType(t);
+      var table = _iais.Protocol().getTableForType(t);
+      if (table != null) {
+        return table;
+      }
+    }
+    {
+      var table = _isp.Protocol().getTableForType(t);
       if (table != null) {
         return table;
       }
     }
     switch (t) {
-      case _i5.ChatMessage:
-        return _i5.ChatMessage.t;
-      case _i7.ChatSession:
-        return _i7.ChatSession.t;
-      case _i12.RAGDocument:
-        return _i12.RAGDocument.t;
+      case _ivuncx2e.ChatMessage:
+        return _ivuncx2e.ChatMessage.t;
+      case _i3zhwn74.ChatSession:
+        return _i3zhwn74.ChatSession.t;
+      case _i8io6bl4.RAGDocument:
+        return _i8io6bl4.RAGDocument.t;
     }
     return null;
   }
 
   @override
-  List<_i2.TableDefinition> getTargetTableDefinitions() =>
+  List<_isp.TableDefinition> getTargetTableDefinitions() =>
       targetTableDefinitions;
 
   @override
@@ -589,7 +591,10 @@ class Protocol extends _i1.SerializationManagerServer {
       return null;
     }
     try {
-      return _i3.Protocol().mapRecordToJson(record);
+      return _iacs.Protocol().mapRecordToJson(record);
+    } catch (_) {}
+    try {
+      return _iais.Protocol().mapRecordToJson(record);
     } catch (_) {}
     throw Exception('Unsupported record type ${record.runtimeType}');
   }

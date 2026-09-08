@@ -33,6 +33,7 @@ database:
   port: 8090
   name: starguide
   user: postgres
+  dataPath: .serverpod/development/pgdata
 
 # This is the setup for Redis.
 redis:

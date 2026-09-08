@@ -10,13 +10,61 @@
 // ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
-import 'package:serverpod_client/serverpod_client.dart' as _i1;
-import 'dart:async' as _i2;
+import 'dart:async' as _ida;
+import 'package:http/http.dart' as _i85jenna;
+import 'package:serverpod_auth_core_client/serverpod_auth_core_client.dart'
+    as _iacc;
+import 'package:serverpod_auth_idp_client/serverpod_auth_idp_client.dart'
+    as _iaic;
+import 'package:serverpod_client/serverpod_client.dart' as _isc;
+import 'package:starguide_client/src/protocol/chat_session.dart' as _ioqsfhvv;
 import 'package:starguide_client/src/protocol/markdown_resource_info.dart'
-    as _i3;
-import 'package:starguide_client/src/protocol/chat_session.dart' as _i4;
-import 'package:serverpod_auth_client/serverpod_auth_client.dart' as _i5;
-import 'protocol.dart' as _i6;
+    as _i1vbny65;
+import 'protocol.dart' as _il2as5qe;
+
+/// Exposes the Google sign-in endpoints of the auth module.
+/// {@category Endpoint}
+class EndpointGoogleIdp extends _iaic.EndpointGoogleIdpBase {
+  EndpointGoogleIdp(_isc.EndpointCaller caller) : super(caller);
+
+  @override
+  String get name => 'googleIdp';
+
+  /// Validates a Google ID token and either logs in the associated user or
+  /// creates a new user account if the Google account ID is not yet known.
+  ///
+  /// If a new user is created an associated [UserProfile] is also created.
+  @override
+  _ida.Future<_iacc.AuthSuccess> login({
+    required String idToken,
+    required String? accessToken,
+  }) => caller.callServerEndpoint<_iacc.AuthSuccess>('googleIdp', 'login', {
+    'idToken': idToken,
+    'accessToken': accessToken,
+  });
+
+  /// Validates a Google authorization code from the web OAuth2 PKCE flow and
+  /// either logs in the associated user or creates a new account.
+  ///
+  /// This is the web counterpart of [login], which accepts an ID token directly
+  /// (used on native platforms via the `google_sign_in` package).
+  ///
+  /// If a new user is created an associated [UserProfile] is also created.
+  @override
+  _ida.Future<_iacc.AuthSuccess> loginWithCode({
+    required String code,
+    required String codeVerifier,
+    required String redirectUri,
+  }) => caller.callServerEndpoint<_iacc.AuthSuccess>(
+    'googleIdp',
+    'loginWithCode',
+    {'code': code, 'codeVerifier': codeVerifier, 'redirectUri': redirectUri},
+  );
+
+  @override
+  _ida.Future<bool> hasAccount() =>
+      caller.callServerEndpoint<bool>('googleIdp', 'hasAccount', {});
+}
 
 /// Endpoint for handling Model Context Protocol (MCP) related operations.
 ///
@@ -28,8 +76,8 @@ import 'protocol.dart' as _i6;
 ///
 /// {@category Endpoint}
 /// {@category Endpoint}
-class EndpointMcp extends _i1.EndpointRef {
-  EndpointMcp(_i1.EndpointCaller caller) : super(caller);
+class EndpointMcp extends _isc.EndpointRef {
+  EndpointMcp(_isc.EndpointCaller caller) : super(caller);
 
   @override
   String get name => 'mcp';
@@ -38,11 +86,8 @@ class EndpointMcp extends _i1.EndpointRef {
   ///
   /// The returned text outlines the available tools (e.g., list-guides,
   /// get-guide, ask-docs) and how to interact with this server.
-  _i2.Future<String> mcpInstructions() => caller.callServerEndpoint<String>(
-    'mcp',
-    'mcpInstructions',
-    {},
-  );
+  _ida.Future<String> mcpInstructions() =>
+      caller.callServerEndpoint<String>('mcp', 'mcpInstructions', {});
 
   /// Retrieves all markdown resources.
   ///
@@ -57,8 +102,8 @@ class EndpointMcp extends _i1.EndpointRef {
   /// [MarkdownResourceInfo].
   ///
   /// Throws [FileSystemException] if the resources cannot be accessed.
-  _i2.Future<List<_i3.MarkdownResourceInfo>> getAllResources() =>
-      caller.callServerEndpoint<List<_i3.MarkdownResourceInfo>>(
+  _ida.Future<List<_i1vbny65.MarkdownResourceInfo>> getAllResources() =>
+      caller.callServerEndpoint<List<_i1vbny65.MarkdownResourceInfo>>(
         'mcp',
         'getAllResources',
         {},
@@ -81,23 +126,59 @@ class EndpointMcp extends _i1.EndpointRef {
   ///
   /// May throw if the generative AI provider rejects the request or if the
   /// provided [geminiAPIKey] is invalid.
-  _i2.Future<String> ask(
-    String question,
-    String geminiAPIKey,
-  ) => caller.callServerEndpoint<String>(
-    'mcp',
-    'ask',
-    {
-      'question': question,
-      'geminiAPIKey': geminiAPIKey,
-    },
-  );
+  _ida.Future<String> ask(String question, String geminiAPIKey) =>
+      caller.callServerEndpoint<String>('mcp', 'ask', {
+        'question': question,
+        'geminiAPIKey': geminiAPIKey,
+      });
+}
+
+/// Exposes the JWT refresh endpoint so clients can renew expired access
+/// tokens without signing in again.
+/// {@category Endpoint}
+class EndpointRefreshJwtTokens extends _iacc.EndpointRefreshJwtTokens {
+  EndpointRefreshJwtTokens(_isc.EndpointCaller caller) : super(caller);
+
+  @override
+  String get name => 'refreshJwtTokens';
+
+  /// Creates a new token pair for the given [refreshToken].
+  ///
+  /// If [refreshToken] is omitted, cookie-mode web clients fall back to the
+  /// configured HttpOnly refresh cookie. When neither source is present this
+  /// throws [RefreshTokenNotFoundException], the same public "no usable refresh
+  /// credential" exception used for unknown refresh tokens.
+  ///
+  /// Can throw the following exceptions:
+  /// -[RefreshTokenMalformedException]: refresh token is malformed and could
+  ///   not be parsed. Not expected to happen for tokens issued by the server.
+  /// -[RefreshTokenNotFoundException]: refresh token is unknown to the server.
+  ///   Either the token was deleted or generated by a different server.
+  /// -[RefreshTokenExpiredException]: refresh token has expired. Will happen
+  ///   only if it has not been used within configured `refreshTokenLifetime`.
+  /// -[RefreshTokenInvalidSecretException]: refresh token is incorrect, meaning
+  ///   it does not refer to the current secret refresh token. This indicates
+  ///   either a malfunctioning client or a malicious attempt by someone who has
+  ///   obtained the refresh token. In this case the underlying refresh token
+  ///   will be deleted, and access to it will expire fully when the last access
+  ///   token is elapsed.
+  ///
+  /// This endpoint is unauthenticated, meaning the client won't include any
+  /// authentication information with the call.
+  @override
+  _ida.Future<_iacc.AuthSuccess> refreshAccessToken({String? refreshToken}) =>
+      caller.callServerEndpoint<_iacc.AuthSuccess>(
+        'refreshJwtTokens',
+        'refreshAccessToken',
+        {'refreshToken': refreshToken},
+        authenticated: false,
+      );
 }
 
 /// Endpoint for chat sessions and Q&A powered by RAG over Serverpod docs.
 /// {@category Endpoint}
-class EndpointStarguide extends _i1.EndpointRef {
-  EndpointStarguide(_i1.EndpointCaller caller) : super(caller);
+class EndpointStarguide extends _isc.EndpointRef {
+  EndpointStarguide(_isc.EndpointCaller caller) : super(caller);
 
   @override
   String get name => 'starguide';
@@ -106,8 +187,8 @@ class EndpointStarguide extends _i1.EndpointRef {
   ///
   /// Throws [RecaptchaException] if reCAPTCHA verification fails in
   /// non-development environments. Limits total monthly requests.
-  _i2.Future<_i4.ChatSession> createChatSession(String reCaptchaToken) =>
-      caller.callServerEndpoint<_i4.ChatSession>(
+  _ida.Future<_ioqsfhvv.ChatSession> createChatSession(String reCaptchaToken) =>
+      caller.callServerEndpoint<_ioqsfhvv.ChatSession>(
         'starguide',
         'createChatSession',
         {'reCaptchaToken': reCaptchaToken},
@@ -117,62 +198,46 @@ class EndpointStarguide extends _i1.EndpointRef {
   ///
   /// Combines previous conversation context with searched RAG documents
   /// from docs and discussions to produce the answer.
-  _i2.Stream<String> ask(
-    _i4.ChatSession chatSession,
-    String question,
-  ) => caller.callStreamingServerEndpoint<_i2.Stream<String>, String>(
-    'starguide',
-    'ask',
-    {
-      'chatSession': chatSession,
-      'question': question,
-    },
-    {},
-  );
+  _ida.Stream<String> ask(_ioqsfhvv.ChatSession chatSession, String question) =>
+      caller.callStreamingServerEndpoint<_ida.Stream<String>, String>(
+        'starguide',
+        'ask',
+        {'chatSession': chatSession, 'question': question},
+        {},
+      );
 
   /// Records a thumbs up or down for the final answer of a chat session.
-  _i2.Future<void> vote(
-    _i4.ChatSession chatSession,
-    bool goodAnswer,
-  ) => caller.callServerEndpoint<void>(
-    'starguide',
-    'vote',
-    {
-      'chatSession': chatSession,
-      'goodAnswer': goodAnswer,
-    },
-  );
+  _ida.Future<void> vote(_ioqsfhvv.ChatSession chatSession, bool goodAnswer) =>
+      caller.callServerEndpoint<void>('starguide', 'vote', {
+        'chatSession': chatSession,
+        'goodAnswer': goodAnswer,
+      });
 }
 
 class Modules {
   Modules(Client client) {
-    auth = _i5.Caller(client);
+    auth = _iacc.Caller(client);
+    serverpod_auth_idp = _iaic.Caller(client);
   }
 
-  late final _i5.Caller auth;
+  late final _iacc.Caller auth;
+
+  late final _iaic.Caller serverpod_auth_idp;
 }
 
-class Client extends _i1.ServerpodClientShared {
+class Client extends _isc.ServerpodClientShared {
   Client(
     String host, {
     dynamic securityContext,
-    @Deprecated(
-      'Use authKeyProvider instead. This will be removed in future releases.',
-    )
-    super.authenticationKeyManager,
     Duration? streamingConnectionTimeout,
     Duration? connectionTimeout,
-    Function(
-      _i1.MethodCallContext,
-      Object,
-      StackTrace,
-    )?
-    onFailedCall,
-    Function(_i1.MethodCallContext)? onSucceededCall,
+    Function(_isc.MethodCallContext, Object, StackTrace)? onFailedCall,
+    Function(_isc.MethodCallContext)? onSucceededCall,
     bool? disconnectStreamsOnLostInternetConnection,
+    _i85jenna.Client? httpClientOverride,
   }) : super(
          host,
-         _i6.Protocol(),
+         _il2as5qe.Protocol(),
          securityContext: securityContext,
          streamingConnectionTimeout: streamingConnectionTimeout,
          connectionTimeout: connectionTimeout,
@@ -180,26 +245,36 @@ class Client extends _i1.ServerpodClientShared {
          onSucceededCall: onSucceededCall,
          disconnectStreamsOnLostInternetConnection:
              disconnectStreamsOnLostInternetConnection,
+         httpClientOverride: httpClientOverride,
        ) {
+    googleIdp = EndpointGoogleIdp(this);
     mcp = EndpointMcp(this);
+    refreshJwtTokens = EndpointRefreshJwtTokens(this);
     starguide = EndpointStarguide(this);
     modules = Modules(this);
   }
 
+  late final EndpointGoogleIdp googleIdp;
+
   late final EndpointMcp mcp;
+
+  late final EndpointRefreshJwtTokens refreshJwtTokens;
 
   late final EndpointStarguide starguide;
 
   late final Modules modules;
 
   @override
-  Map<String, _i1.EndpointRef> get endpointRefLookup => {
+  Map<String, _isc.EndpointRef> get endpointRefLookup => {
+    'googleIdp': googleIdp,
     'mcp': mcp,
+    'refreshJwtTokens': refreshJwtTokens,
     'starguide': starguide,
   };
 
   @override
-  Map<String, _i1.ModuleEndpointCaller> get moduleLookup => {
+  Map<String, _isc.ModuleEndpointCaller> get moduleLookup => {
     'auth': modules.auth,
+    'serverpod_auth_idp': modules.serverpod_auth_idp,
   };
 }

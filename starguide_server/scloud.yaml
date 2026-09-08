@@ -9,3 +9,8 @@
 
 project:
   projectId: "starguide"
+  scripts:
+    pre_deploy:
+      - "serverpod generate"
+      - "serverpod run flutter_build"
+    post_deploy: []

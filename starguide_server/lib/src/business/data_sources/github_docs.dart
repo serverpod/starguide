@@ -150,7 +150,13 @@ class GithubDocsDataSource implements DataSource {
     final List files = json.decode(response.body);
 
     for (var file in files) {
-      final fileName = file['name'];
+      final String fileName = file['name'];
+
+      // Docusaurus does not publish files or directories starting with an
+      // underscore (e.g. `_category_.json` or `_generated/` partials), so they
+      // have no page to reference.
+      if (fileName.startsWith('_')) continue;
+
       final cleanedFileName = _cleanFileName(fileName);
       final url = referenceUrl.replace(
         pathSegments: [...referenceUrl.pathSegments, cleanedFileName],
@@ -185,20 +191,87 @@ class GithubDocsDataSource implements DataSource {
     String domain,
   ) async {
     // TODO: Render referenced examples.
-    final fileResponse = await _githubApiGet(fileUrl);
-    if (fileResponse.statusCode == 200) {
-      return RawRAGDocument(
-        sourceUrl: fileUrl,
-        document: fileResponse.body,
-        dataSourceType: DataSourceType.markdown,
-        documentType: RAGDocumentType.documentation,
-        title: _getTitle(fileResponse.body),
-        domain: domain,
-      );
-    } else {
-      return null;
-    }
+    final markdown = await _loadMarkdown(fileUrl);
+    if (markdown == null) return null;
+
+    final document = await inlineMdxPartials(
+      markdown,
+      (relativePath) => _loadMarkdown(fileUrl.resolve(relativePath)),
+    );
+
+    return RawRAGDocument(
+      sourceUrl: fileUrl,
+      document: document,
+      dataSourceType: DataSourceType.markdown,
+      documentType: RAGDocumentType.documentation,
+      title: _getTitle(document),
+      domain: domain,
+    );
   }
+
+  Future<String?> _loadMarkdown(Uri fileUrl) async {
+    final response = await _githubApiGet(fileUrl);
+    if (response.statusCode != 200) return null;
+    return response.body;
+  }
+}
+
+final _mdxImportRegex = RegExp(
+  r'''^import\s+(\w+)\s+from\s+['"]([^'"]+\.mdx?)['"];?[ \t]*$''',
+  multiLine: true,
+);
+
+/// Inlines MDX partial imports, e.g. `import Intro from './_intro.md';`
+/// followed by `<Intro/>`, so the indexed document contains the content that
+/// is rendered on the page. Partials may themselves import other partials, up
+/// to [maxDepth] levels.
+///
+/// The [loader] returns the content of a partial given its path relative to
+/// the importing file, or `null` if it cannot be loaded.
+Future<String> inlineMdxPartials(
+  String markdown,
+  Future<String?> Function(String relativePath) loader, {
+  int maxDepth = 3,
+}) async {
+  if (maxDepth <= 0) return markdown;
+
+  final imports = _mdxImportRegex.allMatches(markdown).toList();
+  if (imports.isEmpty) return markdown;
+
+  var result = markdown;
+  for (final import in imports) {
+    final componentName = import.group(1)!;
+    final relativePath = import.group(2)!;
+
+    var partial = await loader(relativePath);
+    if (partial == null) continue;
+
+    partial = _stripFrontmatter(partial);
+    partial = await inlineMdxPartials(
+      partial,
+      (path) => loader(_joinRelativePath(relativePath, path)),
+      maxDepth: maxDepth - 1,
+    );
+
+    result = result.replaceFirst(import.group(0)!, '');
+    result = result.replaceAll(RegExp('<$componentName\\s*/>'), partial.trim());
+  }
+
+  return result;
+}
+
+/// Resolves [path], relative to the directory of [base], into a path relative
+/// to the directory [base] was itself relative to.
+String _joinRelativePath(String base, String path) {
+  final baseDir = base.contains('/')
+      ? base.substring(0, base.lastIndexOf('/'))
+      : '.';
+  return Uri.parse('$baseDir/').resolve(path).toString();
+}
+
+String _stripFrontmatter(String markdown) {
+  final frontmatterRegex = RegExp(r'^---\n.*?\n---\n', dotAll: true);
+  return markdown.replaceFirst(frontmatterRegex, '');
 }
 
 String _cleanFileName(String fileName) {

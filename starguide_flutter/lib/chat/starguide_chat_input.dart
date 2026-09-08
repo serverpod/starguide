@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:lucide_icons_flutter/lucide_icons.dart';
+import 'package:flutter_lucide/flutter_lucide.dart';
 import 'package:starguide_flutter/config/constants.dart';
 
 class StarguideChatInput extends StatefulWidget {
@@ -107,7 +107,7 @@ class _StarguideChatInputState extends State<StarguideChatInput> {
                         }
                       : null,
                   child: const Icon(
-                    LucideIcons.rocket300,
+                    LucideIcons.rocket,
                     size: 20,
                     color: Colors.white,
                   ),

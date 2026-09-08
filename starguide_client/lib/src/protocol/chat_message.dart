@@ -10,10 +10,11 @@
 // ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
-import 'package:serverpod_client/serverpod_client.dart' as _i1;
-import 'chat_message_type.dart' as _i2;
+import 'package:serverpod_client/serverpod_client.dart' as _isc;
+import 'chat_message_type.dart' as _itrf31vi;
 
-abstract class ChatMessage implements _i1.SerializableModel {
+abstract class ChatMessage
+    implements _isc.SerializableModel, _isc.ProtocolSerialization {
   ChatMessage._({
     this.id,
     required this.chatSessionId,
@@ -25,7 +26,7 @@ abstract class ChatMessage implements _i1.SerializableModel {
     int? id,
     required int chatSessionId,
     required String message,
-    required _i2.ChatMessageType type,
+    required _itrf31vi.ChatMessageType type,
   }) = _ChatMessageImpl;
 
   factory ChatMessage.fromJson(Map<String, dynamic> jsonSerialization) {
@@ -33,7 +34,9 @@ abstract class ChatMessage implements _i1.SerializableModel {
       id: jsonSerialization['id'] as int?,
       chatSessionId: jsonSerialization['chatSessionId'] as int,
       message: jsonSerialization['message'] as String,
-      type: _i2.ChatMessageType.fromJson((jsonSerialization['type'] as String)),
+      type: _itrf31vi.ChatMessageType.fromJson(
+        (jsonSerialization['type'] as String),
+      ),
     );
   }
 
@@ -46,16 +49,16 @@ abstract class ChatMessage implements _i1.SerializableModel {
 
   String message;
 
-  _i2.ChatMessageType type;
+  _itrf31vi.ChatMessageType type;
 
   /// Returns a shallow copy of this [ChatMessage]
   /// with some or all fields replaced by the given arguments.
-  @_i1.useResult
+  @_isc.useResult
   ChatMessage copyWith({
     int? id,
     int? chatSessionId,
     String? message,
-    _i2.ChatMessageType? type,
+    _itrf31vi.ChatMessageType? type,
   });
   @override
   Map<String, dynamic> toJson() {
@@ -69,8 +72,19 @@ abstract class ChatMessage implements _i1.SerializableModel {
   }
 
   @override
+  Map<String, dynamic> toJsonForProtocol() {
+    return {
+      '__className__': 'ChatMessage',
+      if (id != null) 'id': id,
+      'chatSessionId': chatSessionId,
+      'message': message,
+      'type': type.toJson(),
+    };
+  }
+
+  @override
   String toString() {
-    return _i1.SerializationManager.encode(this);
+    return _isc.SerializationManager.encode(this);
   }
 }
 
@@ -81,7 +95,7 @@ class _ChatMessageImpl extends ChatMessage {
     int? id,
     required int chatSessionId,
     required String message,
-    required _i2.ChatMessageType type,
+    required _itrf31vi.ChatMessageType type,
   }) : super._(
          id: id,
          chatSessionId: chatSessionId,
@@ -91,13 +105,13 @@ class _ChatMessageImpl extends ChatMessage {
 
   /// Returns a shallow copy of this [ChatMessage]
   /// with some or all fields replaced by the given arguments.
-  @_i1.useResult
+  @_isc.useResult
   @override
   ChatMessage copyWith({
     Object? id = _Undefined,
     int? chatSessionId,
     String? message,
-    _i2.ChatMessageType? type,
+    _itrf31vi.ChatMessageType? type,
   }) {
     return ChatMessage(
       id: id is int? ? id : this.id,

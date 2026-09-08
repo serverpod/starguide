@@ -10,10 +10,11 @@
 // ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
-import 'package:serverpod_client/serverpod_client.dart' as _i1;
-import 'rag_document_type.dart' as _i2;
+import 'package:serverpod_client/serverpod_client.dart' as _isc;
+import 'rag_document_type.dart' as _i19rymhs;
 
-abstract class RAGDocument implements _i1.SerializableModel {
+abstract class RAGDocument
+    implements _isc.SerializableModel, _isc.ProtocolSerialization {
   RAGDocument._({
     this.id,
     required this.embedding,
@@ -29,32 +30,34 @@ abstract class RAGDocument implements _i1.SerializableModel {
 
   factory RAGDocument({
     int? id,
-    required _i1.Vector embedding,
+    required _isc.Vector embedding,
     required DateTime fetchTime,
     required Uri sourceUrl,
     required String content,
     required String title,
     required String embeddingSummary,
     required String shortDescription,
-    required _i2.RAGDocumentType type,
+    required _i19rymhs.RAGDocumentType type,
     required String domain,
   }) = _RAGDocumentImpl;
 
   factory RAGDocument.fromJson(Map<String, dynamic> jsonSerialization) {
     return RAGDocument(
       id: jsonSerialization['id'] as int?,
-      embedding: _i1.VectorJsonExtension.fromJson(
+      embedding: _isc.VectorJsonExtension.fromJson(
         jsonSerialization['embedding'],
       ),
-      fetchTime: _i1.DateTimeJsonExtension.fromJson(
+      fetchTime: _isc.DateTimeJsonExtension.fromJson(
         jsonSerialization['fetchTime'],
       ),
-      sourceUrl: _i1.UriJsonExtension.fromJson(jsonSerialization['sourceUrl']),
+      sourceUrl: _isc.UriJsonExtension.fromJson(jsonSerialization['sourceUrl']),
       content: jsonSerialization['content'] as String,
       title: jsonSerialization['title'] as String,
       embeddingSummary: jsonSerialization['embeddingSummary'] as String,
       shortDescription: jsonSerialization['shortDescription'] as String,
-      type: _i2.RAGDocumentType.fromJson((jsonSerialization['type'] as String)),
+      type: _i19rymhs.RAGDocumentType.fromJson(
+        (jsonSerialization['type'] as String),
+      ),
       domain: jsonSerialization['domain'] as String,
     );
   }
@@ -64,7 +67,7 @@ abstract class RAGDocument implements _i1.SerializableModel {
   /// the id will be null.
   int? id;
 
-  _i1.Vector embedding;
+  _isc.Vector embedding;
 
   DateTime fetchTime;
 
@@ -78,23 +81,23 @@ abstract class RAGDocument implements _i1.SerializableModel {
 
   String shortDescription;
 
-  _i2.RAGDocumentType type;
+  _i19rymhs.RAGDocumentType type;
 
   String domain;
 
   /// Returns a shallow copy of this [RAGDocument]
   /// with some or all fields replaced by the given arguments.
-  @_i1.useResult
+  @_isc.useResult
   RAGDocument copyWith({
     int? id,
-    _i1.Vector? embedding,
+    _isc.Vector? embedding,
     DateTime? fetchTime,
     Uri? sourceUrl,
     String? content,
     String? title,
     String? embeddingSummary,
     String? shortDescription,
-    _i2.RAGDocumentType? type,
+    _i19rymhs.RAGDocumentType? type,
     String? domain,
   });
   @override
@@ -115,8 +118,25 @@ abstract class RAGDocument implements _i1.SerializableModel {
   }
 
   @override
+  Map<String, dynamic> toJsonForProtocol() {
+    return {
+      '__className__': 'RAGDocument',
+      if (id != null) 'id': id,
+      'embedding': embedding.toJson(),
+      'fetchTime': fetchTime.toJson(),
+      'sourceUrl': sourceUrl.toJson(),
+      'content': content,
+      'title': title,
+      'embeddingSummary': embeddingSummary,
+      'shortDescription': shortDescription,
+      'type': type.toJson(),
+      'domain': domain,
+    };
+  }
+
+  @override
   String toString() {
-    return _i1.SerializationManager.encode(this);
+    return _isc.SerializationManager.encode(this);
   }
 }
 
@@ -125,14 +145,14 @@ class _Undefined {}
 class _RAGDocumentImpl extends RAGDocument {
   _RAGDocumentImpl({
     int? id,
-    required _i1.Vector embedding,
+    required _isc.Vector embedding,
     required DateTime fetchTime,
     required Uri sourceUrl,
     required String content,
     required String title,
     required String embeddingSummary,
     required String shortDescription,
-    required _i2.RAGDocumentType type,
+    required _i19rymhs.RAGDocumentType type,
     required String domain,
   }) : super._(
          id: id,
@@ -149,18 +169,18 @@ class _RAGDocumentImpl extends RAGDocument {
 
   /// Returns a shallow copy of this [RAGDocument]
   /// with some or all fields replaced by the given arguments.
-  @_i1.useResult
+  @_isc.useResult
   @override
   RAGDocument copyWith({
     Object? id = _Undefined,
-    _i1.Vector? embedding,
+    _isc.Vector? embedding,
     DateTime? fetchTime,
     Uri? sourceUrl,
     String? content,
     String? title,
     String? embeddingSummary,
     String? shortDescription,
-    _i2.RAGDocumentType? type,
+    _i19rymhs.RAGDocumentType? type,
     String? domain,
   }) {
     return RAGDocument(

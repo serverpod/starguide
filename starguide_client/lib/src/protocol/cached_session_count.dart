@@ -10,9 +10,10 @@
 // ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
-import 'package:serverpod_client/serverpod_client.dart' as _i1;
+import 'package:serverpod_client/serverpod_client.dart' as _isc;
 
-abstract class CachedSessionCount implements _i1.SerializableModel {
+abstract class CachedSessionCount
+    implements _isc.SerializableModel, _isc.ProtocolSerialization {
   CachedSessionCount._({required this.count});
 
   factory CachedSessionCount({required int count}) = _CachedSessionCountImpl;
@@ -25,19 +26,21 @@ abstract class CachedSessionCount implements _i1.SerializableModel {
 
   /// Returns a shallow copy of this [CachedSessionCount]
   /// with some or all fields replaced by the given arguments.
-  @_i1.useResult
+  @_isc.useResult
   CachedSessionCount copyWith({int? count});
   @override
   Map<String, dynamic> toJson() {
-    return {
-      '__className__': 'CachedSessionCount',
-      'count': count,
-    };
+    return {'__className__': 'CachedSessionCount', 'count': count};
+  }
+
+  @override
+  Map<String, dynamic> toJsonForProtocol() {
+    return {'__className__': 'CachedSessionCount', 'count': count};
   }
 
   @override
   String toString() {
-    return _i1.SerializationManager.encode(this);
+    return _isc.SerializationManager.encode(this);
   }
 }
 
@@ -46,7 +49,7 @@ class _CachedSessionCountImpl extends CachedSessionCount {
 
   /// Returns a shallow copy of this [CachedSessionCount]
   /// with some or all fields replaced by the given arguments.
-  @_i1.useResult
+  @_isc.useResult
   @override
   CachedSessionCount copyWith({int? count}) {
     return CachedSessionCount(count: count ?? this.count);

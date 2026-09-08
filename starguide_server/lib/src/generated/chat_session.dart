@@ -10,13 +10,13 @@
 // ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
-import 'package:serverpod/serverpod.dart' as _i1;
+import 'package:serverpod/serverpod.dart' as _is;
 
 abstract class ChatSession
-    implements _i1.TableRow<int?>, _i1.ProtocolSerialization {
+    implements _is.TableRow<int?>, _is.ProtocolSerialization {
   ChatSession._({
     this.id,
-    this.userId,
+    this.authUserId,
     required this.keyToken,
     this.goodAnswer,
     DateTime? createdAt,
@@ -24,7 +24,7 @@ abstract class ChatSession
 
   factory ChatSession({
     int? id,
-    int? userId,
+    _is.UuidValue? authUserId,
     required String keyToken,
     bool? goodAnswer,
     DateTime? createdAt,
@@ -33,14 +33,18 @@ abstract class ChatSession
   factory ChatSession.fromJson(Map<String, dynamic> jsonSerialization) {
     return ChatSession(
       id: jsonSerialization['id'] as int?,
-      userId: jsonSerialization['userId'] as int?,
+      authUserId: jsonSerialization['authUserId'] == null
+          ? null
+          : _is.UuidValueJsonExtension.fromJson(
+              jsonSerialization['authUserId'],
+            ),
       keyToken: jsonSerialization['keyToken'] as String,
       goodAnswer: jsonSerialization['goodAnswer'] == null
           ? null
-          : _i1.BoolJsonExtension.fromJson(jsonSerialization['goodAnswer']),
+          : _is.BoolJsonExtension.fromJson(jsonSerialization['goodAnswer']),
       createdAt: jsonSerialization['createdAt'] == null
           ? null
-          : _i1.DateTimeJsonExtension.fromJson(jsonSerialization['createdAt']),
+          : _is.DateTimeJsonExtension.fromJson(jsonSerialization['createdAt']),
     );
   }
 
@@ -51,7 +55,7 @@ abstract class ChatSession
   @override
   int? id;
 
-  int? userId;
+  _is.UuidValue? authUserId;
 
   String keyToken;
 
@@ -60,14 +64,14 @@ abstract class ChatSession
   DateTime createdAt;
 
   @override
-  _i1.Table<int?> get table => t;
+  _is.Table<int?> get table => t;
 
   /// Returns a shallow copy of this [ChatSession]
   /// with some or all fields replaced by the given arguments.
-  @_i1.useResult
+  @_is.useResult
   ChatSession copyWith({
     int? id,
-    int? userId,
+    _is.UuidValue? authUserId,
     String? keyToken,
     bool? goodAnswer,
     DateTime? createdAt,
@@ -77,7 +81,7 @@ abstract class ChatSession
     return {
       '__className__': 'ChatSession',
       if (id != null) 'id': id,
-      if (userId != null) 'userId': userId,
+      if (authUserId != null) 'authUserId': authUserId?.toJson(),
       'keyToken': keyToken,
       if (goodAnswer != null) 'goodAnswer': goodAnswer,
       'createdAt': createdAt.toJson(),
@@ -89,7 +93,7 @@ abstract class ChatSession
     return {
       '__className__': 'ChatSession',
       if (id != null) 'id': id,
-      if (userId != null) 'userId': userId,
+      if (authUserId != null) 'authUserId': authUserId?.toJson(),
       'keyToken': keyToken,
       if (goodAnswer != null) 'goodAnswer': goodAnswer,
       'createdAt': createdAt.toJson(),
@@ -101,12 +105,11 @@ abstract class ChatSession
   }
 
   static ChatSessionIncludeList includeList({
-    _i1.WhereExpressionBuilder<ChatSessionTable>? where,
+    _is.WhereExpressionBuilder<ChatSessionTable>? where,
     int? limit,
     int? offset,
-    _i1.OrderByBuilder<ChatSessionTable>? orderBy,
-    bool orderDescending = false,
-    _i1.OrderByListBuilder<ChatSessionTable>? orderByList,
+    _is.OrderByBuilder<ChatSessionTable>? orderBy,
+    _is.OrderByListBuilder<ChatSessionTable>? orderByList,
     ChatSessionInclude? include,
   }) {
     return ChatSessionIncludeList._(
@@ -114,7 +117,6 @@ abstract class ChatSession
       limit: limit,
       offset: offset,
       orderBy: orderBy?.call(ChatSession.t),
-      orderDescending: orderDescending,
       orderByList: orderByList?.call(ChatSession.t),
       include: include,
     );
@@ -122,7 +124,7 @@ abstract class ChatSession
 
   @override
   String toString() {
-    return _i1.SerializationManager.encode(this);
+    return _is.SerializationManager.encode(this);
   }
 }
 
@@ -131,13 +133,13 @@ class _Undefined {}
 class _ChatSessionImpl extends ChatSession {
   _ChatSessionImpl({
     int? id,
-    int? userId,
+    _is.UuidValue? authUserId,
     required String keyToken,
     bool? goodAnswer,
     DateTime? createdAt,
   }) : super._(
          id: id,
-         userId: userId,
+         authUserId: authUserId,
          keyToken: keyToken,
          goodAnswer: goodAnswer,
          createdAt: createdAt,
@@ -145,18 +147,18 @@ class _ChatSessionImpl extends ChatSession {
 
   /// Returns a shallow copy of this [ChatSession]
   /// with some or all fields replaced by the given arguments.
-  @_i1.useResult
+  @_is.useResult
   @override
   ChatSession copyWith({
     Object? id = _Undefined,
-    Object? userId = _Undefined,
+    Object? authUserId = _Undefined,
     String? keyToken,
     Object? goodAnswer = _Undefined,
     DateTime? createdAt,
   }) {
     return ChatSession(
       id: id is int? ? id : this.id,
-      userId: userId is int? ? userId : this.userId,
+      authUserId: authUserId is _is.UuidValue? ? authUserId : this.authUserId,
       keyToken: keyToken ?? this.keyToken,
       goodAnswer: goodAnswer is bool? ? goodAnswer : this.goodAnswer,
       createdAt: createdAt ?? this.createdAt,
@@ -164,90 +166,68 @@ class _ChatSessionImpl extends ChatSession {
   }
 }
 
-class ChatSessionUpdateTable extends _i1.UpdateTable<ChatSessionTable> {
+class ChatSessionUpdateTable extends _is.UpdateTable<ChatSessionTable> {
   ChatSessionUpdateTable(super.table);
 
-  _i1.ColumnValue<int, int> userId(int? value) => _i1.ColumnValue(
-    table.userId,
-    value,
-  );
+  _is.ColumnValue<_is.UuidValue, _is.UuidValue> authUserId(
+    _is.UuidValue? value,
+  ) => _is.ColumnValue(table.authUserId, value);
 
-  _i1.ColumnValue<String, String> keyToken(String value) => _i1.ColumnValue(
-    table.keyToken,
-    value,
-  );
+  _is.ColumnValue<String, String> keyToken(String value) =>
+      _is.ColumnValue(table.keyToken, value);
 
-  _i1.ColumnValue<bool, bool> goodAnswer(bool? value) => _i1.ColumnValue(
-    table.goodAnswer,
-    value,
-  );
+  _is.ColumnValue<bool, bool> goodAnswer(bool? value) =>
+      _is.ColumnValue(table.goodAnswer, value);
 
-  _i1.ColumnValue<DateTime, DateTime> createdAt(DateTime value) =>
-      _i1.ColumnValue(
-        table.createdAt,
-        value,
-      );
+  _is.ColumnValue<DateTime, DateTime> createdAt(DateTime value) =>
+      _is.ColumnValue(table.createdAt, value);
 }
 
-class ChatSessionTable extends _i1.Table<int?> {
+class ChatSessionTable extends _is.Table<int?> {
   ChatSessionTable({super.tableRelation}) : super(tableName: 'chat_session') {
     updateTable = ChatSessionUpdateTable(this);
-    userId = _i1.ColumnInt(
-      'userId',
-      this,
-    );
-    keyToken = _i1.ColumnString(
-      'keyToken',
-      this,
-    );
-    goodAnswer = _i1.ColumnBool(
-      'goodAnswer',
-      this,
-    );
-    createdAt = _i1.ColumnDateTime(
-      'createdAt',
-      this,
-      hasDefault: true,
-    );
+    authUserId = _is.ColumnUuid('authUserId', this);
+    keyToken = _is.ColumnString('keyToken', this);
+    goodAnswer = _is.ColumnBool('goodAnswer', this);
+    createdAt = _is.ColumnDateTime('createdAt', this, hasDefault: true);
   }
 
   late final ChatSessionUpdateTable updateTable;
 
-  late final _i1.ColumnInt userId;
+  late final _is.ColumnUuid authUserId;
 
-  late final _i1.ColumnString keyToken;
+  late final _is.ColumnString keyToken;
 
-  late final _i1.ColumnBool goodAnswer;
+  late final _is.ColumnBool goodAnswer;
 
-  late final _i1.ColumnDateTime createdAt;
+  late final _is.ColumnDateTime createdAt;
 
   @override
-  List<_i1.Column> get columns => [
+  List<_is.Column> get columns => [
     id,
-    userId,
+    authUserId,
     keyToken,
     goodAnswer,
     createdAt,
   ];
 }
 
-class ChatSessionInclude extends _i1.IncludeObject {
+class ChatSessionInclude extends _is.IncludeObject {
   ChatSessionInclude._();
 
   @override
-  Map<String, _i1.Include?> get includes => {};
+  Map<String, _is.Include?> get includes => {};
 
   @override
-  _i1.Table<int?> get table => ChatSession.t;
+  _is.Table<int?> get table => ChatSession.t;
 }
 
-class ChatSessionIncludeList extends _i1.IncludeList {
+class ChatSessionIncludeList extends _is.IncludeList {
   ChatSessionIncludeList._({
-    _i1.WhereExpressionBuilder<ChatSessionTable>? where,
+    _is.WhereExpressionBuilder<ChatSessionTable>? where,
     super.limit,
     super.offset,
     super.orderBy,
-    super.orderDescending,
     super.orderByList,
     super.include,
   }) {
@@ -255,10 +235,10 @@ class ChatSessionIncludeList extends _i1.IncludeList {
   }
 
   @override
-  Map<String, _i1.Include?> get includes => include?.includes ?? {};
+  Map<String, _is.Include?> get includes => include?.includes ?? {};
 
   @override
-  _i1.Table<int?> get table => ChatSession.t;
+  _is.Table<int?> get table => ChatSession.t;
 }
 
 class ChatSessionRepository {
@@ -287,22 +267,20 @@ class ChatSessionRepository {
   /// );
   /// ```
   Future<List<ChatSession>> find(
-    _i1.DatabaseSession session, {
-    _i1.WhereExpressionBuilder<ChatSessionTable>? where,
+    _is.DatabaseSession session, {
+    _is.WhereExpressionBuilder<ChatSessionTable>? where,
     int? limit,
     int? offset,
-    _i1.OrderByBuilder<ChatSessionTable>? orderBy,
-    bool orderDescending = false,
-    _i1.OrderByListBuilder<ChatSessionTable>? orderByList,
-    _i1.Transaction? transaction,
-    _i1.LockMode? lockMode,
-    _i1.LockBehavior? lockBehavior,
+    _is.OrderByBuilder<ChatSessionTable>? orderBy,
+    _is.OrderByListBuilder<ChatSessionTable>? orderByList,
+    _is.Transaction? transaction,
+    _is.LockMode? lockMode,
+    _is.LockBehavior? lockBehavior,
   }) async {
     return session.db.find<ChatSession>(
       where: where?.call(ChatSession.t),
       orderBy: orderBy?.call(ChatSession.t),
       orderByList: orderByList?.call(ChatSession.t),
-      orderDescending: orderDescending,
       limit: limit,
       offset: offset,
       transaction: transaction,
@@ -329,21 +307,19 @@ class ChatSessionRepository {
   /// );
   /// ```
   Future<ChatSession?> findFirstRow(
-    _i1.DatabaseSession session, {
-    _i1.WhereExpressionBuilder<ChatSessionTable>? where,
+    _is.DatabaseSession session, {
+    _is.WhereExpressionBuilder<ChatSessionTable>? where,
     int? offset,
-    _i1.OrderByBuilder<ChatSessionTable>? orderBy,
-    bool orderDescending = false,
-    _i1.OrderByListBuilder<ChatSessionTable>? orderByList,
-    _i1.Transaction? transaction,
-    _i1.LockMode? lockMode,
-    _i1.LockBehavior? lockBehavior,
+    _is.OrderByBuilder<ChatSessionTable>? orderBy,
+    _is.OrderByListBuilder<ChatSessionTable>? orderByList,
+    _is.Transaction? transaction,
+    _is.LockMode? lockMode,
+    _is.LockBehavior? lockBehavior,
   }) async {
     return session.db.findFirstRow<ChatSession>(
       where: where?.call(ChatSession.t),
       orderBy: orderBy?.call(ChatSession.t),
       orderByList: orderByList?.call(ChatSession.t),
-      orderDescending: orderDescending,
       offset: offset,
       transaction: transaction,
       lockMode: lockMode,
@@ -353,11 +329,11 @@ class ChatSessionRepository {
 
   /// Finds a single [ChatSession] by its [id] or null if no such row exists.
   Future<ChatSession?> findById(
-    _i1.DatabaseSession session,
+    _is.DatabaseSession session,
     int id, {
-    _i1.Transaction? transaction,
-    _i1.LockMode? lockMode,
-    _i1.LockBehavior? lockBehavior,
+    _is.Transaction? transaction,
+    _is.LockMode? lockMode,
+    _is.LockBehavior? lockBehavior,
   }) async {
     return session.db.findById<ChatSession>(
       id,
@@ -377,16 +353,22 @@ class ChatSessionRepository {
   /// If [ignoreConflicts] is set to `true`, rows that conflict with existing
   /// rows are silently skipped, and only the successfully inserted rows are
   /// returned.
+  ///
+  /// If [noReturn] is set to `true`, the inserted rows are not read back from
+  /// the database and an empty list is returned. This avoids the overhead of
+  /// transferring and deserializing the rows when the result is not needed.
   Future<List<ChatSession>> insert(
-    _i1.DatabaseSession session,
+    _is.DatabaseSession session,
     List<ChatSession> rows, {
-    _i1.Transaction? transaction,
+    _is.Transaction? transaction,
     bool ignoreConflicts = false,
+    bool noReturn = false,
   }) async {
     return session.db.insert<ChatSession>(
       rows,
       transaction: transaction,
       ignoreConflicts: ignoreConflicts,
+      noReturn: noReturn,
     );
   }
 
@@ -394,12 +376,78 @@ class ChatSessionRepository {
   ///
   /// The returned [ChatSession] will have its `id` field set.
   Future<ChatSession> insertRow(
-    _i1.DatabaseSession session,
+    _is.DatabaseSession session,
     ChatSession row, {
-    _i1.Transaction? transaction,
+    _is.Transaction? transaction,
   }) async {
-    return session.db.insertRow<ChatSession>(
+    return session.db.insertRow<ChatSession>(row, transaction: transaction);
+  }
+
+  /// Upserts all [ChatSession]s in the list and returns the resulting rows.
+  ///
+  /// If a row conflicts on the given [conflictColumns], the existing row is
+  /// updated with the new values. Otherwise, a new row is inserted.
+  ///
+  /// If [updateColumns] is provided, only those columns will be updated on
+  /// conflict. If null, all non-conflict, non-id columns are updated.
+  ///
+  /// If [updateWhere] is provided, the update only applies to rows matching the
+  /// given expression. Conflicting rows that don't match are skipped and not
+  /// returned, so the resulting list may be shorter than [rows].
+  ///
+  /// The returned [ChatSession]s will have their `id` fields set.
+  ///
+  /// This is an atomic operation, meaning that if one of the rows fails,
+  /// none of the rows will be affected.
+  ///
+  /// If [noReturn] is set to `true`, the resulting rows are not read back from
+  /// the database and an empty list is returned. This avoids the overhead of
+  /// transferring and deserializing the rows when the result is not needed.
+  Future<List<ChatSession>> upsert(
+    _is.DatabaseSession session,
+    List<ChatSession> rows, {
+    required _is.ColumnSelections<ChatSessionTable> conflictColumns,
+    _is.ColumnSelections<ChatSessionTable>? updateColumns,
+    _is.WhereExpressionBuilder<ChatSessionTable>? updateWhere,
+    _is.Transaction? transaction,
+    bool noReturn = false,
+  }) async {
+    return session.db.upsert<ChatSession>(
+      rows,
+      conflictColumns: conflictColumns(ChatSession.t),
+      updateColumns: updateColumns?.call(ChatSession.t),
+      updateWhere: updateWhere?.call(ChatSession.t),
+      transaction: transaction,
+      noReturn: noReturn,
+    );
+  }
+
+  /// Upserts a single [ChatSession] and returns the resulting row.
+  ///
+  /// If the row conflicts on the given [conflictColumns], the existing row is
+  /// updated. Otherwise, a new row is inserted.
+  ///
+  /// If [updateColumns] is provided, only those columns will be updated on
+  /// conflict. If null, all non-conflict, non-id columns are updated.
+  ///
+  /// If [updateWhere] is provided, the update only applies when the existing
+  /// row matches the expression. Returns `null` if no row was affected — for
+  /// example when [updateWhere] does not match the conflicting row.
+  ///
+  /// The returned [ChatSession] will have its `id` field set.
+  Future<ChatSession?> upsertRow(
+    _is.DatabaseSession session,
+    ChatSession row, {
+    required _is.ColumnSelections<ChatSessionTable> conflictColumns,
+    _is.ColumnSelections<ChatSessionTable>? updateColumns,
+    _is.WhereExpressionBuilder<ChatSessionTable>? updateWhere,
+    _is.Transaction? transaction,
+  }) async {
+    return session.db.upsertRow<ChatSession>(
       row,
+      conflictColumns: conflictColumns(ChatSession.t),
+      updateColumns: updateColumns?.call(ChatSession.t),
+      updateWhere: updateWhere?.call(ChatSession.t),
       transaction: transaction,
     );
   }
@@ -409,16 +457,22 @@ class ChatSessionRepository {
   /// all columns.
   /// This is an atomic operation, meaning that if one of the rows fails to
   /// update, none of the rows will be updated.
+  ///
+  /// If [noReturn] is set to `true`, the updated rows are not read back from
+  /// the database and an empty list is returned. This avoids the overhead of
+  /// transferring and deserializing the rows when the result is not needed.
   Future<List<ChatSession>> update(
-    _i1.DatabaseSession session,
+    _is.DatabaseSession session,
     List<ChatSession> rows, {
-    _i1.ColumnSelections<ChatSessionTable>? columns,
-    _i1.Transaction? transaction,
+    _is.ColumnSelections<ChatSessionTable>? columns,
+    _is.Transaction? transaction,
+    bool noReturn = false,
   }) async {
     return session.db.update<ChatSession>(
       rows,
       columns: columns?.call(ChatSession.t),
       transaction: transaction,
+      noReturn: noReturn,
     );
   }
 
@@ -426,10 +480,10 @@ class ChatSessionRepository {
   /// Optionally, a list of [columns] can be provided to only update those
   /// columns. Defaults to all columns.
   Future<ChatSession> updateRow(
-    _i1.DatabaseSession session,
+    _is.DatabaseSession session,
     ChatSession row, {
-    _i1.ColumnSelections<ChatSessionTable>? columns,
-    _i1.Transaction? transaction,
+    _is.ColumnSelections<ChatSessionTable>? columns,
+    _is.Transaction? transaction,
   }) async {
     return session.db.updateRow<ChatSession>(
       row,
@@ -441,10 +495,10 @@ class ChatSessionRepository {
   /// Updates a single [ChatSession] by its [id] with the specified [columnValues].
   /// Returns the updated row or null if no row with the given id exists.
   Future<ChatSession?> updateById(
-    _i1.DatabaseSession session,
+    _is.DatabaseSession session,
     int id, {
-    required _i1.ColumnValueListBuilder<ChatSessionUpdateTable> columnValues,
-    _i1.Transaction? transaction,
+    required _is.ColumnValueListBuilder<ChatSessionUpdateTable> columnValues,
+    _is.Transaction? transaction,
   }) async {
     return session.db.updateById<ChatSession>(
       id,
@@ -455,16 +509,20 @@ class ChatSessionRepository {
 
   /// Updates all [ChatSession]s matching the [where] expression with the specified [columnValues].
   /// Returns the list of updated rows.
+  ///
+  /// If [noReturn] is set to `true`, the updated rows are not read back from
+  /// the database and an empty list is returned. This avoids the overhead of
+  /// transferring and deserializing the rows when the result is not needed.
   Future<List<ChatSession>> updateWhere(
-    _i1.DatabaseSession session, {
-    required _i1.ColumnValueListBuilder<ChatSessionUpdateTable> columnValues,
-    required _i1.WhereExpressionBuilder<ChatSessionTable> where,
+    _is.DatabaseSession session, {
+    required _is.ColumnValueListBuilder<ChatSessionUpdateTable> columnValues,
+    required _is.WhereExpressionBuilder<ChatSessionTable> where,
     int? limit,
     int? offset,
-    _i1.OrderByBuilder<ChatSessionTable>? orderBy,
-    _i1.OrderByListBuilder<ChatSessionTable>? orderByList,
-    bool orderDescending = false,
-    _i1.Transaction? transaction,
+    _is.OrderByBuilder<ChatSessionTable>? orderBy,
+    _is.OrderByListBuilder<ChatSessionTable>? orderByList,
+    _is.Transaction? transaction,
+    bool noReturn = false,
   }) async {
     return session.db.updateWhere<ChatSession>(
       columnValues: columnValues(ChatSession.t.updateTable),
@@ -473,56 +531,80 @@ class ChatSessionRepository {
       offset: offset,
       orderBy: orderBy?.call(ChatSession.t),
       orderByList: orderByList?.call(ChatSession.t),
-      orderDescending: orderDescending,
       transaction: transaction,
+      noReturn: noReturn,
     );
   }
 
   /// Deletes all [ChatSession]s in the list and returns the deleted rows.
+  ///
+  /// To specify the order of the returned rows use [orderBy] or [orderByList]
+  /// when sorting by multiple columns.
+  ///
   /// This is an atomic operation, meaning that if one of the rows fail to
   /// be deleted, none of the rows will be deleted.
+  ///
+  /// If [noReturn] is set to `true`, the deleted rows are not read back from
+  /// the database and an empty list is returned. This avoids the overhead of
+  /// transferring and deserializing the rows when the result is not needed.
   Future<List<ChatSession>> delete(
-    _i1.DatabaseSession session,
+    _is.DatabaseSession session,
     List<ChatSession> rows, {
-    _i1.Transaction? transaction,
+    _is.OrderByBuilder<ChatSessionTable>? orderBy,
+    _is.OrderByListBuilder<ChatSessionTable>? orderByList,
+    _is.Transaction? transaction,
+    bool noReturn = false,
   }) async {
     return session.db.delete<ChatSession>(
       rows,
+      orderBy: orderBy?.call(ChatSession.t),
+      orderByList: orderByList?.call(ChatSession.t),
       transaction: transaction,
+      noReturn: noReturn,
     );
   }
 
   /// Deletes a single [ChatSession].
   Future<ChatSession> deleteRow(
-    _i1.DatabaseSession session,
+    _is.DatabaseSession session,
     ChatSession row, {
-    _i1.Transaction? transaction,
+    _is.Transaction? transaction,
   }) async {
-    return session.db.deleteRow<ChatSession>(
-      row,
-      transaction: transaction,
-    );
+    return session.db.deleteRow<ChatSession>(row, transaction: transaction);
   }
 
   /// Deletes all rows matching the [where] expression.
+  ///
+  /// To specify the order of the returned rows use [orderBy] or [orderByList]
+  /// when sorting by multiple columns.
+  ///
+  /// If [noReturn] is set to `true`, the deleted rows are not read back from
+  /// the database and an empty list is returned. This avoids the overhead of
+  /// transferring and deserializing the rows when the result is not needed.
   Future<List<ChatSession>> deleteWhere(
-    _i1.DatabaseSession session, {
-    required _i1.WhereExpressionBuilder<ChatSessionTable> where,
-    _i1.Transaction? transaction,
+    _is.DatabaseSession session, {
+    required _is.WhereExpressionBuilder<ChatSessionTable> where,
+    _is.OrderByBuilder<ChatSessionTable>? orderBy,
+    _is.OrderByListBuilder<ChatSessionTable>? orderByList,
+    _is.Transaction? transaction,
+    bool noReturn = false,
   }) async {
     return session.db.deleteWhere<ChatSession>(
       where: where(ChatSession.t),
+      orderBy: orderBy?.call(ChatSession.t),
+      orderByList: orderByList?.call(ChatSession.t),
       transaction: transaction,
+      noReturn: noReturn,
     );
   }
 
   /// Counts the number of rows matching the [where] expression. If omitted,
   /// will return the count of all rows in the table.
   Future<int> count(
-    _i1.DatabaseSession session, {
-    _i1.WhereExpressionBuilder<ChatSessionTable>? where,
+    _is.DatabaseSession session, {
+    _is.WhereExpressionBuilder<ChatSessionTable>? where,
     int? limit,
-    _i1.Transaction? transaction,
+    _is.Transaction? transaction,
   }) async {
     return session.db.count<ChatSession>(
       where: where?.call(ChatSession.t),
@@ -533,11 +615,11 @@ class ChatSessionRepository {
 
   /// Acquires row-level locks on [ChatSession] rows matching the [where] expression.
   Future<void> lockRows(
-    _i1.DatabaseSession session, {
-    required _i1.WhereExpressionBuilder<ChatSessionTable> where,
-    required _i1.LockMode lockMode,
-    required _i1.Transaction transaction,
-    _i1.LockBehavior lockBehavior = _i1.LockBehavior.wait,
+    _is.DatabaseSession session, {
+    required _is.WhereExpressionBuilder<ChatSessionTable> where,
+    required _is.LockMode lockMode,
+    required _is.Transaction transaction,
+    _is.LockBehavior lockBehavior = _is.LockBehavior.wait,
   }) async {
     return session.db.lockRows<ChatSession>(
       where: where(ChatSession.t),

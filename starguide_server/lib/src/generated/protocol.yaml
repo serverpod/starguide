@@ -1,7 +1,13 @@
+googleIdp:
+  - login:
+  - loginWithCode:
+  - hasAccount:
 mcp:
   - mcpInstructions:
   - getAllResources:
   - ask:
+refreshJwtTokens:
+  - refreshAccessToken:
 starguide:
   - createChatSession:
   - ask:

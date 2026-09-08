@@ -10,10 +10,10 @@
 // ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
-import 'package:serverpod/serverpod.dart' as _i1;
+import 'package:serverpod/serverpod.dart' as _is;
 
 abstract class MarkdownResourceInfo
-    implements _i1.SerializableModel, _i1.ProtocolSerialization {
+    implements _is.SerializableModel, _is.ProtocolSerialization {
   MarkdownResourceInfo._({
     required this.name,
     required this.uri,
@@ -49,7 +49,7 @@ abstract class MarkdownResourceInfo
 
   /// Returns a shallow copy of this [MarkdownResourceInfo]
   /// with some or all fields replaced by the given arguments.
-  @_i1.useResult
+  @_is.useResult
   MarkdownResourceInfo copyWith({
     String? name,
     String? uri,
@@ -80,7 +80,7 @@ abstract class MarkdownResourceInfo
 
   @override
   String toString() {
-    return _i1.SerializationManager.encode(this);
+    return _is.SerializationManager.encode(this);
   }
 }
 
@@ -90,16 +90,11 @@ class _MarkdownResourceInfoImpl extends MarkdownResourceInfo {
     required String uri,
     required String description,
     required String text,
-  }) : super._(
-         name: name,
-         uri: uri,
-         description: description,
-         text: text,
-       );
+  }) : super._(name: name, uri: uri, description: description, text: text);
 
   /// Returns a shallow copy of this [MarkdownResourceInfo]
   /// with some or all fields replaced by the given arguments.
-  @_i1.useResult
+  @_is.useResult
   @override
   MarkdownResourceInfo copyWith({
     String? name,

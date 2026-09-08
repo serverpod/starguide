@@ -12,6 +12,7 @@ A few steps are required to get Starguide working on your local machine:
 1. Create a GitHub personal access token, as Starguide will use it to load the documentation pages and discussions into the database. Sign in to GitHub and visit [this settings page](https://github.com/settings/personal-access-tokens). (Settings > Developer Settings > Personal access tokens > Fine-grained personal access tokens.) Create a new token. It doesn't need to have any specific permissions, as all the information Starguide is requesting is public. Save the token.
 2. Get a Gemini key from [here](https://aistudio.google.com/app/apikey). The free tier should be fine, but it may work better on a paid plan, as the free tier is rate-limited.
 3. Optionally, get a key for reCAPTCHA (this is only required if you deploy your server to production). You will need to do this in a new project on GCP. Find the setup page [here](https://console.cloud.google.com/security/recaptcha).
+4. Optionally, set up Google sign-in, which lets users who fail the reCAPTCHA check sign in instead. Create a web application OAuth client in the [Google Cloud console](https://console.cloud.google.com/auth/clients), add `<web app origin>/googlesignin` as an authorized redirect URI, download the client JSON, and save it as `starguide_server/config/google_client_secret.json`. Without this file, the server runs with Google sign-in disabled.
 
 When you have the required tokens and API keys, you must add them to a new `starguide_server/config/passwords.yaml` file. This is what the passwords file should look like:
 
@@ -24,52 +25,56 @@ shared:
   githubToken: '<GitHub token>'
   recaptchaSecretKey: '<reCAPTCHA secret>' # Optional for local development
 
-# These are passwords used when running the server locally in development mode
+# These are passwords used when running the server locally in development mode.
+# Use your own random strings for all of these. The database password is used
+# by the embedded Postgres database.
 development:
-  database: 'KG3uoH8yvl2TBJGZWYA6Pw5ToPV0FwRP'
-  redis: 'cv62dn4dCyCL8NZEWjJYZNDjOKXQzQqH'
+  database: '<random string>'
+  redis: '<random string>'
 
   # The service secret is used to communicate between servers and to access the
   # service protocol.
-  serviceSecret: '-bqxtPOy79-V1xjYZBm3BX-UzgSFZBlo'
+  serviceSecret: '<random string>'
+
+  # Secrets used by the JWT token manager of the auth module.
+  jwtRefreshTokenHashPepper: '<random string>'
+  jwtHmacSha512PrivateKey: '<random string of at least 64 bytes>'
 
 test:
-  database: '9mPvLeV-d_p6P8DsoZDhiPB_l_BlvGeq'
-  redis: 'xDbf-Z9dVvEZo2iMx2tDMLRbZDsq-Wdq'
+  database: '<random string>'
+  redis: '<random string>'
 
-# IMPORTANT! Replace the staging and production passwords if you deploy the
-# server or share this file.
+  # Secrets used by the JWT token manager of the auth module.
+  jwtRefreshTokenHashPepper: '<random string>'
+  jwtHmacSha512PrivateKey: '<random string of at least 64 bytes>'
 
-# Passwords used in your staging environment if you use one. The default setup
-# use a password for Redis.
+# Passwords used in your staging and production environments, if you deploy
+# the server yourself. Serverpod Cloud manages these as secrets instead.
 staging:
-  database: 'icekXsg1yYju_XS6fa-y3lrzA0H4ULpu'
-  serviceSecret: 'I4Todv2g1xj2r7HMq-t2DkSS45RtPi8r'
+  database: '<random string>'
+  serviceSecret: '<random string>'
+  jwtRefreshTokenHashPepper: '<random string>'
+  jwtHmacSha512PrivateKey: '<random string of at least 64 bytes>'
 
-# Passwords used in production mode.
 production:
-  database: 'clrVprd2XfLN-KZDEzVa8XVX4mjcRDI8'
-  serviceSecret: '71d7N3Zwfg7vVp3ac69uacSw0SYD8qG9'
-
+  database: '<random string>'
+  serviceSecret: '<random string>'
+  jwtRefreshTokenHashPepper: '<random string>'
+  jwtHmacSha512PrivateKey: '<random string of at least 64 bytes>'
 ```
 
-With the passwords in place, you should be able to start the server by running:
+With the passwords in place, you should be able to start the server, its embedded Postgres database, and the Flutter app by running:
 
 ```bash
 cd starguide_server
-docker compose up --detach
-dart bin/main.dart --apply-migrations
+serverpod start
 ```
 
-When you are finished, you can shut down Serverpod with `Ctrl-C`, then stop Postgres and Redis:
+Press `M` in the `serverpod start` terminal to create and apply database migrations. When you are finished, shut everything down with `Ctrl-C`.
+
+The Flutter app reads the URL of the API server from `starguide_flutter/assets/config.json`, which points at the local server. When the app is served by the Serverpod web server, the server provides that file with the URL of its own API server instead. To build the web app and serve it from the server at [http://localhost:8082](http://localhost:8082), run:
 
 ```bash
-docker compose stop
-```
-
-Start the local Flutter app by running:
-
-```bash
-cd starguide_flutter
-flutter run
+cd starguide_server
+serverpod run flutter_build
 ```

@@ -1,5 +1,6 @@
 import 'package:serverpod/serverpod.dart';
-import 'package:serverpod_auth_server/serverpod_auth_server.dart';
+import 'package:serverpod_auth_core_server/serverpod_auth_core_server.dart'
+    show AuthenticationInfoAuthUserId;
 import 'package:starguide_server/src/business/search.dart';
 import 'package:starguide_server/src/config/setup_data_fetcher.dart';
 import 'package:starguide_server/src/generative_ai/generative_ai.dart';
@@ -22,8 +23,8 @@ class StarguideEndpoint extends Endpoint {
     Session session,
     String reCaptchaToken,
   ) async {
-    final userId = session.authenticated?.userId;
-    if (userId == null) {
+    final authUserId = session.authenticated?.authUserId;
+    if (authUserId == null) {
       if (Serverpod.instance.runMode != 'development') {
         // Verify the reCAPTCHA token.
         final score = await verifyRecaptchaToken(
@@ -72,7 +73,7 @@ class StarguideEndpoint extends Endpoint {
     return await ChatSession.db.insertRow(
       session,
       ChatSession(
-        userId: session.authenticated?.userId,
+        authUserId: authUserId,
         keyToken: generateRandomString(16),
       ),
     );

@@ -10,76 +10,129 @@
 // ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
-import 'package:serverpod/serverpod.dart' as _i1;
-import '../endpoints/mcp_endpoint.dart' as _i2;
-import '../endpoints/starguide_endpoint.dart' as _i3;
-import 'package:starguide_server/src/generated/chat_session.dart' as _i4;
-import 'package:serverpod_auth_server/serverpod_auth_server.dart' as _i5;
-import 'package:starguide_server/src/generated/future_calls.dart' as _i6;
+import 'package:serverpod/serverpod.dart' as _is;
+import 'package:serverpod_auth_core_server/serverpod_auth_core_server.dart'
+    as _iacs;
+import 'package:serverpod_auth_idp_server/serverpod_auth_idp_server.dart'
+    as _iais;
+import 'package:starguide_server/src/generated/chat_session.dart' as _icpeorlm;
+import 'package:starguide_server/src/generated/future_calls.dart' as _inaozf8m;
+import '../endpoints/google_idp_endpoint.dart' as _iiimk4ot;
+import '../endpoints/mcp_endpoint.dart' as _i7ut3egp;
+import '../endpoints/refresh_jwt_tokens_endpoint.dart' as _iaxm0zi1;
+import '../endpoints/starguide_endpoint.dart' as _iaui8z7d;
 export 'future_calls.dart' show ServerpodFutureCallsGetter;
 
-class Endpoints extends _i1.EndpointDispatch {
+class Endpoints extends _is.EndpointDispatch {
   @override
-  void initializeEndpoints(_i1.Server server) {
-    var endpoints = <String, _i1.Endpoint>{
-      'mcp': _i2.McpEndpoint()
-        ..initialize(
-          server,
-          'mcp',
-          null,
-        ),
-      'starguide': _i3.StarguideEndpoint()
-        ..initialize(
-          server,
-          'starguide',
-          null,
-        ),
+  void initializeEndpoints(_is.Server server) {
+    var endpoints = <String, _is.Endpoint>{
+      'googleIdp': _iiimk4ot.GoogleIdpEndpoint()
+        ..initialize(server, 'googleIdp', null),
+      'mcp': _i7ut3egp.McpEndpoint()..initialize(server, 'mcp', null),
+      'refreshJwtTokens': _iaxm0zi1.RefreshJwtTokensEndpoint()
+        ..initialize(server, 'refreshJwtTokens', null),
+      'starguide': _iaui8z7d.StarguideEndpoint()
+        ..initialize(server, 'starguide', null),
     };
-    connectors['mcp'] = _i1.EndpointConnector(
-      name: 'mcp',
-      endpoint: endpoints['mcp']!,
+    connectors['googleIdp'] = _is.EndpointConnector(
+      name: 'googleIdp',
+      endpoint: endpoints['googleIdp']!,
       methodConnectors: {
-        'mcpInstructions': _i1.MethodConnector(
-          name: 'mcpInstructions',
-          params: {},
-          call:
-              (
-                _i1.Session session,
-                Map<String, dynamic> params,
-              ) async => (endpoints['mcp'] as _i2.McpEndpoint).mcpInstructions(
-                session,
-              ),
-        ),
-        'getAllResources': _i1.MethodConnector(
-          name: 'getAllResources',
-          params: {},
-          call:
-              (
-                _i1.Session session,
-                Map<String, dynamic> params,
-              ) async => (endpoints['mcp'] as _i2.McpEndpoint).getAllResources(
-                session,
-              ),
-        ),
-        'ask': _i1.MethodConnector(
-          name: 'ask',
+        'login': _is.MethodConnector(
+          name: 'login',
           params: {
-            'question': _i1.ParameterDescription(
-              name: 'question',
-              type: _i1.getType<String>(),
+            'idToken': _is.ParameterDescription(
+              name: 'idToken',
+              type: _is.getType<String>(),
               nullable: false,
             ),
-            'geminiAPIKey': _i1.ParameterDescription(
-              name: 'geminiAPIKey',
-              type: _i1.getType<String>(),
+            'accessToken': _is.ParameterDescription(
+              name: 'accessToken',
+              type: _is.getType<String?>(),
+              nullable: true,
+            ),
+          },
+          call: (_is.Session session, Map<String, dynamic> params) async =>
+              (endpoints['googleIdp'] as _iiimk4ot.GoogleIdpEndpoint).login(
+                session,
+                idToken: params['idToken'],
+                accessToken: params['accessToken'],
+              ),
+        ),
+        'loginWithCode': _is.MethodConnector(
+          name: 'loginWithCode',
+          params: {
+            'code': _is.ParameterDescription(
+              name: 'code',
+              type: _is.getType<String>(),
+              nullable: false,
+            ),
+            'codeVerifier': _is.ParameterDescription(
+              name: 'codeVerifier',
+              type: _is.getType<String>(),
+              nullable: false,
+            ),
+            'redirectUri': _is.ParameterDescription(
+              name: 'redirectUri',
+              type: _is.getType<String>(),
               nullable: false,
             ),
           },
-          call:
-              (
-                _i1.Session session,
-                Map<String, dynamic> params,
-              ) async => (endpoints['mcp'] as _i2.McpEndpoint).ask(
+          call: (_is.Session session, Map<String, dynamic> params) async =>
+              (endpoints['googleIdp'] as _iiimk4ot.GoogleIdpEndpoint)
+                  .loginWithCode(
+                    session,
+                    code: params['code'],
+                    codeVerifier: params['codeVerifier'],
+                    redirectUri: params['redirectUri'],
+                  ),
+        ),
+        'hasAccount': _is.MethodConnector(
+          name: 'hasAccount',
+          params: {},
+          call: (_is.Session session, Map<String, dynamic> params) async =>
+              (endpoints['googleIdp'] as _iiimk4ot.GoogleIdpEndpoint)
+                  .hasAccount(session),
+        ),
+      },
+    );
+    connectors['mcp'] = _is.EndpointConnector(
+      name: 'mcp',
+      endpoint: endpoints['mcp']!,
+      methodConnectors: {
+        'mcpInstructions': _is.MethodConnector(
+          name: 'mcpInstructions',
+          params: {},
+          call: (_is.Session session, Map<String, dynamic> params) async =>
+              (endpoints['mcp'] as _i7ut3egp.McpEndpoint).mcpInstructions(
+                session,
+              ),
+        ),
+        'getAllResources': _is.MethodConnector(
+          name: 'getAllResources',
+          params: {},
+          call: (_is.Session session, Map<String, dynamic> params) async =>
+              (endpoints['mcp'] as _i7ut3egp.McpEndpoint).getAllResources(
+                session,
+              ),
+        ),
+        'ask': _is.MethodConnector(
+          name: 'ask',
+          params: {
+            'question': _is.ParameterDescription(
+              name: 'question',
+              type: _is.getType<String>(),
+              nullable: false,
+            ),
+            'geminiAPIKey': _is.ParameterDescription(
+              name: 'geminiAPIKey',
+              type: _is.getType<String>(),
+              nullable: false,
+            ),
+          },
+          call: (_is.Session session, Map<String, dynamic> params) async =>
+              (endpoints['mcp'] as _i7ut3egp.McpEndpoint).ask(
                 session,
                 params['question'],
                 params['geminiAPIKey'],
@@ -87,75 +140,89 @@ class Endpoints extends _i1.EndpointDispatch {
         ),
       },
     );
-    connectors['starguide'] = _i1.EndpointConnector(
+    connectors['refreshJwtTokens'] = _is.EndpointConnector(
+      name: 'refreshJwtTokens',
+      endpoint: endpoints['refreshJwtTokens']!,
+      methodConnectors: {
+        'refreshAccessToken': _is.MethodConnector(
+          name: 'refreshAccessToken',
+          params: {
+            'refreshToken': _is.ParameterDescription(
+              name: 'refreshToken',
+              type: _is.getType<String?>(),
+              nullable: true,
+            ),
+          },
+          call: (_is.Session session, Map<String, dynamic> params) async =>
+              (endpoints['refreshJwtTokens']
+                      as _iaxm0zi1.RefreshJwtTokensEndpoint)
+                  .refreshAccessToken(
+                    session,
+                    refreshToken: params['refreshToken'],
+                  ),
+        ),
+      },
+    );
+    connectors['starguide'] = _is.EndpointConnector(
       name: 'starguide',
       endpoint: endpoints['starguide']!,
       methodConnectors: {
-        'createChatSession': _i1.MethodConnector(
+        'createChatSession': _is.MethodConnector(
           name: 'createChatSession',
           params: {
-            'reCaptchaToken': _i1.ParameterDescription(
+            'reCaptchaToken': _is.ParameterDescription(
               name: 'reCaptchaToken',
-              type: _i1.getType<String>(),
+              type: _is.getType<String>(),
               nullable: false,
             ),
           },
-          call:
-              (
-                _i1.Session session,
-                Map<String, dynamic> params,
-              ) async => (endpoints['starguide'] as _i3.StarguideEndpoint)
-                  .createChatSession(
-                    session,
-                    params['reCaptchaToken'],
-                  ),
+          call: (_is.Session session, Map<String, dynamic> params) async =>
+              (endpoints['starguide'] as _iaui8z7d.StarguideEndpoint)
+                  .createChatSession(session, params['reCaptchaToken']),
         ),
-        'vote': _i1.MethodConnector(
+        'vote': _is.MethodConnector(
           name: 'vote',
           params: {
-            'chatSession': _i1.ParameterDescription(
+            'chatSession': _is.ParameterDescription(
               name: 'chatSession',
-              type: _i1.getType<_i4.ChatSession>(),
+              type: _is.getType<_icpeorlm.ChatSession>(),
               nullable: false,
             ),
-            'goodAnswer': _i1.ParameterDescription(
+            'goodAnswer': _is.ParameterDescription(
               name: 'goodAnswer',
-              type: _i1.getType<bool>(),
+              type: _is.getType<bool>(),
               nullable: false,
             ),
           },
-          call:
-              (
-                _i1.Session session,
-                Map<String, dynamic> params,
-              ) async => (endpoints['starguide'] as _i3.StarguideEndpoint).vote(
+          call: (_is.Session session, Map<String, dynamic> params) async =>
+              (endpoints['starguide'] as _iaui8z7d.StarguideEndpoint).vote(
                 session,
                 params['chatSession'],
                 params['goodAnswer'],
               ),
         ),
-        'ask': _i1.MethodStreamConnector(
+        'ask': _is.MethodStreamConnector(
           name: 'ask',
           params: {
-            'chatSession': _i1.ParameterDescription(
+            'chatSession': _is.ParameterDescription(
               name: 'chatSession',
-              type: _i1.getType<_i4.ChatSession>(),
+              type: _is.getType<_icpeorlm.ChatSession>(),
               nullable: false,
             ),
-            'question': _i1.ParameterDescription(
+            'question': _is.ParameterDescription(
               name: 'question',
-              type: _i1.getType<String>(),
+              type: _is.getType<String>(),
               nullable: false,
             ),
           },
           streamParams: {},
-          returnType: _i1.MethodStreamReturnType.streamType,
+          returnType: _is.MethodStreamReturnType.streamType,
           call:
               (
-                _i1.Session session,
+                _is.Session session,
                 Map<String, dynamic> params,
                 Map<String, Stream> streamParams,
-              ) => (endpoints['starguide'] as _i3.StarguideEndpoint).ask(
+              ) => (endpoints['starguide'] as _iaui8z7d.StarguideEndpoint).ask(
                 session,
                 params['chatSession'],
                 params['question'],
@@ -163,11 +230,14 @@ class Endpoints extends _i1.EndpointDispatch {
         ),
       },
     );
-    modules['serverpod_auth'] = _i5.Endpoints()..initializeEndpoints(server);
+    modules['serverpod_auth_core'] = _iacs.Endpoints()
+      ..initializeEndpoints(server);
+    modules['serverpod_auth_idp'] = _iais.Endpoints()
+      ..initializeEndpoints(server);
   }
 
   @override
-  _i1.FutureCallDispatch? get futureCalls {
-    return _i6.FutureCalls();
+  _is.FutureCallDispatch? get futureCalls {
+    return _inaozf8m.FutureCalls();
   }
 }

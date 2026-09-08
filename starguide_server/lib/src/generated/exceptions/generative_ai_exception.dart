@@ -10,13 +10,13 @@
 // ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
-import 'package:serverpod/serverpod.dart' as _i1;
+import 'package:serverpod/serverpod.dart' as _is;
 
 abstract class GenerativeAiException
     implements
-        _i1.SerializableException,
-        _i1.SerializableModel,
-        _i1.ProtocolSerialization {
+        _is.SerializableException,
+        _is.SerializableModel,
+        _is.ProtocolSerialization {
   GenerativeAiException._({required this.message});
 
   factory GenerativeAiException({required String message}) =
@@ -34,22 +34,16 @@ abstract class GenerativeAiException
 
   /// Returns a shallow copy of this [GenerativeAiException]
   /// with some or all fields replaced by the given arguments.
-  @_i1.useResult
+  @_is.useResult
   GenerativeAiException copyWith({String? message});
   @override
   Map<String, dynamic> toJson() {
-    return {
-      '__className__': 'GenerativeAiException',
-      'message': message,
-    };
+    return {'__className__': 'GenerativeAiException', 'message': message};
   }
 
   @override
   Map<String, dynamic> toJsonForProtocol() {
-    return {
-      '__className__': 'GenerativeAiException',
-      'message': message,
-    };
+    return {'__className__': 'GenerativeAiException', 'message': message};
   }
 
   @override
@@ -64,7 +58,7 @@ class _GenerativeAiExceptionImpl extends GenerativeAiException {
 
   /// Returns a shallow copy of this [GenerativeAiException]
   /// with some or all fields replaced by the given arguments.
-  @_i1.useResult
+  @_is.useResult
   @override
   GenerativeAiException copyWith({String? message}) {
     return GenerativeAiException(message: message ?? this.message);

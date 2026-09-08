@@ -10,10 +10,13 @@
 // ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
-import 'package:serverpod_client/serverpod_client.dart' as _i1;
+import 'package:serverpod_client/serverpod_client.dart' as _isc;
 
 abstract class RecaptchaException
-    implements _i1.SerializableException, _i1.SerializableModel {
+    implements
+        _isc.SerializableException,
+        _isc.SerializableModel,
+        _isc.ProtocolSerialization {
   RecaptchaException._();
 
   factory RecaptchaException() = _RecaptchaExceptionImpl;
@@ -24,10 +27,15 @@ abstract class RecaptchaException
 
   /// Returns a shallow copy of this [RecaptchaException]
   /// with some or all fields replaced by the given arguments.
-  @_i1.useResult
+  @_isc.useResult
   RecaptchaException copyWith();
   @override
   Map<String, dynamic> toJson() {
+    return {'__className__': 'RecaptchaException'};
+  }
+
+  @override
+  Map<String, dynamic> toJsonForProtocol() {
     return {'__className__': 'RecaptchaException'};
   }
 
@@ -42,7 +50,7 @@ class _RecaptchaExceptionImpl extends RecaptchaException {
 
   /// Returns a shallow copy of this [RecaptchaException]
   /// with some or all fields replaced by the given arguments.
-  @_i1.useResult
+  @_isc.useResult
   @override
   RecaptchaException copyWith() {
     return RecaptchaException();

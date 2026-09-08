@@ -24,9 +24,9 @@ Future<void> configureDataFetcher() async {
 
   final serverpodCloudDocs = GithubDocsDataSource(
     owner: 'serverpod',
-    repo: 'serverpod_cloud',
-    basePath: 'docs/docs',
-    referenceUrl: Uri.parse('https://docs.serverpod.cloud'),
+    repo: 'serverpod_docs',
+    basePath: 'cloud_docs',
+    referenceUrl: Uri.parse('https://docs.serverpod.dev/cloud'),
     branch: 'main',
     domain: 'Serverpod Cloud',
   );
