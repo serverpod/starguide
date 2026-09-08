@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:serverpod_auth_idp_server/core.dart';
 import 'package:serverpod_auth_idp_server/providers/google.dart';
+import 'package:starguide_server/src/business/admin_scope.dart';
 import 'package:starguide_server/src/business/data_fetcher_scheduling.dart';
 import 'package:starguide_server/src/config/setup_data_fetcher.dart';
 import 'package:starguide_server/src/web/routes/app_config_route.dart';
@@ -33,6 +34,8 @@ void run(List<String> args) async {
       if (googleClientSecretFile.existsSync())
         GoogleIdpConfig(
           clientSecret: GoogleClientSecret.fromJsonFile(googleClientSecretFile),
+          // Users signing up with a serverpod.dev account are made admins.
+          onAfterGoogleAccountCreated: grantAdminScopeToServerpodAccounts,
         ),
     ],
   );

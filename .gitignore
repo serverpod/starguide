@@ -2,3 +2,15 @@ starguide_server/web/app
 google_client_secret.json
 main.exe
 .dart_tool/
+# Agents
+.dart_skills/
+.agents/
+.claude/
+.gemini/
+.cursor/
+.vscode/mcp.json
+.codex/
+.mcp.json
+
+# Serverpod Cloud CLI
+.scloud/

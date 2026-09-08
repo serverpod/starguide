@@ -108,9 +108,7 @@ Future<void> _initializeGoogleSignIn() async {
         redirectUri: _googleWebRedirectUri,
       );
     } else {
-      await client.auth.initializeGoogleSignIn(
-        serverClientId: _googleClientId,
-      );
+      await client.auth.initializeGoogleSignIn(serverClientId: _googleClientId);
     }
   } catch (e) {
     // Sign-in is only a fallback for failed reCAPTCHA checks, so a missing
@@ -165,9 +163,22 @@ class StarguideChatPageState extends State<StarguideChatPage> {
   String? _connectionErrorMessage;
   bool _recaptchaError = false;
 
+  late final GoogleAuthController _googleAuthController;
+
   @override
   void initState() {
     super.initState();
+
+    _googleAuthController = GoogleAuthController(
+      client: client,
+      onError: (error) {
+        debugPrint('Google sign-in failed: $error');
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Sign in failed. Please try again.')),
+        );
+      },
+    );
 
     _inputTextController.addListener(() {
       setState(() {
@@ -204,9 +215,21 @@ class StarguideChatPageState extends State<StarguideChatPage> {
 
   @override
   void dispose() {
+    _googleAuthController.dispose();
     _inputTextController.dispose();
     _inputFocusNode.dispose();
     super.dispose();
+  }
+
+  void _handleSignIn() async {
+    try {
+      await _googleAuthController.signIn();
+    } catch (e) {
+      // Errors during the sign-in flow itself are reported through the
+      // controller's onError callback. This catches platforms where Google
+      // sign-in is not supported at all.
+      debugPrint('Google sign-in is unavailable: $e');
+    }
   }
 
   void _sendMessage(String text) async {
@@ -500,6 +523,21 @@ class StarguideChatPageState extends State<StarguideChatPage> {
                     ),
                   ),
                 ),
+                if (!sessionManager.isAuthenticated)
+                  ListenableBuilder(
+                    listenable: _googleAuthController,
+                    builder: (context, _) => TextButton(
+                      onPressed: _googleAuthController.isLoading
+                          ? null
+                          : _handleSignIn,
+                      child: Text(
+                        'Sign In',
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: Colors.blue.shade600,
+                        ),
+                      ),
+                    ),
+                  ),
                 Spacer(),
                 if (!sessionManager.isAuthenticated)
                   Text(
