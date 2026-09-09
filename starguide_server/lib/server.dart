@@ -13,27 +13,16 @@ void run(List<String> args) async {
   final pod = Serverpod(args);
 
   // Set up authentication. Users sign in with Google and are issued JWT
-  // tokens. The Google OAuth client credentials are read from the JSON file
-  // downloaded from the Google Cloud console. Without it, the server still
-  // runs but Google sign-in is unavailable.
-  final googleClientSecretFile = File(
-    pod.serverDirectory.uri
-        .resolve('config/google_client_secret.json')
-        .toFilePath(),
-  );
-  if (!googleClientSecretFile.existsSync()) {
-    stderr.writeln(
-      'WARNING: ${googleClientSecretFile.path} not found. '
-      'Google sign-in is disabled.',
-    );
-  }
+  // tokens. Without Google OAuth client credentials, the server still runs
+  // but Google sign-in is unavailable.
+  final googleClientSecret = _loadGoogleClientSecret(pod);
 
   pod.initializeAuthServices(
     tokenManagerBuilders: [JwtConfigFromPasswords()],
     identityProviderBuilders: [
-      if (googleClientSecretFile.existsSync())
+      if (googleClientSecret != null)
         GoogleIdpConfig(
-          clientSecret: GoogleClientSecret.fromJsonFile(googleClientSecretFile),
+          clientSecret: googleClientSecret,
           // Users signing up with a serverpod.dev account are made admins.
           onAfterGoogleAccountCreated: grantAdminScopeToServerpodAccounts,
         ),
@@ -78,6 +67,35 @@ void run(List<String> args) async {
 
   // Keep the data sources up to date with recurring future calls.
   await scheduleDataFetching(pod);
+}
+
+/// Loads the Google OAuth client credentials, or returns null if they are not
+/// configured.
+///
+/// The credentials are read from the JSON file downloaded from the Google
+/// Cloud console when it is present, which is the case in local development.
+/// The file is not deployed to Serverpod Cloud, where the same JSON is instead
+/// provided as the `serverpod_auth_googleClientSecret` password.
+GoogleClientSecret? _loadGoogleClientSecret(Serverpod pod) {
+  final file = File(
+    pod.serverDirectory.uri
+        .resolve('config/google_client_secret.json')
+        .toFilePath(),
+  );
+  if (file.existsSync()) {
+    return GoogleClientSecret.fromJsonFile(file);
+  }
+
+  final json = pod.getPassword('serverpod_auth_googleClientSecret');
+  if (json != null) {
+    return GoogleClientSecret.fromJsonString(json);
+  }
+
+  stderr.writeln(
+    'WARNING: Neither ${file.path} nor the serverpod_auth_googleClientSecret '
+    'password is available. Google sign-in is disabled.',
+  );
+  return null;
 }
 
 Handler _googleSignInCoopMiddleware(Handler next) {
