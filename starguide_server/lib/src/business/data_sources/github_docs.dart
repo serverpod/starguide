@@ -5,6 +5,7 @@ import 'package:pub_semver/pub_semver.dart';
 import 'package:serverpod/serverpod.dart';
 import 'package:starguide_server/src/business/data_fetcher.dart';
 import 'package:starguide_server/src/business/data_source.dart';
+import 'package:starguide_server/src/business/data_sources/markdown_frontmatter.dart';
 import 'package:starguide_server/src/generated/protocol.dart';
 
 class GithubDocsDataSource implements DataSource {
@@ -258,7 +259,7 @@ Future<String> inlineMdxPartials(
     var partial = await loader(relativePath);
     if (partial == null) continue;
 
-    partial = _stripFrontmatter(partial);
+    partial = stripFrontmatter(partial);
     partial = await inlineMdxPartials(
       partial,
       (path) => loader(_joinRelativePath(relativePath, path)),
@@ -279,11 +280,6 @@ String _joinRelativePath(String base, String path) {
       ? base.substring(0, base.lastIndexOf('/'))
       : '.';
   return Uri.parse('$baseDir/').resolve(path).toString();
-}
-
-String _stripFrontmatter(String markdown) {
-  final frontmatterRegex = RegExp(r'^---\n.*?\n---\n', dotAll: true);
-  return markdown.replaceFirst(frontmatterRegex, '');
 }
 
 String _cleanFileName(String fileName) {

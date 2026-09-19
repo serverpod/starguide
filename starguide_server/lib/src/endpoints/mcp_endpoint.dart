@@ -15,7 +15,7 @@ const _mcpInstructions =
     'the "list-guides" tool. Then, retrieve relevant guides to the problem you '
     'are working on using the "get-guide" tool. If the answer is not found in '
     'the guides, use the "ask-docs" tool to search the full Serverpod '
-    'documentation and get answers from GitHub discussions.';
+    'documentation, website and blog and get answers from GitHub discussions.';
 
 /// Endpoint for handling Model Context Protocol (MCP) related operations.
 ///
@@ -64,8 +64,9 @@ class McpEndpoint extends Endpoint {
 
   /// Processes a question using RAG (Retrieval-Augmented Generation).
   ///
-  /// Searches both documentation and discussions to find relevant context,
-  /// then generates an answer using the generative AI system.
+  /// Searches the documentation, the website, discussions and blog posts to
+  /// find relevant context, then generates an answer using the generative AI
+  /// system.
   ///
   /// [session] - The server session for database access.
   /// [question] - The user's question to be answered.
@@ -89,7 +90,7 @@ class McpEndpoint extends Endpoint {
     // Search RAG documents in parallel, using different methods.
     final results = await Future.wait([
       searchDocumentation(session, [], question),
-      searchDiscussions(session, [], question),
+      searchByEmbedding(session, [], question),
     ]);
     var documents = results.expand((list) => list).toList();
 

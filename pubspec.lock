@@ -29,10 +29,10 @@ packages:
     dependency: transitive
     description:
       name: anthropic_sdk_dart
-      sha256: a5a1cc97d4253dd039c3bc36a8eb2fe14bb59c120765f5b91c5fabb8576129e8
+      sha256: b0e91039942930341b24e3871d5b9481b6d31528b711eb752f413f4d1f5980eb
       url: "https://pub.dev"
     source: hosted
-    version: "5.0.0"
+    version: "1.5.0"
   archive:
     dependency: transitive
     description:
@@ -245,10 +245,10 @@ packages:
     dependency: transitive
     description:
       name: dartantic_ai
-      sha256: "942ff61316b3596a1b78cd6a3808b942106d1b0dde89c6057202ba3485a1f312"
+      sha256: "32a3cb9f47d37d8d0da9dee2c9bfa7d1ad421b5c10b53428751b526fa6ece28f"
       url: "https://pub.dev"
     source: hosted
-    version: "3.4.2"
+    version: "3.4.1"
   dartantic_interface:
     dependency: transitive
     description:
@@ -633,10 +633,10 @@ packages:
     dependency: transitive
     description:
       name: googleai_dart
-      sha256: "06e8f181a55d548cef39582c4e81d4b8e4e3e3179052dfa7479051cff058da8d"
+      sha256: b7283c2d0d0aefb8feb735b1a8bcaa5cd1eaeb18fef86d500e9644564586d762
       url: "https://pub.dev"
     source: hosted
-    version: "8.0.0"
+    version: "5.1.0"
   gpt_markdown:
     dependency: transitive
     description:
@@ -921,10 +921,10 @@ packages:
     dependency: transitive
     description:
       name: mistralai_dart
-      sha256: "45b4ed6ee8655707d376780a67d9c198628faf86480d7884a497d51d878a7b7b"
+      sha256: ee6a06c6cac399fc3f4a707f379acd3afea79775033fe4b605da6a8c2dfd3768
       url: "https://pub.dev"
     source: hosted
-    version: "4.0.0"
+    version: "1.3.0"
   native_toolchain_c:
     dependency: transitive
     description:
@@ -969,18 +969,18 @@ packages:
     dependency: transitive
     description:
       name: ollama_dart
-      sha256: "949bc2638832f24108d8708e2cda06b5cf68da402faabf8a0fbb8c46e595d6cc"
+      sha256: d301154465e07810bd0c6ebb4ebc24f1e0f51372a299ae6b28433ac3bea91031
       url: "https://pub.dev"
     source: hosted
-    version: "2.6.1"
+    version: "1.4.1"
   openai_dart:
     dependency: transitive
     description:
       name: openai_dart
-      sha256: c2d690fb68ae56a913872a1347fa11294fea9cf373e6fdf0b253754d83f1e779
+      sha256: "4731f94ea9a09cd9e92333debcfb87efda2764718e506538206df9f540e9ab60"
       url: "https://pub.dev"
     source: hosted
-    version: "7.0.1"
+    version: "1.4.0"
   package_config:
     dependency: transitive
     description:

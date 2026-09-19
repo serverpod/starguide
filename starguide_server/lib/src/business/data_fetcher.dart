@@ -106,7 +106,7 @@ class DataFetcher {
       await RAGDocument.db.updateRow(session, ragDocument);
     }
 
-    if (ragDocument.type == RAGDocumentType.documentation) {
+    if (DocsTableOfContents.includedTypes.contains(ragDocument.type)) {
       await DocsTableOfContents.invalidateCache(session);
     }
   }

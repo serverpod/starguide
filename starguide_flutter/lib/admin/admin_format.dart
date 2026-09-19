@@ -53,6 +53,8 @@ String formatGotHelpRatio(VoteStats stats) {
 /// A human readable label for a document type.
 String documentTypeLabel(RAGDocumentType type) => switch (type) {
   RAGDocumentType.documentation => 'Documentation',
+  RAGDocumentType.site => 'Website',
   RAGDocumentType.discussion => 'Discussion',
+  RAGDocumentType.blog => 'Blog',
   RAGDocumentType.issue => 'Issue',
 };

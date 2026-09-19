@@ -4,6 +4,12 @@ import 'package:starguide_server/src/generated/protocol.dart';
 import 'package:starguide_server/src/generative_ai/generative_ai.dart';
 import 'package:starguide_server/src/generative_ai/prompts.dart';
 
+/// The document types that are found by embedding search, as opposed to
+/// being picked from the table of contents by [searchDocumentation].
+const embeddingSearchTypes = {RAGDocumentType.discussion, RAGDocumentType.blog};
+
+/// Finds documentation and website pages by letting the model pick the most
+/// relevant URLs from the table of contents.
 Future<List<RAGDocument>> searchDocumentation(
   Session session,
   List<ChatMessage> conversation,
@@ -67,7 +73,9 @@ Future<List<RAGDocument>> searchDocumentation(
   return documents;
 }
 
-Future<List<RAGDocument>> searchDiscussions(
+/// Finds the discussions and blog posts closest to the question, by comparing
+/// the embedding of the question with the embeddings of the documents.
+Future<List<RAGDocument>> searchByEmbedding(
   Session session,
   List<ChatMessage> conversation,
   String question,
@@ -110,12 +118,12 @@ Future<List<RAGDocument>> searchDiscussions(
   generateEmbeddingStopwatch.stop();
   timings['generateEmbedding'] = generateEmbeddingStopwatch.elapsed;
 
-  // Find the most similar question in the RAG database.
+  // Find the most similar documents in the RAG database.
   final findDocumentsStopwatch = Stopwatch()..start();
   final documents = await RAGDocument.db.find(
     session,
     orderBy: (rag) => rag.embedding.distanceCosine(embedding),
-    where: (t) => t.type.equals(RAGDocumentType.discussion),
+    where: (t) => t.type.inSet(embeddingSearchTypes),
     limit: 5,
   );
   findDocumentsStopwatch.stop();
@@ -129,7 +137,7 @@ Future<List<RAGDocument>> searchDiscussions(
       .map((e) => '${e.key}: ${e.value.inMilliseconds}ms')
       .join(', ');
   session.log(
-    'searchDiscussions() performance: $timingStrings',
+    'searchByEmbedding() performance: $timingStrings',
     level: LogLevel.debug,
   );
 

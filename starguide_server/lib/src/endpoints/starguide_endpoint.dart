@@ -82,7 +82,8 @@ class StarguideEndpoint extends Endpoint {
   /// Asks a question and streams the generated answer as chunks.
   ///
   /// Combines previous conversation context with searched RAG documents
-  /// from docs and discussions to produce the answer.
+  /// from the docs, the website, discussions and blog posts to produce the
+  /// answer.
   Stream<String> ask(
     Session session,
     ChatSession chatSession,
@@ -117,7 +118,7 @@ class StarguideEndpoint extends Endpoint {
     final searchStopwatch = Stopwatch()..start();
     final results = await Future.wait([
       searchDocumentation(session, conversation, question),
-      searchDiscussions(session, conversation, question),
+      searchByEmbedding(session, conversation, question),
     ]);
     var documents = results.expand((list) => list).toList();
     searchStopwatch.stop();

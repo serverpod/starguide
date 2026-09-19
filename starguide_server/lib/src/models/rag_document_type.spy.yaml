@@ -1,5 +1,12 @@
+### The kind of source a document was fetched from.
 enum: RAGDocumentType
 values:
+  ### A page of the documentation. Listed in the table of contents.
   - documentation
+  ### A page of the product website. Listed in the table of contents.
+  - site
+  ### A GitHub discussion with an accepted answer. Found by embedding search.
   - discussion
+  ### A blog post. Found by embedding search.
+  - blog
   - issue

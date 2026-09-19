@@ -10,7 +10,11 @@ resolution: workspace
 
 dependencies:
   http: ^1.3.0
-  dartantic_ai: ^3.3.0
+  # Pinned: 3.4.2 uses the nested embedding config that googleai_dart 8-12
+  # silently drop for the Gemini API, so the 768-dimension setting is ignored
+  # and embeddings come back with 3072 dimensions. Unpin once dartantic_ai
+  # depends on googleai_dart 13 or later, which fixes the serialization.
+  dartantic_ai: 3.4.1
   pub_semver: ^2.2.0
   serverpod: 4.0.1
   serverpod_auth_core_server: 4.0.1

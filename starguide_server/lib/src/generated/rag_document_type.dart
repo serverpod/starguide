@@ -12,17 +12,31 @@
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod/serverpod.dart' as _is;
 
+/// The kind of source a document was fetched from.
 enum RAGDocumentType implements _is.SerializableModel {
+  /// A page of the documentation. Listed in the table of contents.
   documentation,
+
+  /// A page of the product website. Listed in the table of contents.
+  site,
+
+  /// A GitHub discussion with an accepted answer. Found by embedding search.
   discussion,
+
+  /// A blog post. Found by embedding search.
+  blog,
   issue;
 
   static RAGDocumentType fromJson(String name) {
     switch (name) {
       case 'documentation':
         return RAGDocumentType.documentation;
+      case 'site':
+        return RAGDocumentType.site;
       case 'discussion':
         return RAGDocumentType.discussion;
+      case 'blog':
+        return RAGDocumentType.blog;
       case 'issue':
         return RAGDocumentType.issue;
       default:

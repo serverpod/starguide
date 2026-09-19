@@ -128,22 +128,14 @@ class StarguideTextMessage extends StatelessWidget {
               onLinkTap: onLinkTap,
               codeBuilder: (context, name, codes, closed) =>
                   StarguideCodeField(name: name, codes: codes),
-              highlightBuilder: (context, text, style) {
-                return Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 2),
-                  decoration: BoxDecoration(
-                    color: Colors.grey.shade500.withAlpha(64),
-                    borderRadius: BorderRadius.circular(4),
-                  ),
-                  child: Text(
-                    text,
-                    style: style.copyWith(
-                      fontFamily: 'JetBrainsMono',
-                      fontSize: style.fontSize! * 0.9,
-                    ),
-                  ),
-                );
-              },
+              inlineCodeStyle: InlineCodeStyle(
+                fontFamily: 'JetBrainsMono',
+                fontSizeFactor: 0.9,
+                backgroundColor: Colors.grey.shade500.withAlpha(64),
+                borderColor: Colors.transparent,
+                borderRadius: const Radius.circular(4),
+                padding: const EdgeInsets.symmetric(horizontal: 2),
+              ),
             ),
           ),
           if (gptResponse.links.isNotEmpty)
@@ -369,21 +361,46 @@ class GptResponse {
   }
 }
 
+/// The kind of source a reference links to, shown on its tile.
+///
+/// The icons use the thickest Lucide stroke weight, as they are rendered very
+/// small.
+enum GptResponseLinkKind {
+  docs('Docs', LucideIcons.file600),
+  site('Site', LucideIcons.appWindow600),
+  blog('Blog', LucideIcons.notebookPen600),
+  discussion('Discussion', LucideIcons.messagesSquare600);
+
+  const GptResponseLinkKind(this.label, this.icon);
+
+  final String label;
+  final IconData icon;
+
+  /// Tells the kind of source from the URL of a reference. Discussions are
+  /// linked on GitHub, website pages and blog posts on serverpod.dev, and
+  /// everything else is documentation.
+  static GptResponseLinkKind fromUrl(Uri url) {
+    if (url.host == 'github.com' && url.pathSegments.contains('discussions')) {
+      return discussion;
+    }
+    if (url.host == 'serverpod.dev' || url.host == 'www.serverpod.dev') {
+      return url.pathSegments.firstOrNull == 'blog' ? blog : site;
+    }
+    return docs;
+  }
+}
+
 class GptResponseLink {
   final Uri url;
   final String title;
+  final GptResponseLinkKind kind;
 
-  GptResponseLink({required this.url, required this.title});
+  GptResponseLink({required this.url, required this.title})
+    : kind = GptResponseLinkKind.fromUrl(url);
 
-  /// Discussions are linked on GitHub; everything else is documentation.
-  bool get isDiscussion =>
-      url.host == 'github.com' && url.pathSegments.contains('discussions');
+  String get kindLabel => kind.label;
 
-  String get kindLabel => isDiscussion ? 'Discussion' : 'Docs';
-
-  /// The thickest Lucide stroke weight, as the icon is rendered very small.
-  IconData get kindIcon =>
-      isDiscussion ? LucideIcons.messagesSquare600 : LucideIcons.file600;
+  IconData get kindIcon => kind.icon;
 }
 
 class LinkPreviewList extends StatelessWidget {

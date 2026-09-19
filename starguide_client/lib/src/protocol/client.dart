@@ -198,8 +198,9 @@ class EndpointMcp extends _isc.EndpointRef {
 
   /// Processes a question using RAG (Retrieval-Augmented Generation).
   ///
-  /// Searches both documentation and discussions to find relevant context,
-  /// then generates an answer using the generative AI system.
+  /// Searches the documentation, the website, discussions and blog posts to
+  /// find relevant context, then generates an answer using the generative AI
+  /// system.
   ///
   /// [session] - The server session for database access.
   /// [question] - The user's question to be answered.
@@ -284,7 +285,8 @@ class EndpointStarguide extends _isc.EndpointRef {
   /// Asks a question and streams the generated answer as chunks.
   ///
   /// Combines previous conversation context with searched RAG documents
-  /// from docs and discussions to produce the answer.
+  /// from the docs, the website, discussions and blog posts to produce the
+  /// answer.
   _ida.Stream<String> ask(_ioqsfhvv.ChatSession chatSession, String question) =>
       caller.callStreamingServerEndpoint<_ida.Stream<String>, String>(
         'starguide',

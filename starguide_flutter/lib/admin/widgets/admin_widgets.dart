@@ -188,8 +188,10 @@ class DocumentTypeBadge extends StatelessWidget {
   Widget build(BuildContext context) {
     final label = Text(documentTypeLabel(type));
     return switch (type) {
-      RAGDocumentType.documentation => ShadBadge.secondary(child: label),
-      RAGDocumentType.discussion => ShadBadge.outline(child: label),
+      RAGDocumentType.documentation ||
+      RAGDocumentType.site => ShadBadge.secondary(child: label),
+      RAGDocumentType.discussion ||
+      RAGDocumentType.blog ||
       RAGDocumentType.issue => ShadBadge.outline(child: label),
     };
   }

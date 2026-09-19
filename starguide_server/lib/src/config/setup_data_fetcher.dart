@@ -1,6 +1,8 @@
 import 'package:starguide_server/src/business/data_fetcher.dart';
 import 'package:starguide_server/src/business/data_sources/github_discussions.dart';
 import 'package:starguide_server/src/business/data_sources/github_docs.dart';
+import 'package:starguide_server/src/business/data_sources/website.dart';
+import 'package:starguide_server/src/generated/protocol.dart';
 
 late final String latestServerpodVersion;
 
@@ -40,11 +42,32 @@ Future<void> configureDataFetcher() async {
     domain: 'Relic',
   );
 
+  // Pages on serverpod.dev are listed in the table of contents together with
+  // the documentation, while blog posts are found by embedding search like
+  // the discussions.
+  final serverpodSite = WebsiteDataSource(
+    indexUrls: [
+      Uri.parse('https://serverpod.dev/markdown/feature'),
+      Uri.parse('https://serverpod.dev/markdown/for'),
+      Uri.parse('https://serverpod.dev/markdown/compare'),
+    ],
+    domain: 'Serverpod',
+    documentType: RAGDocumentType.site,
+  );
+
+  final serverpodBlog = WebsiteDataSource(
+    indexUrls: [Uri.parse('https://serverpod.dev/markdown/blog')],
+    domain: 'Serverpod',
+    documentType: RAGDocumentType.blog,
+  );
+
   final dataSources = [
     serverpodDocs,
     serverpodCloudDocs,
     serverpodDiscussions,
     relicDocs,
+    serverpodSite,
+    serverpodBlog,
   ];
 
   DataFetcher.configure(dataSources);

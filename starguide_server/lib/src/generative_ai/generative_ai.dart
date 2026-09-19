@@ -155,8 +155,12 @@ extension RAGDocumentTypeName on RAGDocumentType {
     switch (this) {
       case RAGDocumentType.documentation:
         return 'Documentation';
+      case RAGDocumentType.site:
+        return 'Website Page';
       case RAGDocumentType.discussion:
         return 'GitHub Discussion';
+      case RAGDocumentType.blog:
+        return 'Blog Post';
       case RAGDocumentType.issue:
         return 'GitHub Issue';
     }

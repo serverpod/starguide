@@ -1,7 +1,17 @@
 import 'package:serverpod/serverpod.dart';
 import 'package:starguide_server/src/generated/protocol.dart';
 
+/// The table of contents lists every document of the types in
+/// [DocsTableOfContents.includedTypes]. It is given to the model, which picks
+/// the pages most likely to answer a question. Documents of other types are
+/// found by embedding search instead.
 class DocsTableOfContents {
+  /// The document types listed in the table of contents.
+  static const includedTypes = {
+    RAGDocumentType.documentation,
+    RAGDocumentType.site,
+  };
+
   static const int _batchSize = 20;
   static const String _cacheKey = 'docs_table_of_contents';
 
@@ -14,9 +24,7 @@ class DocsTableOfContents {
     while (hasMoreDocuments) {
       final documents = await RAGDocument.db.find(
         session,
-        where: (d) =>
-            (d.id > (lastDocumentId)) &
-            (d.type.equals(RAGDocumentType.documentation)),
+        where: (d) => (d.id > (lastDocumentId)) & d.type.inSet(includedTypes),
         limit: _batchSize,
         orderBy: (d) => d.id,
       );
@@ -49,13 +57,10 @@ class DocsTableOfContents {
   static Future<String> getTableOfContents(Session session) async {
     var toc = await session.caches.local.get<TableOfContents>(
       _cacheKey,
-      CacheMissHandler(
-        () async {
-          final toc = await _generateTOC(session);
-          return TableOfContents(contents: toc);
-        },
-        lifetime: const Duration(hours: 1),
-      ),
+      CacheMissHandler(() async {
+        final toc = await _generateTOC(session);
+        return TableOfContents(contents: toc);
+      }, lifetime: const Duration(hours: 1)),
     );
     return toc?.contents ?? '';
   }
