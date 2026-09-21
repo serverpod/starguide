@@ -40,6 +40,12 @@ class DocumentIndexCache {
   static const int _batchSize = 100;
   static const String _cacheKey = 'document_index';
 
+  /// The documents listed in the cached index, keyed by id, with the
+  /// generation time of that index. They are kept outside the local cache,
+  /// which serializes on every read, so that picked pages need neither a
+  /// database query nor decoding.
+  static ({DateTime generatedAt, Map<int, RAGDocument> byId})? _documents;
+
   /// Returns the cached index, building it from the database on a miss.
   static Future<DocumentIndex> get(Session session) async {
     final index = await session.caches.local.get<DocumentIndex>(
@@ -51,7 +57,34 @@ class DocumentIndexCache {
 
   /// Drops the cached index, so that the next [get] rebuilds it.
   static Future<void> invalidate(Session session) async {
+    _documents = null;
     await session.caches.local.invalidateKey(_cacheKey);
+  }
+
+  /// The listed documents with [ids], keyed by id. They come from memory if
+  /// they were loaded when [index] was built, and from the database
+  /// otherwise. Documents that no longer exist are left out.
+  static Future<Map<int, RAGDocument>> findDocuments(
+    Session session,
+    DocumentIndex index,
+    Set<int> ids,
+  ) async {
+    final cached = _documents;
+    if (cached != null &&
+        cached.generatedAt.isAtSameMomentAs(index.generatedAt)) {
+      final byId = <int, RAGDocument>{};
+      for (final id in ids) {
+        final document = cached.byId[id];
+        if (document != null) byId[id] = document;
+      }
+      return byId;
+    }
+
+    final found = await RAGDocument.db.find(
+      session,
+      where: (t) => t.id.inSet(ids),
+    );
+    return {for (final document in found) document.id!: document};
   }
 
   /// Builds the index from all documents of the [includedTypes] in the
@@ -72,6 +105,10 @@ class DocumentIndexCache {
     }
 
     final index = fromDocuments(documents, descriptions: _domainDescriptions());
+    _documents = (
+      generatedAt: index.generatedAt,
+      byId: {for (final document in documents) document.id!: document},
+    );
     session.log(
       'Built document index with ${index.groups.length} groups and '
       '${documents.length} documents.',

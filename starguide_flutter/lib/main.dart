@@ -158,6 +158,11 @@ class StarguideChatPageState extends State<StarguideChatPage> {
   final _model = const User(id: _modelId);
 
   ChatSession? _chatSession;
+
+  /// The chat session being created, started as soon as the user focuses the
+  /// input so that it is ready when the first question is sent.
+  Future<ChatSession>? _chatSessionFuture;
+
   TextMessage? _currentResponse;
   bool _hasInputText = false;
   bool _isGeneratingResponse = false;
@@ -208,6 +213,7 @@ class StarguideChatPageState extends State<StarguideChatPage> {
       setState(() {
         _isInputFocused = _inputFocusNode.hasFocus;
       });
+      if (_inputFocusNode.hasFocus) _prepareChatSession();
     });
 
     // Check if there is an initial query in the URL.
@@ -258,9 +264,7 @@ class StarguideChatPageState extends State<StarguideChatPage> {
 
     // Set up a new chat session, if we haven't started one already.
     try {
-      _chatSession ??= await client.starguide.createChatSession(
-        kIsWeb ? (await GRecaptchaV3.execute('create_chat_session'))! : '',
-      );
+      _chatSession ??= await _getChatSession();
 
       final responseStream = client.starguide.ask(_chatSession!, text);
 
@@ -289,17 +293,43 @@ class StarguideChatPageState extends State<StarguideChatPage> {
         _isGeneratingResponse = false;
       });
     } on RecaptchaException catch (_) {
+      _chatSessionFuture = null;
       setState(() {
         _recaptchaError = true;
         _connectionError = true;
       });
       return;
     } catch (e) {
+      _chatSessionFuture = null;
       setState(() {
         _connectionError = true;
         _connectionErrorMessage = 'Error: $e';
       });
       return;
+    }
+  }
+
+  /// The chat session, created on the first call. The reCAPTCHA check and
+  /// the request to the server are only made once, even if this is called
+  /// again while they are in progress.
+  Future<ChatSession> _getChatSession() {
+    return _chatSessionFuture ??= () async {
+      final token = kIsWeb
+          ? (await GRecaptchaV3.execute('create_chat_session'))!
+          : '';
+      return client.starguide.createChatSession(token);
+    }();
+  }
+
+  /// Starts creating the chat session ahead of the first question. A failure
+  /// is dropped here and reported when the question is sent, which tries
+  /// again.
+  Future<void> _prepareChatSession() async {
+    if (_chatSession != null || _chatSessionFuture != null) return;
+    try {
+      _chatSession ??= await _getChatSession();
+    } catch (_) {
+      _chatSessionFuture = null;
     }
   }
 
@@ -320,6 +350,7 @@ class StarguideChatPageState extends State<StarguideChatPage> {
     setState(() {
       _chatController.setMessages([]);
       _chatSession = null;
+      _chatSessionFuture = null;
       _currentResponse = null;
       _numChatRequests = 0;
       _vote = null;

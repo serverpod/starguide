@@ -71,14 +71,35 @@ class GenerativeAi {
     }
   }
 
+  /// The most characters of a document's content included in the prompt
+  /// when generating an answer. The time to the first token grows with the
+  /// size of the prompt, and only a few outliers, such as discussions with
+  /// pasted logs, are longer than this.
+  static const maxDocumentCharacters = 40000;
+
+  /// The thinking budget of the chat models, in tokens. Gemini 2.5 Flash
+  /// thinks before its first token unless the budget is zero, which delays
+  /// the start of the streamed answer by seconds.
+  static const thinkingBudgetTokens = 0;
+
   String _formatDocument(RAGDocument document) {
-    return '<doc href="${document.sourceUrl}" type="${document.type.name}" title="${document.title}">\n${document.content}\n</doc>';
+    var content = document.content;
+    if (content.length > maxDocumentCharacters) {
+      content = '${content.substring(0, maxDocumentCharacters)}\n[Truncated]';
+    }
+    return '<doc href="${document.sourceUrl}" type="${document.type.name}" title="${document.title}">\n$content\n</doc>';
   }
 
   ai.Agent _createAgent({final ModelQuality quality = ModelQuality.fast}) {
     ai.Agent.environment['GEMINI_API_KEY'] = _geminiAPIKey;
     return ai.Agent(
       quality.model,
+      // The thinking budget is only sent when thinking is enabled. Thoughts
+      // are never part of the output, so enabling it changes nothing else.
+      enableThinking: true,
+      chatModelOptions: const ai.GoogleChatModelOptions(
+        thinkingBudgetTokens: thinkingBudgetTokens,
+      ),
       embeddingsModelOptions: const ai.GoogleEmbeddingsModelOptions(
         dimensions: 768,
       ),

@@ -46,11 +46,7 @@ Future<List<RAGDocument>> searchDocumentation(
   final documents = <RAGDocument>[];
   if (picks.isNotEmpty) {
     final ids = <int>{for (final pick in picks) pick.documentId};
-    final found = await RAGDocument.db.find(
-      session,
-      where: (t) => t.id.inSet(ids),
-    );
-    final byId = {for (final document in found) document.id!: document};
+    final byId = await DocumentIndexCache.findDocuments(session, index, ids);
 
     // Keep Jev's order, best first. A picked page may have been removed
     // since the index was built.

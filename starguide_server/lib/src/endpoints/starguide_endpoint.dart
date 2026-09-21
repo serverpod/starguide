@@ -93,21 +93,23 @@ class StarguideEndpoint extends Endpoint {
     final totalStopwatch = Stopwatch()..start();
     final timings = <String, Duration>{};
 
-    // Verify that the session is valid.
+    // Verify that the session is valid and find the earlier conversation.
+    // Both only need the chat session, so the queries run at the same time.
     final verifyStopwatch = Stopwatch()..start();
-    await _verifyChatSession(session, chatSession);
-    verifyStopwatch.stop();
-    timings['verifyChatSession'] = verifyStopwatch.elapsed;
-
-    // Find earlier conversation.
-    final findConversationStopwatch = Stopwatch()..start();
-    final conversation = await ChatMessage.db.find(
+    final conversationFuture = ChatMessage.db.find(
       session,
       where: (chatMessage) => chatMessage.chatSessionId.equals(chatSession.id!),
       orderBy: (chatMessage) => chatMessage.id,
     );
-    findConversationStopwatch.stop();
-    timings['findConversation'] = findConversationStopwatch.elapsed;
+    try {
+      await _verifyChatSession(session, chatSession);
+    } catch (_) {
+      conversationFuture.ignore();
+      rethrow;
+    }
+    final conversation = await conversationFuture;
+    verifyStopwatch.stop();
+    timings['verifyAndFindConversation'] = verifyStopwatch.elapsed;
 
     if (conversation.length >= _maxConversationLength) {
       throw FormatException('Conversation too long.');

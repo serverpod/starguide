@@ -41,9 +41,14 @@ class Jev {
   /// trusted to contain the answer, so no further search is needed.
   static const answerGateThreshold = 0.7;
 
-  /// The most characters of a page's content sent to [canAnswer], so that a
-  /// few long pages cannot blow up the request.
-  static const maxPageCharacters = 12000;
+  /// How many of the picked pages, best first, [canAnswer] judges. The
+  /// request to Jev grows with the pages it carries, and fewer or shorter
+  /// pages can only make the judgement more cautious, which costs an
+  /// embedding search but never a document in the answer.
+  static const answerGatePageCount = 3;
+
+  /// The most characters of a page's content sent to [canAnswer].
+  static const maxPageCharacters = 8000;
 
   static Jev? _instance;
 
@@ -140,8 +145,9 @@ class Jev {
     return picked;
   }
 
-  /// The probability that [documents] contain what is needed to answer
-  /// [question]. Throws a [GenerativeAiException] if the request fails.
+  /// The probability that the first [answerGatePageCount] of [documents]
+  /// contain what is needed to answer [question]. Throws a
+  /// [GenerativeAiException] if the request fails.
   Future<double> canAnswer(
     Session session,
     List<ChatMessage> conversation,
@@ -149,10 +155,11 @@ class Jev {
     List<RAGDocument> documents,
   ) async {
     final stopwatch = Stopwatch()..start();
+    final pages = documents.take(answerGatePageCount).toList();
     final state = {
       ..._state(conversation, question),
       'pages': [
-        for (final document in documents)
+        for (final document in pages)
           {
             'title': document.title,
             'url': document.sourceUrl.toString(),
@@ -173,7 +180,7 @@ class Jev {
     final probability = result.noul('answerable').noul;
 
     session.log(
-      'Jev judged that the ${documents.length} picked pages answer the '
+      'Jev judged that the ${pages.length} picked pages answer the '
       'question with ${_percent(probability)} probability in '
       '${stopwatch.elapsedMilliseconds}ms, tokens: ${_usage([result])}',
       level: LogLevel.debug,
