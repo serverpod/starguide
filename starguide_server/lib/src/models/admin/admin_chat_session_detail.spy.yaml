@@ -5,4 +5,7 @@ fields:
   createdAt: DateTime
   goodAnswer: bool?
   authUserId: UuidValue?
+  ### Jev's judgement of the latest answer, if it was judged.
+  answerOutcome: AnswerOutcome?
+  answerOutcomeConfidence: double?
   messages: List<ChatMessage>

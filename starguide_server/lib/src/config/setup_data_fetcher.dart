@@ -14,6 +14,10 @@ Future<void> configureDataFetcher() async {
     referenceUrl: Uri.parse('https://docs.serverpod.dev'),
     branch: 'main',
     domain: 'Serverpod framework',
+    description:
+        'The open source backend framework for Flutter, written in Dart, '
+        'with its server, ORM, migrations, authentication, and client '
+        'code generation.',
   );
   latestServerpodVersion = serverpodDocs.latestVersion!;
 
@@ -22,6 +26,7 @@ Future<void> configureDataFetcher() async {
     repo: 'serverpod',
     categoryName: 'Q&A',
     domain: 'Serverpod',
+    description: 'Questions and answers about Serverpod on GitHub.',
   );
 
   final serverpodCloudDocs = GithubDocsDataSource(
@@ -31,6 +36,10 @@ Future<void> configureDataFetcher() async {
     referenceUrl: Uri.parse('https://docs.serverpod.dev/cloud'),
     branch: 'main',
     domain: 'Serverpod Cloud',
+    description:
+        'The hosting service for Serverpod servers, with its scloud command '
+        'line tool, deployments, databases, secrets, custom domains, and '
+        'billing.',
   );
 
   final relicDocs = GithubDocsDataSource(
@@ -40,6 +49,9 @@ Future<void> configureDataFetcher() async {
     referenceUrl: Uri.parse('https://docs.dartrelic.dev'),
     branch: 'main',
     domain: 'Relic',
+    description:
+        'The low-level web server for Dart that Serverpod is built on, with '
+        'routing, middleware, requests, responses, and static files.',
   );
 
   // Pages on serverpod.dev are listed in the table of contents together with
@@ -53,12 +65,16 @@ Future<void> configureDataFetcher() async {
     ],
     domain: 'Serverpod',
     documentType: RAGDocumentType.site,
+    description:
+        'The Serverpod website, which presents the features and compares '
+        'Serverpod with other frameworks and services.',
   );
 
   final serverpodBlog = WebsiteDataSource(
     indexUrls: [Uri.parse('https://serverpod.dev/markdown/blog')],
     domain: 'Serverpod',
     documentType: RAGDocumentType.blog,
+    description: 'Blog posts on the Serverpod website.',
   );
 
   final dataSources = [

@@ -1,5 +1,8 @@
 import 'package:serverpod/serverpod.dart';
+import 'dart:convert';
+
 import 'package:starguide_server/src/business/admin_stats.dart';
+import 'package:starguide_server/src/business/document_index.dart';
 import 'package:starguide_server/src/generated/protocol.dart';
 
 /// Endpoint backing the admin interface. Only users with the admin scope,
@@ -101,23 +104,63 @@ class AdminEndpoint extends Endpoint {
     );
   }
 
+  /// Returns the document index as it is cached for Jev, with the payloads
+  /// of its questions. Builds it if it is not cached.
+  Future<AdminDocumentIndex> getDocumentIndex(Session session) async {
+    return _describeIndex(await DocumentIndexCache.get(session));
+  }
+
+  /// Rebuilds the document index from the database and returns it.
+  Future<AdminDocumentIndex> rebuildDocumentIndex(Session session) async {
+    await DocumentIndexCache.invalidate(session);
+    return _describeIndex(await DocumentIndexCache.get(session));
+  }
+
+  static AdminDocumentIndex _describeIndex(DocumentIndex index) {
+    final domainPayload = jsonEncode(index.domainCriteria);
+    final groupPayloads = [
+      for (final group in index.groups) jsonEncode(group.criteria),
+    ];
+    final totalSizeInBytes =
+        index.sizeInBytes + utf8.encode(domainPayload).length;
+    return AdminDocumentIndex(
+      index: index,
+      expiresAt: index.generatedAt.add(DocumentIndexCache.lifetime),
+      entryCount: index.entryCount,
+      totalSizeInBytes: totalSizeInBytes,
+      estimatedTokens: (totalSizeInBytes / 4).round(),
+      domainPayload: domainPayload,
+      groupPayloads: groupPayloads,
+    );
+  }
+
   /// Lists chat sessions, newest first. With [goodAnswer] set, only sessions
   /// with that vote are listed. With [votedOnly], unvoted sessions are
-  /// skipped. The default lists sessions where the answer was voted poor.
+  /// skipped. With [outcomes], only sessions whose latest answer Jev judged
+  /// with one of those outcomes are listed. The default lists sessions where
+  /// the answer was voted poor.
   Future<AdminChatSessionPage> listChatSessions(
     Session session, {
     required int page,
     required int pageSize,
     bool? goodAnswer = false,
     bool votedOnly = false,
+    List<AnswerOutcome>? outcomes,
   }) async {
     final limit = pageSize.clamp(1, _maxPageSize);
     final offset = page.clamp(0, 1 << 30) * limit;
 
     Expression where(ChatSessionTable t) {
-      if (goodAnswer != null) return t.goodAnswer.equals(goodAnswer);
-      if (votedOnly) return t.goodAnswer.notEquals(null);
-      return Constant.bool(true);
+      Expression expression = Constant.bool(true);
+      if (goodAnswer != null) {
+        expression = expression & t.goodAnswer.equals(goodAnswer);
+      } else if (votedOnly) {
+        expression = expression & t.goodAnswer.notEquals(null);
+      }
+      if (outcomes != null) {
+        expression = expression & t.answerOutcome.inSet(outcomes.toSet());
+      }
+      return expression;
     }
 
     final totalCount = await ChatSession.db.count(session, where: where);
@@ -165,6 +208,8 @@ class AdminEndpoint extends Endpoint {
             goodAnswer: s.goodAnswer,
             authUserId: s.authUserId,
             messageCount: messageCounts[s.id!] ?? 0,
+            answerOutcome: s.answerOutcome,
+            answerOutcomeConfidence: s.answerOutcomeConfidence,
             firstQuestion: firstQuestions[s.id!] ?? '',
           ),
       ],
@@ -191,6 +236,8 @@ class AdminEndpoint extends Endpoint {
       createdAt: chatSession.createdAt,
       goodAnswer: chatSession.goodAnswer,
       authUserId: chatSession.authUserId,
+      answerOutcome: chatSession.answerOutcome,
+      answerOutcomeConfidence: chatSession.answerOutcomeConfidence,
       messages: messages,
     );
   }

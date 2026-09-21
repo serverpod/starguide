@@ -13,12 +13,15 @@ class GithubDiscussionsDataSource implements DataSource {
   final String categoryName;
   @override
   final String domain;
+  @override
+  final String description;
 
   GithubDiscussionsDataSource({
     required this.owner,
     required this.repo,
     required this.categoryName,
     required this.domain,
+    required this.description,
   });
 
   @override

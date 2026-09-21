@@ -23,7 +23,12 @@ abstract class DailyStats
     required this.sessionCount,
     required this.goodAnswerCount,
     required this.poorAnswerCount,
-  });
+    int? answeredCount,
+    int? notAnsweredCount,
+    int? unsureCount,
+  }) : answeredCount = answeredCount ?? 0,
+       notAnsweredCount = notAnsweredCount ?? 0,
+       unsureCount = unsureCount ?? 0;
 
   factory DailyStats({
     int? id,
@@ -31,6 +36,9 @@ abstract class DailyStats
     required int sessionCount,
     required int goodAnswerCount,
     required int poorAnswerCount,
+    int? answeredCount,
+    int? notAnsweredCount,
+    int? unsureCount,
   }) = _DailyStatsImpl;
 
   factory DailyStats.fromJson(Map<String, dynamic> jsonSerialization) {
@@ -40,6 +48,9 @@ abstract class DailyStats
       sessionCount: jsonSerialization['sessionCount'] as int,
       goodAnswerCount: jsonSerialization['goodAnswerCount'] as int,
       poorAnswerCount: jsonSerialization['poorAnswerCount'] as int,
+      answeredCount: jsonSerialization['answeredCount'] as int?,
+      notAnsweredCount: jsonSerialization['notAnsweredCount'] as int?,
+      unsureCount: jsonSerialization['unsureCount'] as int?,
     );
   }
 
@@ -57,6 +68,13 @@ abstract class DailyStats
 
   int poorAnswerCount;
 
+  /// Sessions whose latest answer Jev judged to have answered the question.
+  int answeredCount;
+
+  int notAnsweredCount;
+
+  int unsureCount;
+
   /// Returns a shallow copy of this [DailyStats]
   /// with some or all fields replaced by the given arguments.
   @_isc.useResult
@@ -66,6 +84,9 @@ abstract class DailyStats
     int? sessionCount,
     int? goodAnswerCount,
     int? poorAnswerCount,
+    int? answeredCount,
+    int? notAnsweredCount,
+    int? unsureCount,
   });
   @override
   Map<String, dynamic> toJson() {
@@ -76,6 +97,9 @@ abstract class DailyStats
       'sessionCount': sessionCount,
       'goodAnswerCount': goodAnswerCount,
       'poorAnswerCount': poorAnswerCount,
+      'answeredCount': answeredCount,
+      'notAnsweredCount': notAnsweredCount,
+      'unsureCount': unsureCount,
     };
   }
 
@@ -88,6 +112,9 @@ abstract class DailyStats
       'sessionCount': sessionCount,
       'goodAnswerCount': goodAnswerCount,
       'poorAnswerCount': poorAnswerCount,
+      'answeredCount': answeredCount,
+      'notAnsweredCount': notAnsweredCount,
+      'unsureCount': unsureCount,
     };
   }
 
@@ -106,12 +133,18 @@ class _DailyStatsImpl extends DailyStats {
     required int sessionCount,
     required int goodAnswerCount,
     required int poorAnswerCount,
+    int? answeredCount,
+    int? notAnsweredCount,
+    int? unsureCount,
   }) : super._(
          id: id,
          day: day,
          sessionCount: sessionCount,
          goodAnswerCount: goodAnswerCount,
          poorAnswerCount: poorAnswerCount,
+         answeredCount: answeredCount,
+         notAnsweredCount: notAnsweredCount,
+         unsureCount: unsureCount,
        );
 
   /// Returns a shallow copy of this [DailyStats]
@@ -124,6 +157,9 @@ class _DailyStatsImpl extends DailyStats {
     int? sessionCount,
     int? goodAnswerCount,
     int? poorAnswerCount,
+    int? answeredCount,
+    int? notAnsweredCount,
+    int? unsureCount,
   }) {
     return DailyStats(
       id: id is int? ? id : this.id,
@@ -131,6 +167,9 @@ class _DailyStatsImpl extends DailyStats {
       sessionCount: sessionCount ?? this.sessionCount,
       goodAnswerCount: goodAnswerCount ?? this.goodAnswerCount,
       poorAnswerCount: poorAnswerCount ?? this.poorAnswerCount,
+      answeredCount: answeredCount ?? this.answeredCount,
+      notAnsweredCount: notAnsweredCount ?? this.notAnsweredCount,
+      unsureCount: unsureCount ?? this.unsureCount,
     );
   }
 }

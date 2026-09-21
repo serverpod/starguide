@@ -10,8 +10,8 @@ class Prompts {
     final promptsFolder = Directory('assets/prompts');
     for (var file in promptsFolder.listSync(recursive: true)) {
       if (file.path.endsWith('.txt') && file is File) {
-        _prompts[file.path.split('/').last.replaceAll('.txt', '')] =
-            file.readAsStringSync();
+        _prompts[file.path.split('/').last.replaceAll('.txt', '')] = file
+            .readAsStringSync();
       }
     }
   }

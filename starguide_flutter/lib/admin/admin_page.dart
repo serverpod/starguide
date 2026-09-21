@@ -1,13 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:shad/shad.dart';
+import 'package:starguide_flutter/admin/views/admin_document_index_view.dart';
 import 'package:starguide_flutter/admin/views/admin_overview_view.dart';
 import 'package:starguide_flutter/admin/views/admin_poor_answers_view.dart';
 import 'package:starguide_flutter/admin/views/admin_sources_view.dart';
+import 'package:starguide_flutter/admin/views/admin_unanswered_view.dart';
 
 enum _AdminSection {
   overview('Overview', LucideIcons.chartColumn),
   sources('Sources', LucideIcons.database),
-  poorAnswers('Poor Answers', LucideIcons.thumbsDown);
+  documentIndex('Document Index', LucideIcons.listTree),
+  poorAnswers('Poor Answers', LucideIcons.thumbsDown),
+  unanswered('Unanswered', LucideIcons.messageCircleQuestionMark);
 
   const _AdminSection(this.label, this.icon);
 
@@ -80,6 +84,7 @@ class _AdminPageState extends State<AdminPage> {
                   children: [
                     _menuButton(_AdminSection.overview),
                     _menuButton(_AdminSection.poorAnswers),
+                    _menuButton(_AdminSection.unanswered),
                   ],
                 ),
               ],
@@ -87,7 +92,12 @@ class _AdminPageState extends State<AdminPage> {
             ShadSidebarGroup(
               label: const Text('Data'),
               children: [
-                ShadSidebarMenu(children: [_menuButton(_AdminSection.sources)]),
+                ShadSidebarMenu(
+                  children: [
+                    _menuButton(_AdminSection.sources),
+                    _menuButton(_AdminSection.documentIndex),
+                  ],
+                ),
               ],
             ),
           ],
@@ -119,6 +129,9 @@ class _AdminPageState extends State<AdminPage> {
                   child: switch (_section) {
                     _AdminSection.overview => const AdminOverviewView(),
                     _AdminSection.sources => const AdminSourcesView(),
+                    _AdminSection.documentIndex =>
+                      const AdminDocumentIndexView(),
+                    _AdminSection.unanswered => const AdminUnansweredView(),
                     _AdminSection.poorAnswers => const AdminPoorAnswersView(),
                   },
                 ),

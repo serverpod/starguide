@@ -15,6 +15,7 @@ dependencies:
   # and embeddings come back with 3072 dimensions. Unpin once dartantic_ai
   # depends on googleai_dart 13 or later, which fixes the serialization.
   dartantic_ai: 3.4.1
+  jev_dart: ^0.1.2
   pub_semver: ^2.2.0
   serverpod: 4.0.1
   serverpod_auth_core_server: 4.0.1
@@ -42,3 +43,10 @@ serverpod:
       posix: |
         cd ../starguide_flutter
         flutter build web --no-tree-shake-icons --base-href / --output ../starguide_server/web/app
+  flutter_apps:
+    starguide:
+      path: ../starguide_flutter
+      displayName: "Starguide app"
+      auto_launch: true
+      target: lib/main.dart
+      web-port: 8888

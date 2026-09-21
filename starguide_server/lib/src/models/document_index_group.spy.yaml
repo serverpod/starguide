@@ -1,0 +1,14 @@
+### The pages of one data source, asked about as one choice question.
+class: DocumentIndexGroup
+fields:
+  ### Unique name of the group. The domain, with a number appended when a
+  ### source has more pages than fit in one question.
+  name: String
+  ### The domain of the pages, which is an option of the domain question.
+  domain: String
+  ### What the domain is, as the description of its option.
+  description: String
+  type: RAGDocumentType
+  entries: List<DocumentIndexEntry>
+  ### UTF-8 bytes of the options as sent to Jev.
+  sizeInBytes: int

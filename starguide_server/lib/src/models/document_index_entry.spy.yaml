@@ -1,0 +1,12 @@
+### One page of the index, an option of its group's choice question.
+class: DocumentIndexEntry
+fields:
+  documentId: int
+  ### The option label, the page's URL path relative to its group.
+  label: String
+  title: String
+  ### The option description, the page's short description.
+  description: String
+  sourceUrl: Uri
+  ### UTF-8 bytes of the label and description as sent to Jev.
+  sizeInBytes: int

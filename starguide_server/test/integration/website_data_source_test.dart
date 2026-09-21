@@ -53,6 +53,7 @@ void main() {
       indexUrls: [Uri.parse('https://serverpod.dev/markdown/feature')],
       domain: 'Serverpod',
       documentType: RAGDocumentType.site,
+      description: 'The Serverpod website',
       client: client,
     );
 
@@ -134,6 +135,7 @@ void main() {
         indexUrls: [Uri.parse('https://serverpod.dev/markdown/missing')],
         domain: 'Serverpod',
         documentType: RAGDocumentType.site,
+        description: 'The Serverpod website',
         client: client,
       );
 

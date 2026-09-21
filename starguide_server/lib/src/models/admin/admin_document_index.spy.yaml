@@ -1,0 +1,16 @@
+### The cached document index with the payloads sent to Jev and totals, for
+### the admin interface.
+class: AdminDocumentIndex
+fields:
+  index: DocumentIndex
+  ### When the cached index expires and is rebuilt on the next question.
+  expiresAt: DateTime
+  entryCount: int
+  totalSizeInBytes: int
+  ### A rough token count of the payloads, at four bytes per token.
+  estimatedTokens: int
+  ### The options of the domain question, as JSON.
+  domainPayload: String
+  ### The options of each group's question, as JSON, in the order of the
+  ### groups of the index.
+  groupPayloads: List<String>

@@ -211,12 +211,18 @@ class AdminStats {
       SELECT
         COUNT(*)::int,
         COUNT(*) FILTER (WHERE "goodAnswer" = TRUE)::int,
-        COUNT(*) FILTER (WHERE "goodAnswer" = FALSE)::int
+        COUNT(*) FILTER (WHERE "goodAnswer" = FALSE)::int,
+        COUNT(*) FILTER (WHERE "answerOutcome" = @answered)::int,
+        COUNT(*) FILTER (WHERE "answerOutcome" = @notAnswered)::int,
+        COUNT(*) FILTER (WHERE "answerOutcome" = @unsure)::int
       FROM chat_session
       WHERE "createdAt" >= @from
       ''',
       parameters: QueryParameters.named({
         'from': DateTime.now().toUtc().subtract(period),
+        'answered': AnswerOutcome.answered.name,
+        'notAnswered': AnswerOutcome.notAnswered.name,
+        'unsure': AnswerOutcome.unsure.name,
       }),
     );
     final row = rows.first;
@@ -224,6 +230,9 @@ class AdminStats {
       sessionCount: row[0] as int,
       goodAnswerCount: row[1] as int,
       poorAnswerCount: row[2] as int,
+      answeredCount: row[3] as int,
+      notAnsweredCount: row[4] as int,
+      unsureCount: row[5] as int,
     );
   }
 
@@ -269,6 +278,9 @@ class AdminStats {
               sessionCount: 0,
               goodAnswerCount: 0,
               poorAnswerCount: 0,
+              answeredCount: 0,
+              notAnsweredCount: 0,
+              unsureCount: 0,
             );
         statsByDay[day] = await _storeDailyStats(
           session,
@@ -286,6 +298,9 @@ class AdminStats {
               sessionCount: 0,
               goodAnswerCount: 0,
               poorAnswerCount: 0,
+              answeredCount: 0,
+              notAnsweredCount: 0,
+              unsureCount: 0,
             ),
     ];
   }
@@ -295,16 +310,27 @@ class AdminStats {
     Session session, {
     required DateTime from,
   }) async {
-    final rows = await session.db.unsafeQuery('''
+    final rows = await session.db.unsafeQuery(
+      '''
       SELECT
         date_trunc('day', "createdAt") AS day,
         COUNT(*)::int,
         COUNT(*) FILTER (WHERE "goodAnswer" = TRUE)::int,
-        COUNT(*) FILTER (WHERE "goodAnswer" = FALSE)::int
+        COUNT(*) FILTER (WHERE "goodAnswer" = FALSE)::int,
+        COUNT(*) FILTER (WHERE "answerOutcome" = @answered)::int,
+        COUNT(*) FILTER (WHERE "answerOutcome" = @notAnswered)::int,
+        COUNT(*) FILTER (WHERE "answerOutcome" = @unsure)::int
       FROM chat_session
       WHERE "createdAt" >= @from
       GROUP BY day
-      ''', parameters: QueryParameters.named({'from': from}));
+      ''',
+      parameters: QueryParameters.named({
+        'from': from,
+        'answered': AnswerOutcome.answered.name,
+        'notAnswered': AnswerOutcome.notAnswered.name,
+        'unsure': AnswerOutcome.unsure.name,
+      }),
+    );
     return {
       for (final row in rows)
         (row[0] as DateTime).toUtc(): DailyStats(
@@ -312,6 +338,9 @@ class AdminStats {
           sessionCount: row[1] as int,
           goodAnswerCount: row[2] as int,
           poorAnswerCount: row[3] as int,
+          answeredCount: row[4] as int,
+          notAnsweredCount: row[5] as int,
+          unsureCount: row[6] as int,
         ),
     };
   }
@@ -330,7 +359,10 @@ class AdminStats {
       }
       if (existing.sessionCount == stats.sessionCount &&
           existing.goodAnswerCount == stats.goodAnswerCount &&
-          existing.poorAnswerCount == stats.poorAnswerCount) {
+          existing.poorAnswerCount == stats.poorAnswerCount &&
+          existing.answeredCount == stats.answeredCount &&
+          existing.notAnsweredCount == stats.notAnsweredCount &&
+          existing.unsureCount == stats.unsureCount) {
         return existing;
       }
       return await DailyStats.db.updateRow(

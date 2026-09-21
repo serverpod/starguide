@@ -5,31 +5,23 @@ import 'package:shad/shad.dart';
 import 'package:starguide_client/starguide_client.dart';
 import 'package:starguide_flutter/admin/admin_format.dart';
 
-/// Colors used for the votes in the chart and its legend.
-class VoteColors {
-  const VoteColors({
-    required this.gotHelp,
-    required this.poorAnswer,
-    required this.noVote,
+/// One segment of the stacked bars: how many sessions of a day it counts,
+/// and how it is drawn and named in the legend and the tooltip.
+class DailySeries {
+  const DailySeries({
+    required this.label,
+    required this.color,
+    required this.count,
   });
 
-  factory VoteColors.of(BuildContext context) {
-    final colorScheme = ShadTheme.of(context).colorScheme;
-    return VoteColors(
-      gotHelp: const Color(0xFF16A34A),
-      poorAnswer: colorScheme.destructive,
-      noVote: colorScheme.border,
-    );
-  }
-
-  final Color gotHelp;
-  final Color poorAnswer;
-  final Color noVote;
+  final String label;
+  final Color color;
+  final int Function(DailyStats stats) count;
 }
 
 /// A stacked bar chart of chat sessions per day, split by vote. Hovering a
 /// bar shows the counts of that day.
-class VoteHistoryChart extends StatefulWidget {
+class VoteHistoryChart extends StatelessWidget {
   const VoteHistoryChart({super.key, required this.stats, this.height = 220});
 
   /// One entry per day, oldest first.
@@ -37,16 +29,109 @@ class VoteHistoryChart extends StatefulWidget {
   final double height;
 
   @override
-  State<VoteHistoryChart> createState() => _VoteHistoryChartState();
+  Widget build(BuildContext context) {
+    final colorScheme = ShadTheme.of(context).colorScheme;
+    return DailyHistoryChart(
+      stats: stats,
+      height: height,
+      series: [
+        DailySeries(
+          label: 'Got Help',
+          color: const Color(0xFF16A34A),
+          count: (s) => s.goodAnswerCount,
+        ),
+        DailySeries(
+          label: 'Poor Answer',
+          color: colorScheme.destructive,
+          count: (s) => s.poorAnswerCount,
+        ),
+        DailySeries(
+          label: 'No vote',
+          color: colorScheme.border,
+          count: (s) => s.sessionCount - s.goodAnswerCount - s.poorAnswerCount,
+        ),
+      ],
+    );
+  }
 }
 
-class _VoteHistoryChartState extends State<VoteHistoryChart> {
+/// A stacked bar chart of chat sessions per day, split by whether Jev judged
+/// the question answered. Hovering a bar shows the counts of that day.
+class OutcomeHistoryChart extends StatelessWidget {
+  const OutcomeHistoryChart({
+    super.key,
+    required this.stats,
+    this.height = 220,
+  });
+
+  /// One entry per day, oldest first.
+  final List<DailyStats> stats;
+  final double height;
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = ShadTheme.of(context).colorScheme;
+    return DailyHistoryChart(
+      stats: stats,
+      height: height,
+      series: [
+        DailySeries(
+          label: 'Answered',
+          color: const Color(0xFF2563EB),
+          count: (s) => s.answeredCount,
+        ),
+        DailySeries(
+          label: 'Unsure',
+          color: const Color(0xFFF59E0B),
+          count: (s) => s.unsureCount,
+        ),
+        DailySeries(
+          label: 'Not answered',
+          color: colorScheme.destructive,
+          count: (s) => s.notAnsweredCount,
+        ),
+        DailySeries(
+          label: 'Not judged',
+          color: colorScheme.border,
+          count: (s) =>
+              s.sessionCount -
+              s.answeredCount -
+              s.unsureCount -
+              s.notAnsweredCount,
+        ),
+      ],
+    );
+  }
+}
+
+/// A stacked bar chart of chat sessions per day, one segment per series.
+/// The series must add up to the sessions of the day. Hovering a bar shows
+/// the counts of that day.
+class DailyHistoryChart extends StatefulWidget {
+  const DailyHistoryChart({
+    super.key,
+    required this.stats,
+    required this.series,
+    this.height = 220,
+  });
+
+  /// One entry per day, oldest first.
+  final List<DailyStats> stats;
+
+  /// The segments of each bar, bottom first.
+  final List<DailySeries> series;
+  final double height;
+
+  @override
+  State<DailyHistoryChart> createState() => _DailyHistoryChartState();
+}
+
+class _DailyHistoryChartState extends State<DailyHistoryChart> {
   int? _hoveredIndex;
 
   @override
   Widget build(BuildContext context) {
     final theme = ShadTheme.of(context);
-    final colors = VoteColors.of(context);
     final labelStyle = theme.textTheme.muted.copyWith(fontSize: 11);
 
     return Column(
@@ -58,9 +143,8 @@ class _VoteHistoryChartState extends State<VoteHistoryChart> {
           spacing: 16,
           runSpacing: 4,
           children: [
-            _LegendItem(color: colors.gotHelp, label: 'Got Help'),
-            _LegendItem(color: colors.poorAnswer, label: 'Poor Answer'),
-            _LegendItem(color: colors.noVote, label: 'No vote'),
+            for (final series in widget.series)
+              _LegendItem(color: series.color, label: series.label),
           ],
         ),
         SizedBox(
@@ -91,10 +175,10 @@ class _VoteHistoryChartState extends State<VoteHistoryChart> {
                   children: [
                     Positioned.fill(
                       child: CustomPaint(
-                        painter: _VoteHistoryPainter(
+                        painter: _DailyHistoryPainter(
                           stats: widget.stats,
+                          series: widget.series,
                           geometry: geometry,
-                          colors: colors,
                           gridColor: theme.colorScheme.border,
                           labelStyle: labelStyle,
                           hoveredIndex: _hoveredIndex,
@@ -106,7 +190,10 @@ class _VoteHistoryChartState extends State<VoteHistoryChart> {
                       Positioned(
                         top: 0,
                         left: geometry.tooltipLeft(_hoveredIndex!),
-                        child: _DayTooltip(stats: hovered),
+                        child: _DayTooltip(
+                          stats: hovered,
+                          series: widget.series,
+                        ),
                       ),
                   ],
                 ),
@@ -147,15 +234,14 @@ class _LegendItem extends StatelessWidget {
 }
 
 class _DayTooltip extends StatelessWidget {
-  const _DayTooltip({required this.stats});
+  const _DayTooltip({required this.stats, required this.series});
 
   final DailyStats stats;
+  final List<DailySeries> series;
 
   @override
   Widget build(BuildContext context) {
     final theme = ShadTheme.of(context);
-    final noVote =
-        stats.sessionCount - stats.goodAnswerCount - stats.poorAnswerCount;
     return IgnorePointer(
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
@@ -174,8 +260,9 @@ class _DayTooltip extends StatelessWidget {
               style: theme.textTheme.muted,
             ),
             Text(
-              '${stats.goodAnswerCount} got help · '
-              '${stats.poorAnswerCount} poor · $noVote no vote',
+              series
+                  .map((s) => '${s.count(stats)} ${s.label.toLowerCase()}')
+                  .join(' · '),
               style: theme.textTheme.muted,
             ),
           ],
@@ -225,11 +312,11 @@ class _ChartGeometry {
   }
 }
 
-class _VoteHistoryPainter extends CustomPainter {
-  _VoteHistoryPainter({
+class _DailyHistoryPainter extends CustomPainter {
+  _DailyHistoryPainter({
     required this.stats,
+    required this.series,
     required this.geometry,
-    required this.colors,
     required this.gridColor,
     required this.labelStyle,
     required this.hoveredIndex,
@@ -237,8 +324,8 @@ class _VoteHistoryPainter extends CustomPainter {
   });
 
   final List<DailyStats> stats;
+  final List<DailySeries> series;
   final _ChartGeometry geometry;
-  final VoteColors colors;
   final Color gridColor;
   final TextStyle labelStyle;
   final int? hoveredIndex;
@@ -294,12 +381,9 @@ class _VoteHistoryPainter extends CustomPainter {
         bottom -= height;
       }
 
-      segment(day.goodAnswerCount, colors.gotHelp);
-      segment(day.poorAnswerCount, colors.poorAnswer);
-      segment(
-        day.sessionCount - day.goodAnswerCount - day.poorAnswerCount,
-        colors.noVote,
-      );
+      for (final s in series) {
+        segment(s.count(day), s.color);
+      }
     }
 
     // Date labels, spaced so they do not overlap.
@@ -344,8 +428,9 @@ class _VoteHistoryPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(_VoteHistoryPainter oldDelegate) {
+  bool shouldRepaint(_DailyHistoryPainter oldDelegate) {
     return stats != oldDelegate.stats ||
+        series != oldDelegate.series ||
         hoveredIndex != oldDelegate.hoveredIndex ||
         geometry.size != oldDelegate.geometry.size ||
         labelStyle != oldDelegate.labelStyle;

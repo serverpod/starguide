@@ -11,6 +11,7 @@
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod/serverpod.dart' as _is;
+import 'answer_outcome.dart' as _i3g19xo2;
 
 abstract class ChatSession
     implements _is.TableRow<int?>, _is.ProtocolSerialization {
@@ -20,6 +21,8 @@ abstract class ChatSession
     required this.keyToken,
     this.goodAnswer,
     DateTime? createdAt,
+    this.answerOutcome,
+    this.answerOutcomeConfidence,
   }) : createdAt = createdAt ?? DateTime.now();
 
   factory ChatSession({
@@ -28,6 +31,8 @@ abstract class ChatSession
     required String keyToken,
     bool? goodAnswer,
     DateTime? createdAt,
+    _i3g19xo2.AnswerOutcome? answerOutcome,
+    double? answerOutcomeConfidence,
   }) = _ChatSessionImpl;
 
   factory ChatSession.fromJson(Map<String, dynamic> jsonSerialization) {
@@ -45,6 +50,13 @@ abstract class ChatSession
       createdAt: jsonSerialization['createdAt'] == null
           ? null
           : _is.DateTimeJsonExtension.fromJson(jsonSerialization['createdAt']),
+      answerOutcome: jsonSerialization['answerOutcome'] == null
+          ? null
+          : _i3g19xo2.AnswerOutcome.fromJson(
+              (jsonSerialization['answerOutcome'] as String),
+            ),
+      answerOutcomeConfidence:
+          (jsonSerialization['answerOutcomeConfidence'] as num?)?.toDouble(),
     );
   }
 
@@ -63,6 +75,12 @@ abstract class ChatSession
 
   DateTime createdAt;
 
+  /// Jev's judgement of whether the latest answer resolved the question.
+  _i3g19xo2.AnswerOutcome? answerOutcome;
+
+  /// Jev's confidence in that judgement, 0–1.
+  double? answerOutcomeConfidence;
+
   @override
   _is.Table<int?> get table => t;
 
@@ -75,6 +93,8 @@ abstract class ChatSession
     String? keyToken,
     bool? goodAnswer,
     DateTime? createdAt,
+    _i3g19xo2.AnswerOutcome? answerOutcome,
+    double? answerOutcomeConfidence,
   });
   @override
   Map<String, dynamic> toJson() {
@@ -85,6 +105,9 @@ abstract class ChatSession
       'keyToken': keyToken,
       if (goodAnswer != null) 'goodAnswer': goodAnswer,
       'createdAt': createdAt.toJson(),
+      if (answerOutcome != null) 'answerOutcome': answerOutcome?.toJson(),
+      if (answerOutcomeConfidence != null)
+        'answerOutcomeConfidence': answerOutcomeConfidence,
     };
   }
 
@@ -97,6 +120,9 @@ abstract class ChatSession
       'keyToken': keyToken,
       if (goodAnswer != null) 'goodAnswer': goodAnswer,
       'createdAt': createdAt.toJson(),
+      if (answerOutcome != null) 'answerOutcome': answerOutcome?.toJson(),
+      if (answerOutcomeConfidence != null)
+        'answerOutcomeConfidence': answerOutcomeConfidence,
     };
   }
 
@@ -137,12 +163,16 @@ class _ChatSessionImpl extends ChatSession {
     required String keyToken,
     bool? goodAnswer,
     DateTime? createdAt,
+    _i3g19xo2.AnswerOutcome? answerOutcome,
+    double? answerOutcomeConfidence,
   }) : super._(
          id: id,
          authUserId: authUserId,
          keyToken: keyToken,
          goodAnswer: goodAnswer,
          createdAt: createdAt,
+         answerOutcome: answerOutcome,
+         answerOutcomeConfidence: answerOutcomeConfidence,
        );
 
   /// Returns a shallow copy of this [ChatSession]
@@ -155,6 +185,8 @@ class _ChatSessionImpl extends ChatSession {
     String? keyToken,
     Object? goodAnswer = _Undefined,
     DateTime? createdAt,
+    Object? answerOutcome = _Undefined,
+    Object? answerOutcomeConfidence = _Undefined,
   }) {
     return ChatSession(
       id: id is int? ? id : this.id,
@@ -162,6 +194,12 @@ class _ChatSessionImpl extends ChatSession {
       keyToken: keyToken ?? this.keyToken,
       goodAnswer: goodAnswer is bool? ? goodAnswer : this.goodAnswer,
       createdAt: createdAt ?? this.createdAt,
+      answerOutcome: answerOutcome is _i3g19xo2.AnswerOutcome?
+          ? answerOutcome
+          : this.answerOutcome,
+      answerOutcomeConfidence: answerOutcomeConfidence is double?
+          ? answerOutcomeConfidence
+          : this.answerOutcomeConfidence,
     );
   }
 }
@@ -181,6 +219,13 @@ class ChatSessionUpdateTable extends _is.UpdateTable<ChatSessionTable> {
 
   _is.ColumnValue<DateTime, DateTime> createdAt(DateTime value) =>
       _is.ColumnValue(table.createdAt, value);
+
+  _is.ColumnValue<_i3g19xo2.AnswerOutcome, _i3g19xo2.AnswerOutcome>
+  answerOutcome(_i3g19xo2.AnswerOutcome? value) =>
+      _is.ColumnValue(table.answerOutcome, value);
+
+  _is.ColumnValue<double, double> answerOutcomeConfidence(double? value) =>
+      _is.ColumnValue(table.answerOutcomeConfidence, value);
 }
 
 class ChatSessionTable extends _is.Table<int?> {
@@ -190,6 +235,12 @@ class ChatSessionTable extends _is.Table<int?> {
     keyToken = _is.ColumnString('keyToken', this);
     goodAnswer = _is.ColumnBool('goodAnswer', this);
     createdAt = _is.ColumnDateTime('createdAt', this, hasDefault: true);
+    answerOutcome = _is.ColumnEnum(
+      'answerOutcome',
+      this,
+      _is.EnumSerialization.byName,
+    );
+    answerOutcomeConfidence = _is.ColumnDouble('answerOutcomeConfidence', this);
   }
 
   late final ChatSessionUpdateTable updateTable;
@@ -202,6 +253,12 @@ class ChatSessionTable extends _is.Table<int?> {
 
   late final _is.ColumnDateTime createdAt;
 
+  /// Jev's judgement of whether the latest answer resolved the question.
+  late final _is.ColumnEnum<_i3g19xo2.AnswerOutcome> answerOutcome;
+
+  /// Jev's confidence in that judgement, 0–1.
+  late final _is.ColumnDouble answerOutcomeConfidence;
+
   @override
   List<_is.Column> get columns => [
     id,
@@ -209,6 +266,8 @@ class ChatSessionTable extends _is.Table<int?> {
     keyToken,
     goodAnswer,
     createdAt,
+    answerOutcome,
+    answerOutcomeConfidence,
   ];
 }
 

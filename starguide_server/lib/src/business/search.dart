@@ -1,58 +1,62 @@
 import 'package:serverpod/serverpod.dart';
-import 'package:starguide_server/src/business/docs_table_of_contents.dart';
+import 'package:starguide_server/src/business/document_index.dart';
 import 'package:starguide_server/src/generated/protocol.dart';
 import 'package:starguide_server/src/generative_ai/generative_ai.dart';
+import 'package:starguide_server/src/generative_ai/jev.dart';
 import 'package:starguide_server/src/generative_ai/prompts.dart';
 
 /// The document types that are found by embedding search, as opposed to
-/// being picked from the table of contents by [searchDocumentation].
+/// being picked from the document index by [searchDocumentation].
 const embeddingSearchTypes = {RAGDocumentType.discussion, RAGDocumentType.blog};
 
-/// Finds documentation and website pages by letting the model pick the most
-/// relevant URLs from the table of contents.
+/// Finds the documentation and website pages most likely to answer the
+/// question, by letting Jev pick them from the [DocumentIndex].
+///
+/// Returns nothing if Jev is not configured. Throws a
+/// [GenerativeAiException] if Jev cannot be reached.
 Future<List<RAGDocument>> searchDocumentation(
   Session session,
   List<ChatMessage> conversation,
   String question,
 ) async {
+  final jev = Jev.instance;
+  if (jev == null) {
+    session.log(
+      'The ${Jev.passwordKey} password is not set, so no documentation '
+      'pages are picked.',
+      level: LogLevel.warning,
+    );
+    return const [];
+  }
+
   final totalStopwatch = Stopwatch()..start();
   final timings = <String, Duration>{};
 
-  final genAi = GenerativeAi();
-  var documents = <RAGDocument>[];
+  final getIndexStopwatch = Stopwatch()..start();
+  final index = await DocumentIndexCache.get(session);
+  getIndexStopwatch.stop();
+  timings['getDocumentIndex'] = getIndexStopwatch.elapsed;
 
-  // Search documentation for the most relevant URLs.
-  final getTocStopwatch = Stopwatch()..start();
-  final toc = await DocsTableOfContents.getTableOfContents(session);
-  getTocStopwatch.stop();
-  timings['getTableOfContents'] = getTocStopwatch.elapsed;
-
-  session.log('TOC:\n$toc', level: LogLevel.debug);
-
-  final generateUrlsStopwatch = Stopwatch()..start();
-  final urls = await genAi.generateUrlList(
-    systemPrompt: Prompts.instance.get('search_toc')! + toc,
-    conversation: [
-      ...conversation,
-      ChatMessage(
-        chatSessionId: 0,
-        message: question,
-        type: ChatMessageType.user,
-      ),
-    ],
-  );
-  generateUrlsStopwatch.stop();
-  timings['generateUrlList'] = generateUrlsStopwatch.elapsed;
+  final pickStopwatch = Stopwatch()..start();
+  final picks = await jev.pickDocuments(session, index, conversation, question);
+  pickStopwatch.stop();
+  timings['pickDocuments'] = pickStopwatch.elapsed;
 
   final findDocumentsStopwatch = Stopwatch()..start();
-  for (final url in urls) {
-    var document = await RAGDocument.db.findFirstRow(
+  final documents = <RAGDocument>[];
+  if (picks.isNotEmpty) {
+    final ids = <int>{for (final pick in picks) pick.documentId};
+    final found = await RAGDocument.db.find(
       session,
-      where: (t) => t.sourceUrl.equals(url),
+      where: (t) => t.id.inSet(ids),
     );
+    final byId = {for (final document in found) document.id!: document};
 
-    if (document != null) {
-      documents.add(document);
+    // Keep Jev's order, best first. A picked page may have been removed
+    // since the index was built.
+    for (final pick in picks) {
+      final document = byId[pick.documentId];
+      if (document != null) documents.add(document);
     }
   }
   findDocumentsStopwatch.stop();

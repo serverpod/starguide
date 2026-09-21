@@ -6,5 +6,8 @@ fields:
   goodAnswer: bool?
   authUserId: UuidValue?
   messageCount: int
+  ### Jev's judgement of the latest answer, if it was judged.
+  answerOutcome: AnswerOutcome?
+  answerOutcomeConfidence: double?
   ### The first question of the conversation, truncated.
   firstQuestion: String

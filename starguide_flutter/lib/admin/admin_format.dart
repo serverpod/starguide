@@ -50,6 +50,23 @@ String formatGotHelpRatio(VoteStats stats) {
   return '${(stats.goodAnswerCount / voted * 100).round()}%';
 }
 
+/// A byte count in its largest unit, e.g. `1.2 kB` or `3.4 MB`.
+String formatBytes(int bytes) {
+  if (bytes < 1000) return '$bytes B';
+  if (bytes < 1000000) return '${(bytes / 1000).toStringAsFixed(1)} kB';
+  return '${(bytes / 1000000).toStringAsFixed(1)} MB';
+}
+
+/// A probability or confidence as a percentage, e.g. `82%`.
+String formatPercent(double value) => '${(value * 100).round()}%';
+
+/// A human readable label for the outcome of an answer.
+String answerOutcomeLabel(AnswerOutcome outcome) => switch (outcome) {
+  AnswerOutcome.answered => 'Answered',
+  AnswerOutcome.notAnswered => 'Not answered',
+  AnswerOutcome.unsure => 'Unsure',
+};
+
 /// A human readable label for a document type.
 String documentTypeLabel(RAGDocumentType type) => switch (type) {
   RAGDocumentType.documentation => 'Documentation',

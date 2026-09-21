@@ -1,4 +1,0 @@
-Please reply ONLY with JSON containing a field of "urls" which is a list of URLs. If you cannot find any URLs, return an empty list.
-
-Serverpod is an open source backend framework for Flutter developers written in Dart. Serverpod Cloud is a zero-configuration hosting service for Serverpod. Relic is a low-level web server for Dart, used by Serverpod. This is the table of contents from the documentation of these libraries and services and from the pages on the Serverpod website, which present features and compare Serverpod with other frameworks and services, followed by a conversation about Serverpod or Relic. Please return a list of the top 5 URLs most likely to contain the answer for the question.
-

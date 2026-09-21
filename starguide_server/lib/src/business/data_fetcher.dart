@@ -1,6 +1,6 @@
 import 'package:serverpod/serverpod.dart';
 import 'package:starguide_server/src/business/data_source.dart';
-import 'package:starguide_server/src/business/docs_table_of_contents.dart';
+import 'package:starguide_server/src/business/document_index.dart';
 import 'package:starguide_server/src/generated/protocol.dart';
 import 'package:starguide_server/src/generative_ai/generative_ai.dart';
 import 'package:starguide_server/src/generative_ai/prompts.dart';
@@ -27,6 +27,9 @@ class DataFetcher {
   }
 
   static DataFetcher get instance => _instance!;
+
+  /// Whether [configure] has been called.
+  static bool get isConfigured => _instance != null;
 
   DataFetcher._({
     required this.dataSources,
@@ -106,8 +109,8 @@ class DataFetcher {
       await RAGDocument.db.updateRow(session, ragDocument);
     }
 
-    if (DocsTableOfContents.includedTypes.contains(ragDocument.type)) {
-      await DocsTableOfContents.invalidateCache(session);
+    if (DocumentIndexCache.includedTypes.contains(ragDocument.type)) {
+      await DocumentIndexCache.invalidate(session);
     }
   }
 

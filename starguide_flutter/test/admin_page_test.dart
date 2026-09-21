@@ -44,6 +44,8 @@ void main() {
     expect(find.text('Overview'), findsWidgets);
     expect(find.text('Sources'), findsOneWidget);
     expect(find.text('Poor Answers'), findsOneWidget);
+    expect(find.text('Document Index'), findsOneWidget);
+    expect(find.text('Unanswered'), findsOneWidget);
 
     // The overview fails to load without a server.
     await tester.pump(const Duration(seconds: 2));
@@ -57,6 +59,14 @@ void main() {
     await tester.tap(find.text('Poor Answers'));
     await tester.pump();
     expect(find.text('Poor Answer'), findsOneWidget);
+
+    await tester.tap(find.text('Unanswered'));
+    await tester.pump();
+    expect(find.text('Not answered'), findsOneWidget);
+
+    await tester.tap(find.text('Document Index'));
+    await tester.pump();
+    expect(find.text('Rebuild'), findsOneWidget);
 
     await tester.tap(find.text('Back to chat'));
     expect(closed, isTrue);
@@ -115,6 +125,9 @@ void main() {
           sessionCount: i + 3,
           goodAnswerCount: i,
           poorAnswerCount: 1,
+          answeredCount: i,
+          notAnsweredCount: 1,
+          unsureCount: 1,
         ),
     ];
 

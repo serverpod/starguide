@@ -3,6 +3,8 @@ admin:
   - listDocuments:
   - listDocumentDomains:
   - getDocument:
+  - getDocumentIndex:
+  - rebuildDocumentIndex:
   - listChatSessions:
   - getChatSession:
 googleIdp:

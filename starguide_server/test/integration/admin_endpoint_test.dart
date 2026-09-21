@@ -7,6 +7,7 @@ import 'package:starguide_server/src/business/data_fetcher_scheduling.dart';
 import 'package:starguide_server/src/business/admin_stats.dart';
 import 'package:starguide_server/src/business/data_fetcher.dart';
 import 'package:starguide_server/src/business/data_source.dart';
+import 'package:starguide_server/src/business/document_index.dart';
 import 'package:starguide_server/src/generated/protocol.dart';
 import 'package:test/test.dart';
 
@@ -27,6 +28,9 @@ class _FakeDataSource implements DataSource {
 
   @override
   final RAGDocumentType documentType;
+
+  @override
+  String get description => 'Fake source';
 
   @override
   Stream<RawRAGDocument> fetch(Session session, DataFetcher fetcher) =>
@@ -147,8 +151,19 @@ void main() {
           );
           poorSessionId = poorSession.id!;
           await ChatSession.db.insert(session, [
-            ChatSession(keyToken: 'good', goodAnswer: true, createdAt: now),
-            ChatSession(keyToken: 'unvoted', createdAt: now),
+            ChatSession(
+              keyToken: 'good',
+              goodAnswer: true,
+              createdAt: now,
+              answerOutcome: AnswerOutcome.answered,
+              answerOutcomeConfidence: 0.9,
+            ),
+            ChatSession(
+              keyToken: 'unvoted',
+              createdAt: now,
+              answerOutcome: AnswerOutcome.notAnswered,
+              answerOutcomeConfidence: 0.6,
+            ),
             ChatSession(
               keyToken: 'old-good',
               goodAnswer: true,
@@ -186,12 +201,17 @@ void main() {
             expect(overview.lastWeek.sessionCount, 3);
             expect(overview.lastWeek.goodAnswerCount, 1);
             expect(overview.lastWeek.poorAnswerCount, 1);
+            expect(overview.lastWeek.answeredCount, 1);
+            expect(overview.lastWeek.notAnsweredCount, 1);
+            expect(overview.lastWeek.unsureCount, 0);
             expect(overview.lastMonth.sessionCount, 4);
             expect(overview.lastMonth.goodAnswerCount, 2);
 
             expect(overview.dailyStats, hasLength(AdminStats.overviewDays));
             expect(overview.dailyStats.last.sessionCount, 2);
             expect(overview.dailyStats.last.goodAnswerCount, 1);
+            expect(overview.dailyStats.last.answeredCount, 1);
+            expect(overview.dailyStats.last.notAnsweredCount, 1);
             final yesterday =
                 overview.dailyStats[overview.dailyStats.length - 2];
             expect(yesterday.poorAnswerCount, 1);
@@ -315,6 +335,53 @@ void main() {
             // Newest first.
             expect(all.sessions.last.goodAnswer, true);
             expect(all.sessions.first.messageCount, 0);
+
+            final unanswered = await endpoints.admin.listChatSessions(
+              admin,
+              page: 0,
+              pageSize: 10,
+              goodAnswer: null,
+              votedOnly: false,
+              outcomes: [AnswerOutcome.notAnswered, AnswerOutcome.unsure],
+            );
+            expect(unanswered.totalCount, 1);
+            expect(
+              unanswered.sessions.single.answerOutcome,
+              AnswerOutcome.notAnswered,
+            );
+            expect(unanswered.sessions.single.answerOutcomeConfidence, 0.6);
+          },
+        );
+
+        test(
+          'when getting the document index then the listed pages are grouped',
+          () async {
+            await DocumentIndexCache.invalidate(sessionBuilder.build());
+            final index = await endpoints.admin.getDocumentIndex(admin);
+
+            // The discussion is found by embedding search, not listed.
+            expect(index.entryCount, 3);
+            expect(index.index.groups.map((g) => g.name), [
+              'Serverpod',
+              'Relic',
+            ]);
+            expect(index.index.groups.first.description, 'Fake source');
+            expect(index.groupPayloads, hasLength(2));
+            expect(index.groupPayloads.first, contains('"none"'));
+            expect(index.domainPayload, contains('"Relic"'));
+            expect(index.totalSizeInBytes, greaterThan(0));
+            expect(index.estimatedTokens, (index.totalSizeInBytes / 4).round());
+            expect(
+              index.expiresAt.difference(index.index.generatedAt),
+              DocumentIndexCache.lifetime,
+            );
+
+            final rebuilt = await endpoints.admin.rebuildDocumentIndex(admin);
+            expect(rebuilt.entryCount, 3);
+            expect(
+              rebuilt.index.generatedAt.isBefore(index.index.generatedAt),
+              isFalse,
+            );
           },
         );
 

@@ -11,6 +11,7 @@
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod_client/serverpod_client.dart' as _isc;
+import '../answer_outcome.dart' as _ig2enm7h;
 
 /// A chat session with the first question asked, for listing.
 abstract class AdminChatSessionSummary
@@ -21,6 +22,8 @@ abstract class AdminChatSessionSummary
     this.goodAnswer,
     this.authUserId,
     required this.messageCount,
+    this.answerOutcome,
+    this.answerOutcomeConfidence,
     required this.firstQuestion,
   });
 
@@ -30,6 +33,8 @@ abstract class AdminChatSessionSummary
     bool? goodAnswer,
     _isc.UuidValue? authUserId,
     required int messageCount,
+    _ig2enm7h.AnswerOutcome? answerOutcome,
+    double? answerOutcomeConfidence,
     required String firstQuestion,
   }) = _AdminChatSessionSummaryImpl;
 
@@ -50,6 +55,13 @@ abstract class AdminChatSessionSummary
               jsonSerialization['authUserId'],
             ),
       messageCount: jsonSerialization['messageCount'] as int,
+      answerOutcome: jsonSerialization['answerOutcome'] == null
+          ? null
+          : _ig2enm7h.AnswerOutcome.fromJson(
+              (jsonSerialization['answerOutcome'] as String),
+            ),
+      answerOutcomeConfidence:
+          (jsonSerialization['answerOutcomeConfidence'] as num?)?.toDouble(),
       firstQuestion: jsonSerialization['firstQuestion'] as String,
     );
   }
@@ -64,6 +76,11 @@ abstract class AdminChatSessionSummary
 
   int messageCount;
 
+  /// Jev's judgement of the latest answer, if it was judged.
+  _ig2enm7h.AnswerOutcome? answerOutcome;
+
+  double? answerOutcomeConfidence;
+
   /// The first question of the conversation, truncated.
   String firstQuestion;
 
@@ -76,6 +93,8 @@ abstract class AdminChatSessionSummary
     bool? goodAnswer,
     _isc.UuidValue? authUserId,
     int? messageCount,
+    _ig2enm7h.AnswerOutcome? answerOutcome,
+    double? answerOutcomeConfidence,
     String? firstQuestion,
   });
   @override
@@ -87,6 +106,9 @@ abstract class AdminChatSessionSummary
       if (goodAnswer != null) 'goodAnswer': goodAnswer,
       if (authUserId != null) 'authUserId': authUserId?.toJson(),
       'messageCount': messageCount,
+      if (answerOutcome != null) 'answerOutcome': answerOutcome?.toJson(),
+      if (answerOutcomeConfidence != null)
+        'answerOutcomeConfidence': answerOutcomeConfidence,
       'firstQuestion': firstQuestion,
     };
   }
@@ -100,6 +122,9 @@ abstract class AdminChatSessionSummary
       if (goodAnswer != null) 'goodAnswer': goodAnswer,
       if (authUserId != null) 'authUserId': authUserId?.toJson(),
       'messageCount': messageCount,
+      if (answerOutcome != null) 'answerOutcome': answerOutcome?.toJson(),
+      if (answerOutcomeConfidence != null)
+        'answerOutcomeConfidence': answerOutcomeConfidence,
       'firstQuestion': firstQuestion,
     };
   }
@@ -119,6 +144,8 @@ class _AdminChatSessionSummaryImpl extends AdminChatSessionSummary {
     bool? goodAnswer,
     _isc.UuidValue? authUserId,
     required int messageCount,
+    _ig2enm7h.AnswerOutcome? answerOutcome,
+    double? answerOutcomeConfidence,
     required String firstQuestion,
   }) : super._(
          id: id,
@@ -126,6 +153,8 @@ class _AdminChatSessionSummaryImpl extends AdminChatSessionSummary {
          goodAnswer: goodAnswer,
          authUserId: authUserId,
          messageCount: messageCount,
+         answerOutcome: answerOutcome,
+         answerOutcomeConfidence: answerOutcomeConfidence,
          firstQuestion: firstQuestion,
        );
 
@@ -139,6 +168,8 @@ class _AdminChatSessionSummaryImpl extends AdminChatSessionSummary {
     Object? goodAnswer = _Undefined,
     Object? authUserId = _Undefined,
     int? messageCount,
+    Object? answerOutcome = _Undefined,
+    Object? answerOutcomeConfidence = _Undefined,
     String? firstQuestion,
   }) {
     return AdminChatSessionSummary(
@@ -147,6 +178,12 @@ class _AdminChatSessionSummaryImpl extends AdminChatSessionSummary {
       goodAnswer: goodAnswer is bool? ? goodAnswer : this.goodAnswer,
       authUserId: authUserId is _isc.UuidValue? ? authUserId : this.authUserId,
       messageCount: messageCount ?? this.messageCount,
+      answerOutcome: answerOutcome is _ig2enm7h.AnswerOutcome?
+          ? answerOutcome
+          : this.answerOutcome,
+      answerOutcomeConfidence: answerOutcomeConfidence is double?
+          ? answerOutcomeConfidence
+          : this.answerOutcomeConfidence,
       firstQuestion: firstQuestion ?? this.firstQuestion,
     );
   }

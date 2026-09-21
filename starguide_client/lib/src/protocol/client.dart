@@ -23,10 +23,13 @@ import 'package:starguide_client/src/protocol/admin/admin_chat_session_page.dart
     as _i7oyhwe3;
 import 'package:starguide_client/src/protocol/admin/admin_document_detail.dart'
     as _i6xgjezv;
+import 'package:starguide_client/src/protocol/admin/admin_document_index.dart'
+    as _igkuszr7;
 import 'package:starguide_client/src/protocol/admin/admin_document_page.dart'
     as _iiofeiuw;
 import 'package:starguide_client/src/protocol/admin/admin_overview.dart'
     as _i9ubmg82;
+import 'package:starguide_client/src/protocol/answer_outcome.dart' as _in8ru61n;
 import 'package:starguide_client/src/protocol/chat_session.dart' as _ioqsfhvv;
 import 'package:starguide_client/src/protocol/markdown_resource_info.dart'
     as _i1vbny65;
@@ -80,14 +83,34 @@ class EndpointAdmin extends _isc.EndpointRef {
         {'id': id},
       );
 
+  /// Returns the document index as it is cached for Jev, with the payloads
+  /// of its questions. Builds it if it is not cached.
+  _ida.Future<_igkuszr7.AdminDocumentIndex> getDocumentIndex() =>
+      caller.callServerEndpoint<_igkuszr7.AdminDocumentIndex>(
+        'admin',
+        'getDocumentIndex',
+        {},
+      );
+
+  /// Rebuilds the document index from the database and returns it.
+  _ida.Future<_igkuszr7.AdminDocumentIndex> rebuildDocumentIndex() =>
+      caller.callServerEndpoint<_igkuszr7.AdminDocumentIndex>(
+        'admin',
+        'rebuildDocumentIndex',
+        {},
+      );
+
   /// Lists chat sessions, newest first. With [goodAnswer] set, only sessions
   /// with that vote are listed. With [votedOnly], unvoted sessions are
-  /// skipped. The default lists sessions where the answer was voted poor.
+  /// skipped. With [outcomes], only sessions whose latest answer Jev judged
+  /// with one of those outcomes are listed. The default lists sessions where
+  /// the answer was voted poor.
   _ida.Future<_i7oyhwe3.AdminChatSessionPage> listChatSessions({
     required int page,
     required int pageSize,
     bool? goodAnswer,
     required bool votedOnly,
+    List<_in8ru61n.AnswerOutcome>? outcomes,
   }) => caller.callServerEndpoint<_i7oyhwe3.AdminChatSessionPage>(
     'admin',
     'listChatSessions',
@@ -96,6 +119,7 @@ class EndpointAdmin extends _isc.EndpointRef {
       'pageSize': pageSize,
       'goodAnswer': goodAnswer,
       'votedOnly': votedOnly,
+      'outcomes': outcomes,
     },
   );
 
@@ -284,9 +308,12 @@ class EndpointStarguide extends _isc.EndpointRef {
 
   /// Asks a question and streams the generated answer as chunks.
   ///
-  /// Combines previous conversation context with searched RAG documents
-  /// from the docs, the website, discussions and blog posts to produce the
-  /// answer.
+  /// Jev picks the documentation and website pages most likely to answer
+  /// the question, and judges whether they do. Only if they may not, the
+  /// closest discussions and blog posts are found by embedding search as
+  /// well. The answer is generated from the found documents and the earlier
+  /// conversation. Finally, Jev judges whether the answer resolved the
+  /// question, which is stored on the chat session.
   _ida.Stream<String> ask(_ioqsfhvv.ChatSession chatSession, String question) =>
       caller.callStreamingServerEndpoint<_ida.Stream<String>, String>(
         'starguide',

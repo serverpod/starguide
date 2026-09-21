@@ -11,6 +11,7 @@
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod_client/serverpod_client.dart' as _isc;
+import 'answer_outcome.dart' as _i3g19xo2;
 
 abstract class ChatSession
     implements _isc.SerializableModel, _isc.ProtocolSerialization {
@@ -20,6 +21,8 @@ abstract class ChatSession
     required this.keyToken,
     this.goodAnswer,
     DateTime? createdAt,
+    this.answerOutcome,
+    this.answerOutcomeConfidence,
   }) : createdAt = createdAt ?? DateTime.now();
 
   factory ChatSession({
@@ -28,6 +31,8 @@ abstract class ChatSession
     required String keyToken,
     bool? goodAnswer,
     DateTime? createdAt,
+    _i3g19xo2.AnswerOutcome? answerOutcome,
+    double? answerOutcomeConfidence,
   }) = _ChatSessionImpl;
 
   factory ChatSession.fromJson(Map<String, dynamic> jsonSerialization) {
@@ -45,6 +50,13 @@ abstract class ChatSession
       createdAt: jsonSerialization['createdAt'] == null
           ? null
           : _isc.DateTimeJsonExtension.fromJson(jsonSerialization['createdAt']),
+      answerOutcome: jsonSerialization['answerOutcome'] == null
+          ? null
+          : _i3g19xo2.AnswerOutcome.fromJson(
+              (jsonSerialization['answerOutcome'] as String),
+            ),
+      answerOutcomeConfidence:
+          (jsonSerialization['answerOutcomeConfidence'] as num?)?.toDouble(),
     );
   }
 
@@ -61,6 +73,12 @@ abstract class ChatSession
 
   DateTime createdAt;
 
+  /// Jev's judgement of whether the latest answer resolved the question.
+  _i3g19xo2.AnswerOutcome? answerOutcome;
+
+  /// Jev's confidence in that judgement, 0–1.
+  double? answerOutcomeConfidence;
+
   /// Returns a shallow copy of this [ChatSession]
   /// with some or all fields replaced by the given arguments.
   @_isc.useResult
@@ -70,6 +88,8 @@ abstract class ChatSession
     String? keyToken,
     bool? goodAnswer,
     DateTime? createdAt,
+    _i3g19xo2.AnswerOutcome? answerOutcome,
+    double? answerOutcomeConfidence,
   });
   @override
   Map<String, dynamic> toJson() {
@@ -80,6 +100,9 @@ abstract class ChatSession
       'keyToken': keyToken,
       if (goodAnswer != null) 'goodAnswer': goodAnswer,
       'createdAt': createdAt.toJson(),
+      if (answerOutcome != null) 'answerOutcome': answerOutcome?.toJson(),
+      if (answerOutcomeConfidence != null)
+        'answerOutcomeConfidence': answerOutcomeConfidence,
     };
   }
 
@@ -92,6 +115,9 @@ abstract class ChatSession
       'keyToken': keyToken,
       if (goodAnswer != null) 'goodAnswer': goodAnswer,
       'createdAt': createdAt.toJson(),
+      if (answerOutcome != null) 'answerOutcome': answerOutcome?.toJson(),
+      if (answerOutcomeConfidence != null)
+        'answerOutcomeConfidence': answerOutcomeConfidence,
     };
   }
 
@@ -110,12 +136,16 @@ class _ChatSessionImpl extends ChatSession {
     required String keyToken,
     bool? goodAnswer,
     DateTime? createdAt,
+    _i3g19xo2.AnswerOutcome? answerOutcome,
+    double? answerOutcomeConfidence,
   }) : super._(
          id: id,
          authUserId: authUserId,
          keyToken: keyToken,
          goodAnswer: goodAnswer,
          createdAt: createdAt,
+         answerOutcome: answerOutcome,
+         answerOutcomeConfidence: answerOutcomeConfidence,
        );
 
   /// Returns a shallow copy of this [ChatSession]
@@ -128,6 +158,8 @@ class _ChatSessionImpl extends ChatSession {
     String? keyToken,
     Object? goodAnswer = _Undefined,
     DateTime? createdAt,
+    Object? answerOutcome = _Undefined,
+    Object? answerOutcomeConfidence = _Undefined,
   }) {
     return ChatSession(
       id: id is int? ? id : this.id,
@@ -135,6 +167,12 @@ class _ChatSessionImpl extends ChatSession {
       keyToken: keyToken ?? this.keyToken,
       goodAnswer: goodAnswer is bool? ? goodAnswer : this.goodAnswer,
       createdAt: createdAt ?? this.createdAt,
+      answerOutcome: answerOutcome is _i3g19xo2.AnswerOutcome?
+          ? answerOutcome
+          : this.answerOutcome,
+      answerOutcomeConfidence: answerOutcomeConfidence is double?
+          ? answerOutcomeConfidence
+          : this.answerOutcomeConfidence,
     );
   }
 }

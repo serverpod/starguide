@@ -6,13 +6,16 @@ __[Starguide app](https://starguide.serverpod.space)__
 
 The server connects to Gemini through [Dartantic](https://pub.dev/packages/dartantic_ai), which makes it easy to switch out models without modifying the code. It uses Serverpod's ORM to interact with the Postgres database (with the PgVector extension for storing the vectors/embeddings).
 
+To find the documentation pages that answer a question, the server asks [Jev](https://typesafe.ai), TypeSafe's System One model, through the [jev_dart](https://pub.dev/packages/jev_dart) package. Jev answers typed questions with a probability for every option, so it is given the pages of the documentation and the website as options and picks the most likely ones in a fraction of the time a generative model needs. Jev also judges whether the picked pages contain the answer, in which case the vector search of discussions and blog posts is skipped, and whether the generated answer resolved the question, which is shown in the admin interface.
+
 Quickstart
 A few steps are required to get Starguide working on your local machine:
 
 1. Create a GitHub personal access token, as Starguide will use it to load the documentation pages and discussions into the database. Sign in to GitHub and visit [this settings page](https://github.com/settings/personal-access-tokens). (Settings > Developer Settings > Personal access tokens > Fine-grained personal access tokens.) Create a new token. It doesn't need to have any specific permissions, as all the information Starguide is requesting is public. Save the token.
 2. Get a Gemini key from [here](https://aistudio.google.com/app/apikey). The free tier should be fine, but it may work better on a paid plan, as the free tier is rate-limited.
-3. Optionally, get a key for reCAPTCHA (this is only required if you deploy your server to production). You will need to do this in a new project on GCP. Find the setup page [here](https://console.cloud.google.com/security/recaptcha).
-4. Optionally, set up Google sign-in, which lets users who fail the reCAPTCHA check sign in instead. Create a web application OAuth client in the [Google Cloud console](https://console.cloud.google.com/auth/clients), add `<web app origin>/googlesignin` as an authorized redirect URI, download the client JSON, and save it as `starguide_server/config/google_client_secret.json`. The file is not uploaded when deploying to Serverpod Cloud. Provide the same JSON there as the `serverpod_auth_googleClientSecret` password instead, using `scloud password set`. Without the file or the password, the server runs with Google sign-in disabled.
+3. Get a TypeSafe API key from [here](https://typesafe.ai), which Starguide uses to talk to Jev. Without it, the server still answers questions, but only from the discussions and blog posts found by vector search. On Serverpod Cloud, set the key with `scloud password set typesafeAPIKey`.
+4. Optionally, get a key for reCAPTCHA (this is only required if you deploy your server to production). You will need to do this in a new project on GCP. Find the setup page [here](https://console.cloud.google.com/security/recaptcha).
+5. Optionally, set up Google sign-in, which lets users who fail the reCAPTCHA check sign in instead. Create a web application OAuth client in the [Google Cloud console](https://console.cloud.google.com/auth/clients), add `<web app origin>/googlesignin` as an authorized redirect URI, download the client JSON, and save it as `starguide_server/config/google_client_secret.json`. The file is not uploaded when deploying to Serverpod Cloud. Provide the same JSON there as the `serverpod_auth_googleClientSecret` password instead, using `scloud password set`. Without the file or the password, the server runs with Google sign-in disabled.
 
 When you have the required tokens and API keys, you must add them to a new `starguide_server/config/passwords.yaml` file. This is what the passwords file should look like:
 
@@ -22,6 +25,7 @@ When you have the required tokens and API keys, you must add them to a new `star
 # Save passwords used across all configurations here.
 shared:
   geminiAPIKey: '<Gemini API key>'
+  typesafeAPIKey: '<TypeSafe API key>'
   githubToken: '<GitHub token>'
   recaptchaSecretKey: '<reCAPTCHA secret>' # Optional for local development
 
@@ -63,7 +67,7 @@ production:
   jwtHmacSha512PrivateKey: '<random string of at least 64 bytes>'
 ```
 
-Users who sign in with a Google account on the serverpod.dev domain are granted the admin scope. For them, an _Admin_ button appears next to _View Source_ in the app. It opens the admin interface, which shows an overview of the loaded sources and how answers are rated, lets you inspect every document used to answer questions, and lists the conversations where the answer was rated poor. Note that the scope is included in the token from the second sign-in on, as it is granted when the account is created.
+Users who sign in with a Google account on the serverpod.dev domain are granted the admin scope. For them, an _Admin_ button appears next to _View Source_ in the app. It opens the admin interface, which shows an overview of the loaded sources and how answers are rated, lets you inspect every document used to answer questions and the index of pages Jev picks from, and lists the conversations where the answer was rated poor or where Jev judged that the question was not answered. Note that the scope is included in the token from the second sign-in on, as it is granted when the account is created.
 
 With the passwords in place, you should be able to start the server, its embedded Postgres database, and the Flutter app by running:
 

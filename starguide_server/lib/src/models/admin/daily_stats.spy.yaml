@@ -9,6 +9,10 @@ fields:
   sessionCount: int
   goodAnswerCount: int
   poorAnswerCount: int
+  ### Sessions whose latest answer Jev judged to have answered the question.
+  answeredCount: int, default=0
+  notAnsweredCount: int, default=0
+  unsureCount: int, default=0
 indexes:
   daily_stats_day:
     fields: day

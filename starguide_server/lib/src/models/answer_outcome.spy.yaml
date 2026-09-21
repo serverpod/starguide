@@ -1,0 +1,10 @@
+### Jev's judgement of whether an answer resolved the question.
+enum: AnswerOutcome
+values:
+  ### The answer addresses the question with concrete information.
+  - answered
+  ### The answer does not address the question, or says that the
+  ### information is not available.
+  - notAnswered
+  ### The answer is partial, hedged or possibly wrong.
+  - unsure

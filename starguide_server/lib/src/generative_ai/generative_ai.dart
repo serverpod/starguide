@@ -71,42 +71,6 @@ class GenerativeAi {
     }
   }
 
-  Future<List<Uri>> generateUrlList({
-    required String systemPrompt,
-    List<ChatMessage> conversation = const [],
-  }) async {
-    final messages = <ai.ChatMessage>[];
-
-    // Add system prompt as the first message
-    messages.add(ai.ChatMessage.system(systemPrompt));
-
-    // Add conversation history
-    for (final chatMessage in conversation) {
-      messages.add(
-        ai.ChatMessage(
-          role: chatMessage.type.aiRole == 'user'
-              ? ai.ChatMessageRole.user
-              : ai.ChatMessageRole.model,
-          parts: [ai.TextPart(chatMessage.message)],
-        ),
-      );
-    }
-
-    final agent = _createAgent();
-
-    try {
-      final response = await agent.sendFor<_UrlList>(
-        systemPrompt,
-        history: messages,
-        outputSchema: ai.Schema.fromMap(_UrlList.schemaMap),
-        outputFromJson: _UrlList.fromJson,
-      );
-      return response.output.urls.map((str) => Uri.parse(str)).toList();
-    } catch (e) {
-      throw GenerativeAiException(message: e.toString());
-    }
-  }
-
   String _formatDocument(RAGDocument document) {
     return '<doc href="${document.sourceUrl}" type="${document.type.name}" title="${document.title}">\n${document.content}\n</doc>';
   }
@@ -119,34 +83,6 @@ class GenerativeAi {
         dimensions: 768,
       ),
     );
-  }
-}
-
-class _UrlList {
-  final List<String> urls;
-
-  _UrlList({required this.urls});
-
-  factory _UrlList.fromJson(Map<String, dynamic> json) {
-    return _UrlList(urls: List<String>.from(json['urls'] as List));
-  }
-
-  Map<String, dynamic> toJson() {
-    return {'urls': urls};
-  }
-
-  static Map<String, dynamic> get schemaMap {
-    return {
-      'type': 'object',
-      'properties': {
-        'urls': {
-          'type': 'array',
-          'items': {'type': 'string', 'format': 'uri'},
-        },
-      },
-      'required': ['urls'],
-      'additionalProperties': false,
-    };
   }
 }
 

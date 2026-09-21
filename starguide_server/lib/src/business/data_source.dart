@@ -15,6 +15,10 @@ abstract class DataSource {
 
   /// The type of the documents produced by this source.
   RAGDocumentType get documentType;
+
+  /// What the domain is, in a sentence. It describes the domain to the model
+  /// that picks the pages to answer a question from.
+  String get description;
 }
 
 enum DataSourceType { html, markdown, text }

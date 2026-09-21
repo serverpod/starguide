@@ -12,6 +12,7 @@
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod/serverpod.dart' as _is;
 import 'package:starguide_server/src/generated/protocol.dart' as _ih7yasqo;
+import '../answer_outcome.dart' as _ig2enm7h;
 import '../chat_message.dart' as _izru38dm;
 
 /// A chat session with its full conversation.
@@ -22,6 +23,8 @@ abstract class AdminChatSessionDetail
     required this.createdAt,
     this.goodAnswer,
     this.authUserId,
+    this.answerOutcome,
+    this.answerOutcomeConfidence,
     required this.messages,
   });
 
@@ -30,6 +33,8 @@ abstract class AdminChatSessionDetail
     required DateTime createdAt,
     bool? goodAnswer,
     _is.UuidValue? authUserId,
+    _ig2enm7h.AnswerOutcome? answerOutcome,
+    double? answerOutcomeConfidence,
     required List<_izru38dm.ChatMessage> messages,
   }) = _AdminChatSessionDetailImpl;
 
@@ -49,6 +54,13 @@ abstract class AdminChatSessionDetail
           : _is.UuidValueJsonExtension.fromJson(
               jsonSerialization['authUserId'],
             ),
+      answerOutcome: jsonSerialization['answerOutcome'] == null
+          ? null
+          : _ig2enm7h.AnswerOutcome.fromJson(
+              (jsonSerialization['answerOutcome'] as String),
+            ),
+      answerOutcomeConfidence:
+          (jsonSerialization['answerOutcomeConfidence'] as num?)?.toDouble(),
       messages: _ih7yasqo.Protocol().deserialize<List<_izru38dm.ChatMessage>>(
         jsonSerialization['messages'],
       ),
@@ -63,6 +75,11 @@ abstract class AdminChatSessionDetail
 
   _is.UuidValue? authUserId;
 
+  /// Jev's judgement of the latest answer, if it was judged.
+  _ig2enm7h.AnswerOutcome? answerOutcome;
+
+  double? answerOutcomeConfidence;
+
   List<_izru38dm.ChatMessage> messages;
 
   /// Returns a shallow copy of this [AdminChatSessionDetail]
@@ -73,6 +90,8 @@ abstract class AdminChatSessionDetail
     DateTime? createdAt,
     bool? goodAnswer,
     _is.UuidValue? authUserId,
+    _ig2enm7h.AnswerOutcome? answerOutcome,
+    double? answerOutcomeConfidence,
     List<_izru38dm.ChatMessage>? messages,
   });
   @override
@@ -83,6 +102,9 @@ abstract class AdminChatSessionDetail
       'createdAt': createdAt.toJson(),
       if (goodAnswer != null) 'goodAnswer': goodAnswer,
       if (authUserId != null) 'authUserId': authUserId?.toJson(),
+      if (answerOutcome != null) 'answerOutcome': answerOutcome?.toJson(),
+      if (answerOutcomeConfidence != null)
+        'answerOutcomeConfidence': answerOutcomeConfidence,
       'messages': messages.toJson(valueToJson: (v) => v.toJson()),
     };
   }
@@ -95,6 +117,9 @@ abstract class AdminChatSessionDetail
       'createdAt': createdAt.toJson(),
       if (goodAnswer != null) 'goodAnswer': goodAnswer,
       if (authUserId != null) 'authUserId': authUserId?.toJson(),
+      if (answerOutcome != null) 'answerOutcome': answerOutcome?.toJson(),
+      if (answerOutcomeConfidence != null)
+        'answerOutcomeConfidence': answerOutcomeConfidence,
       'messages': messages.toJson(valueToJson: (v) => v.toJsonForProtocol()),
     };
   }
@@ -113,12 +138,16 @@ class _AdminChatSessionDetailImpl extends AdminChatSessionDetail {
     required DateTime createdAt,
     bool? goodAnswer,
     _is.UuidValue? authUserId,
+    _ig2enm7h.AnswerOutcome? answerOutcome,
+    double? answerOutcomeConfidence,
     required List<_izru38dm.ChatMessage> messages,
   }) : super._(
          id: id,
          createdAt: createdAt,
          goodAnswer: goodAnswer,
          authUserId: authUserId,
+         answerOutcome: answerOutcome,
+         answerOutcomeConfidence: answerOutcomeConfidence,
          messages: messages,
        );
 
@@ -131,6 +160,8 @@ class _AdminChatSessionDetailImpl extends AdminChatSessionDetail {
     DateTime? createdAt,
     Object? goodAnswer = _Undefined,
     Object? authUserId = _Undefined,
+    Object? answerOutcome = _Undefined,
+    Object? answerOutcomeConfidence = _Undefined,
     List<_izru38dm.ChatMessage>? messages,
   }) {
     return AdminChatSessionDetail(
@@ -138,6 +169,12 @@ class _AdminChatSessionDetailImpl extends AdminChatSessionDetail {
       createdAt: createdAt ?? this.createdAt,
       goodAnswer: goodAnswer is bool? ? goodAnswer : this.goodAnswer,
       authUserId: authUserId is _is.UuidValue? ? authUserId : this.authUserId,
+      answerOutcome: answerOutcome is _ig2enm7h.AnswerOutcome?
+          ? answerOutcome
+          : this.answerOutcome,
+      answerOutcomeConfidence: answerOutcomeConfidence is double?
+          ? answerOutcomeConfidence
+          : this.answerOutcomeConfidence,
       messages: messages ?? this.messages.map((e0) => e0.copyWith()).toList(),
     );
   }

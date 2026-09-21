@@ -15,6 +15,8 @@ import 'package:serverpod_auth_core_server/serverpod_auth_core_server.dart'
     as _iacs;
 import 'package:serverpod_auth_idp_server/serverpod_auth_idp_server.dart'
     as _iais;
+import 'package:starguide_server/src/generated/answer_outcome.dart'
+    as _i5aaccr8;
 import 'package:starguide_server/src/generated/chat_session.dart' as _icpeorlm;
 import 'package:starguide_server/src/generated/future_calls.dart' as _inaozf8m;
 import 'package:starguide_server/src/generated/rag_document_type.dart'
@@ -112,6 +114,21 @@ class Endpoints extends _is.EndpointDispatch {
                 params['id'],
               ),
         ),
+        'getDocumentIndex': _is.MethodConnector(
+          name: 'getDocumentIndex',
+          params: {},
+          call: (_is.Session session, Map<String, dynamic> params) async =>
+              (endpoints['admin'] as _i5t1w2d2.AdminEndpoint).getDocumentIndex(
+                session,
+              ),
+        ),
+        'rebuildDocumentIndex': _is.MethodConnector(
+          name: 'rebuildDocumentIndex',
+          params: {},
+          call: (_is.Session session, Map<String, dynamic> params) async =>
+              (endpoints['admin'] as _i5t1w2d2.AdminEndpoint)
+                  .rebuildDocumentIndex(session),
+        ),
         'listChatSessions': _is.MethodConnector(
           name: 'listChatSessions',
           params: {
@@ -135,6 +152,11 @@ class Endpoints extends _is.EndpointDispatch {
               type: _is.getType<bool>(),
               nullable: false,
             ),
+            'outcomes': _is.ParameterDescription(
+              name: 'outcomes',
+              type: _is.getType<List<_i5aaccr8.AnswerOutcome>?>(),
+              nullable: true,
+            ),
           },
           call: (_is.Session session, Map<String, dynamic> params) async =>
               (endpoints['admin'] as _i5t1w2d2.AdminEndpoint).listChatSessions(
@@ -143,6 +165,7 @@ class Endpoints extends _is.EndpointDispatch {
                 pageSize: params['pageSize'],
                 goodAnswer: params['goodAnswer'],
                 votedOnly: params['votedOnly'],
+                outcomes: params['outcomes'],
               ),
         ),
         'getChatSession': _is.MethodConnector(

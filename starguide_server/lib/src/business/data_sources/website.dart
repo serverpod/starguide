@@ -22,6 +22,8 @@ class WebsiteDataSource implements DataSource {
   final String domain;
   @override
   final RAGDocumentType documentType;
+  @override
+  final String description;
 
   final http.Client _client;
 
@@ -29,6 +31,7 @@ class WebsiteDataSource implements DataSource {
     required this.indexUrls,
     required this.domain,
     required this.documentType,
+    required this.description,
     http.Client? client,
   }) : _client = client ?? http.Client();
 

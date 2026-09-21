@@ -8,3 +8,11 @@ workspace:
   - starguide_client
   - starguide_server
   - starguide_flutter
+
+# jev_dart depends on crimson ^0.4.0+1, which pins analyzer to ^6.0.0.
+# Crimson's JSON parser does not import the analyzer; only its code generator
+# does. That pin cannot be solved in this workspace: flutter_test pins matcher
+# to 0.12.20, and the test versions that accept that matcher need analyzer 8+.
+# Drop this override once crimson allows a current analyzer.
+dependency_overrides:
+  analyzer: ">=13.3.0 <14.0.0"

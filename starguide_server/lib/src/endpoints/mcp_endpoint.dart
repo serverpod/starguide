@@ -48,9 +48,7 @@ class McpEndpoint extends Endpoint {
   /// [MarkdownResourceInfo].
   ///
   /// Throws [FileSystemException] if the resources cannot be accessed.
-  Future<List<MarkdownResourceInfo>> getAllResources(
-    Session session,
-  ) async {
+  Future<List<MarkdownResourceInfo>> getAllResources(Session session) async {
     final resourceDir = Directory('assets/resources');
     final resourceInfos = <MarkdownResourceInfo>[];
     for (final file in resourceDir.listSync()) {
@@ -119,7 +117,8 @@ class McpEndpoint extends Endpoint {
   ///
   /// Throws [FileSystemException] if the file cannot be read.
   Future<MarkdownResourceInfo> _loadMarkdownResource(
-      String relativePath) async {
+    String relativePath,
+  ) async {
     final uri = 'serverpod://$relativePath';
 
     final file = File(relativePath);
@@ -143,8 +142,9 @@ class McpEndpoint extends Endpoint {
       descriptionEnd++;
     }
 
-    final description =
-        lines.sublist(descriptionStart, descriptionEnd).join('\n');
+    final description = lines
+        .sublist(descriptionStart, descriptionEnd)
+        .join('\n');
 
     // Rest of document is the body
     final text = lines.sublist(descriptionEnd).join('\n').trim();

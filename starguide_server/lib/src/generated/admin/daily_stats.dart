@@ -23,7 +23,12 @@ abstract class DailyStats
     required this.sessionCount,
     required this.goodAnswerCount,
     required this.poorAnswerCount,
-  });
+    int? answeredCount,
+    int? notAnsweredCount,
+    int? unsureCount,
+  }) : answeredCount = answeredCount ?? 0,
+       notAnsweredCount = notAnsweredCount ?? 0,
+       unsureCount = unsureCount ?? 0;
 
   factory DailyStats({
     int? id,
@@ -31,6 +36,9 @@ abstract class DailyStats
     required int sessionCount,
     required int goodAnswerCount,
     required int poorAnswerCount,
+    int? answeredCount,
+    int? notAnsweredCount,
+    int? unsureCount,
   }) = _DailyStatsImpl;
 
   factory DailyStats.fromJson(Map<String, dynamic> jsonSerialization) {
@@ -40,6 +48,9 @@ abstract class DailyStats
       sessionCount: jsonSerialization['sessionCount'] as int,
       goodAnswerCount: jsonSerialization['goodAnswerCount'] as int,
       poorAnswerCount: jsonSerialization['poorAnswerCount'] as int,
+      answeredCount: jsonSerialization['answeredCount'] as int?,
+      notAnsweredCount: jsonSerialization['notAnsweredCount'] as int?,
+      unsureCount: jsonSerialization['unsureCount'] as int?,
     );
   }
 
@@ -59,6 +70,13 @@ abstract class DailyStats
 
   int poorAnswerCount;
 
+  /// Sessions whose latest answer Jev judged to have answered the question.
+  int answeredCount;
+
+  int notAnsweredCount;
+
+  int unsureCount;
+
   @override
   _is.Table<int?> get table => t;
 
@@ -71,6 +89,9 @@ abstract class DailyStats
     int? sessionCount,
     int? goodAnswerCount,
     int? poorAnswerCount,
+    int? answeredCount,
+    int? notAnsweredCount,
+    int? unsureCount,
   });
   @override
   Map<String, dynamic> toJson() {
@@ -81,6 +102,9 @@ abstract class DailyStats
       'sessionCount': sessionCount,
       'goodAnswerCount': goodAnswerCount,
       'poorAnswerCount': poorAnswerCount,
+      'answeredCount': answeredCount,
+      'notAnsweredCount': notAnsweredCount,
+      'unsureCount': unsureCount,
     };
   }
 
@@ -93,6 +117,9 @@ abstract class DailyStats
       'sessionCount': sessionCount,
       'goodAnswerCount': goodAnswerCount,
       'poorAnswerCount': poorAnswerCount,
+      'answeredCount': answeredCount,
+      'notAnsweredCount': notAnsweredCount,
+      'unsureCount': unsureCount,
     };
   }
 
@@ -133,12 +160,18 @@ class _DailyStatsImpl extends DailyStats {
     required int sessionCount,
     required int goodAnswerCount,
     required int poorAnswerCount,
+    int? answeredCount,
+    int? notAnsweredCount,
+    int? unsureCount,
   }) : super._(
          id: id,
          day: day,
          sessionCount: sessionCount,
          goodAnswerCount: goodAnswerCount,
          poorAnswerCount: poorAnswerCount,
+         answeredCount: answeredCount,
+         notAnsweredCount: notAnsweredCount,
+         unsureCount: unsureCount,
        );
 
   /// Returns a shallow copy of this [DailyStats]
@@ -151,6 +184,9 @@ class _DailyStatsImpl extends DailyStats {
     int? sessionCount,
     int? goodAnswerCount,
     int? poorAnswerCount,
+    int? answeredCount,
+    int? notAnsweredCount,
+    int? unsureCount,
   }) {
     return DailyStats(
       id: id is int? ? id : this.id,
@@ -158,6 +194,9 @@ class _DailyStatsImpl extends DailyStats {
       sessionCount: sessionCount ?? this.sessionCount,
       goodAnswerCount: goodAnswerCount ?? this.goodAnswerCount,
       poorAnswerCount: poorAnswerCount ?? this.poorAnswerCount,
+      answeredCount: answeredCount ?? this.answeredCount,
+      notAnsweredCount: notAnsweredCount ?? this.notAnsweredCount,
+      unsureCount: unsureCount ?? this.unsureCount,
     );
   }
 }
@@ -176,6 +215,15 @@ class DailyStatsUpdateTable extends _is.UpdateTable<DailyStatsTable> {
 
   _is.ColumnValue<int, int> poorAnswerCount(int value) =>
       _is.ColumnValue(table.poorAnswerCount, value);
+
+  _is.ColumnValue<int, int> answeredCount(int value) =>
+      _is.ColumnValue(table.answeredCount, value);
+
+  _is.ColumnValue<int, int> notAnsweredCount(int value) =>
+      _is.ColumnValue(table.notAnsweredCount, value);
+
+  _is.ColumnValue<int, int> unsureCount(int value) =>
+      _is.ColumnValue(table.unsureCount, value);
 }
 
 class DailyStatsTable extends _is.Table<int?> {
@@ -185,6 +233,13 @@ class DailyStatsTable extends _is.Table<int?> {
     sessionCount = _is.ColumnInt('sessionCount', this);
     goodAnswerCount = _is.ColumnInt('goodAnswerCount', this);
     poorAnswerCount = _is.ColumnInt('poorAnswerCount', this);
+    answeredCount = _is.ColumnInt('answeredCount', this, hasDefault: true);
+    notAnsweredCount = _is.ColumnInt(
+      'notAnsweredCount',
+      this,
+      hasDefault: true,
+    );
+    unsureCount = _is.ColumnInt('unsureCount', this, hasDefault: true);
   }
 
   late final DailyStatsUpdateTable updateTable;
@@ -198,6 +253,13 @@ class DailyStatsTable extends _is.Table<int?> {
 
   late final _is.ColumnInt poorAnswerCount;
 
+  /// Sessions whose latest answer Jev judged to have answered the question.
+  late final _is.ColumnInt answeredCount;
+
+  late final _is.ColumnInt notAnsweredCount;
+
+  late final _is.ColumnInt unsureCount;
+
   @override
   List<_is.Column> get columns => [
     id,
@@ -205,6 +267,9 @@ class DailyStatsTable extends _is.Table<int?> {
     sessionCount,
     goodAnswerCount,
     poorAnswerCount,
+    answeredCount,
+    notAnsweredCount,
+    unsureCount,
   ];
 }
 

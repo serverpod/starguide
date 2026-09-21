@@ -19,12 +19,18 @@ abstract class VoteStats
     required this.sessionCount,
     required this.goodAnswerCount,
     required this.poorAnswerCount,
+    required this.answeredCount,
+    required this.notAnsweredCount,
+    required this.unsureCount,
   });
 
   factory VoteStats({
     required int sessionCount,
     required int goodAnswerCount,
     required int poorAnswerCount,
+    required int answeredCount,
+    required int notAnsweredCount,
+    required int unsureCount,
   }) = _VoteStatsImpl;
 
   factory VoteStats.fromJson(Map<String, dynamic> jsonSerialization) {
@@ -32,6 +38,9 @@ abstract class VoteStats
       sessionCount: jsonSerialization['sessionCount'] as int,
       goodAnswerCount: jsonSerialization['goodAnswerCount'] as int,
       poorAnswerCount: jsonSerialization['poorAnswerCount'] as int,
+      answeredCount: jsonSerialization['answeredCount'] as int,
+      notAnsweredCount: jsonSerialization['notAnsweredCount'] as int,
+      unsureCount: jsonSerialization['unsureCount'] as int,
     );
   }
 
@@ -41,6 +50,13 @@ abstract class VoteStats
 
   int poorAnswerCount;
 
+  /// Sessions whose latest answer Jev judged to have answered the question.
+  int answeredCount;
+
+  int notAnsweredCount;
+
+  int unsureCount;
+
   /// Returns a shallow copy of this [VoteStats]
   /// with some or all fields replaced by the given arguments.
   @_is.useResult
@@ -48,6 +64,9 @@ abstract class VoteStats
     int? sessionCount,
     int? goodAnswerCount,
     int? poorAnswerCount,
+    int? answeredCount,
+    int? notAnsweredCount,
+    int? unsureCount,
   });
   @override
   Map<String, dynamic> toJson() {
@@ -56,6 +75,9 @@ abstract class VoteStats
       'sessionCount': sessionCount,
       'goodAnswerCount': goodAnswerCount,
       'poorAnswerCount': poorAnswerCount,
+      'answeredCount': answeredCount,
+      'notAnsweredCount': notAnsweredCount,
+      'unsureCount': unsureCount,
     };
   }
 
@@ -66,6 +88,9 @@ abstract class VoteStats
       'sessionCount': sessionCount,
       'goodAnswerCount': goodAnswerCount,
       'poorAnswerCount': poorAnswerCount,
+      'answeredCount': answeredCount,
+      'notAnsweredCount': notAnsweredCount,
+      'unsureCount': unsureCount,
     };
   }
 
@@ -80,10 +105,16 @@ class _VoteStatsImpl extends VoteStats {
     required int sessionCount,
     required int goodAnswerCount,
     required int poorAnswerCount,
+    required int answeredCount,
+    required int notAnsweredCount,
+    required int unsureCount,
   }) : super._(
          sessionCount: sessionCount,
          goodAnswerCount: goodAnswerCount,
          poorAnswerCount: poorAnswerCount,
+         answeredCount: answeredCount,
+         notAnsweredCount: notAnsweredCount,
+         unsureCount: unsureCount,
        );
 
   /// Returns a shallow copy of this [VoteStats]
@@ -94,11 +125,17 @@ class _VoteStatsImpl extends VoteStats {
     int? sessionCount,
     int? goodAnswerCount,
     int? poorAnswerCount,
+    int? answeredCount,
+    int? notAnsweredCount,
+    int? unsureCount,
   }) {
     return VoteStats(
       sessionCount: sessionCount ?? this.sessionCount,
       goodAnswerCount: goodAnswerCount ?? this.goodAnswerCount,
       poorAnswerCount: poorAnswerCount ?? this.poorAnswerCount,
+      answeredCount: answeredCount ?? this.answeredCount,
+      notAnsweredCount: notAnsweredCount ?? this.notAnsweredCount,
+      unsureCount: unsureCount ?? this.unsureCount,
     );
   }
 }

@@ -16,6 +16,8 @@ class GithubDocsDataSource implements DataSource {
   final Uri referenceUrl;
   @override
   final String domain;
+  @override
+  final String description;
 
   /// Latest version, if known.
   final String? latestVersion;
@@ -27,6 +29,7 @@ class GithubDocsDataSource implements DataSource {
     required this.basePath,
     required this.referenceUrl,
     required this.domain,
+    required this.description,
     this.latestVersion,
   });
 
@@ -52,6 +55,7 @@ class GithubDocsDataSource implements DataSource {
     required final String basePath,
     required final Uri referenceUrl,
     required final String domain,
+    required final String description,
   }) async {
     // Normalize basePath: remove leading slash, ensure trailing slash (or empty)
     var normalizedPath = basePath;
@@ -120,6 +124,7 @@ class GithubDocsDataSource implements DataSource {
       basePath: finalBasePath,
       referenceUrl: referenceUrl,
       domain: domain,
+      description: description,
       latestVersion: latestVersion,
     );
   }

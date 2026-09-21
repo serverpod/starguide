@@ -17,22 +17,29 @@ import 'package:serverpod_auth_core_server/serverpod_auth_core_server.dart'
     as _iacs;
 import 'package:serverpod_auth_idp_server/serverpod_auth_idp_server.dart'
     as _iais;
+import 'package:starguide_server/src/generated/answer_outcome.dart'
+    as _i5aaccr8;
 import 'package:starguide_server/src/generated/markdown_resource_info.dart'
     as _iwjynyqq;
 import 'admin/admin_chat_session_detail.dart' as _ivo4zckc;
 import 'admin/admin_chat_session_page.dart' as _i3zfrlvg;
 import 'admin/admin_chat_session_summary.dart' as _iv6n96x1;
 import 'admin/admin_document_detail.dart' as _i7rng5on;
+import 'admin/admin_document_index.dart' as _i3j081kx;
 import 'admin/admin_document_page.dart' as _ip2h1oy2;
 import 'admin/admin_document_summary.dart' as _i71m5mgs;
 import 'admin/admin_overview.dart' as _ihz32ruq;
 import 'admin/admin_source_status.dart' as _i9jun6dq;
 import 'admin/daily_stats.dart' as _i9f4s87t;
 import 'admin/vote_stats.dart' as _in6jcx54;
+import 'answer_outcome.dart' as _i3g19xo2;
 import 'cached_session_count.dart' as _iubbw449;
 import 'chat_message.dart' as _ivuncx2e;
 import 'chat_message_type.dart' as _itrf31vi;
 import 'chat_session.dart' as _i3zhwn74;
+import 'document_index.dart' as _ikorg7qt;
+import 'document_index_entry.dart' as _idhgvu66;
+import 'document_index_group.dart' as _iliwdnyq;
 import 'exceptions/generative_ai_exception.dart' as _i3yrs0ae;
 import 'future_calls_generated_models/data_fetcher_future_call_fetch_data_source_model.dart'
     as _iz53h8dc;
@@ -41,28 +48,31 @@ import 'markdown_resource_list.dart' as _ihj0qgwk;
 import 'rag_document.dart' as _i8io6bl4;
 import 'rag_document_type.dart' as _i19rymhs;
 import 'recaptcha/recaptcha_exception.dart' as _i2oyqbrq;
-import 'table_of_contents.dart' as _ikwqo0g2;
 export 'admin/admin_chat_session_detail.dart';
 export 'admin/admin_chat_session_page.dart';
 export 'admin/admin_chat_session_summary.dart';
 export 'admin/admin_document_detail.dart';
+export 'admin/admin_document_index.dart';
 export 'admin/admin_document_page.dart';
 export 'admin/admin_document_summary.dart';
 export 'admin/admin_overview.dart';
 export 'admin/admin_source_status.dart';
 export 'admin/daily_stats.dart';
 export 'admin/vote_stats.dart';
+export 'answer_outcome.dart';
 export 'cached_session_count.dart';
 export 'chat_message.dart';
 export 'chat_message_type.dart';
 export 'chat_session.dart';
+export 'document_index.dart';
+export 'document_index_entry.dart';
+export 'document_index_group.dart';
 export 'exceptions/generative_ai_exception.dart';
 export 'markdown_resource_info.dart';
 export 'markdown_resource_list.dart';
 export 'rag_document.dart';
 export 'rag_document_type.dart';
 export 'recaptcha/recaptcha_exception.dart';
-export 'table_of_contents.dart';
 
 class Protocol extends _is.DatabaseSerializationManager {
   Protocol._();
@@ -146,6 +156,18 @@ class Protocol extends _is.DatabaseSerializationManager {
           dartType: 'DateTime',
           columnDefault: 'now',
         ),
+        _isp.ColumnDefinition(
+          name: 'answerOutcome',
+          columnType: _isp.ColumnType.text,
+          isNullable: true,
+          dartType: 'protocol:AnswerOutcome?',
+        ),
+        _isp.ColumnDefinition(
+          name: 'answerOutcomeConfidence',
+          columnType: _isp.ColumnType.doublePrecision,
+          isNullable: true,
+          dartType: 'double?',
+        ),
       ],
       foreignKeys: [],
       indexes: [
@@ -156,6 +178,19 @@ class Protocol extends _is.DatabaseSerializationManager {
             _isp.IndexElementDefinition(
               type: _isp.IndexElementDefinitionType.column,
               definition: 'createdAt',
+            ),
+          ],
+          type: 'btree',
+          isUnique: false,
+          isPrimary: false,
+        ),
+        _isp.IndexDefinition(
+          indexName: 'chat_session_answer_outcome',
+          tableSpace: null,
+          elements: [
+            _isp.IndexElementDefinition(
+              type: _isp.IndexElementDefinitionType.column,
+              definition: 'answerOutcome',
             ),
           ],
           type: 'btree',
@@ -201,6 +236,27 @@ class Protocol extends _is.DatabaseSerializationManager {
           columnType: _isp.ColumnType.bigint,
           isNullable: false,
           dartType: 'int',
+        ),
+        _isp.ColumnDefinition(
+          name: 'answeredCount',
+          columnType: _isp.ColumnType.bigint,
+          isNullable: false,
+          dartType: 'int',
+          columnDefault: '0',
+        ),
+        _isp.ColumnDefinition(
+          name: 'notAnsweredCount',
+          columnType: _isp.ColumnType.bigint,
+          isNullable: false,
+          dartType: 'int',
+          columnDefault: '0',
+        ),
+        _isp.ColumnDefinition(
+          name: 'unsureCount',
+          columnType: _isp.ColumnType.bigint,
+          isNullable: false,
+          dartType: 'int',
+          columnDefault: '0',
         ),
       ],
       foreignKeys: [],
@@ -377,6 +433,9 @@ class Protocol extends _is.DatabaseSerializationManager {
     if (t == _i7rng5on.AdminDocumentDetail) {
       return _i7rng5on.AdminDocumentDetail.fromJson(data) as T;
     }
+    if (t == _i3j081kx.AdminDocumentIndex) {
+      return _i3j081kx.AdminDocumentIndex.fromJson(data) as T;
+    }
     if (t == _ip2h1oy2.AdminDocumentPage) {
       return _ip2h1oy2.AdminDocumentPage.fromJson(data) as T;
     }
@@ -395,6 +454,9 @@ class Protocol extends _is.DatabaseSerializationManager {
     if (t == _in6jcx54.VoteStats) {
       return _in6jcx54.VoteStats.fromJson(data) as T;
     }
+    if (t == _i3g19xo2.AnswerOutcome) {
+      return _i3g19xo2.AnswerOutcome.fromJson(data) as T;
+    }
     if (t == _iubbw449.CachedSessionCount) {
       return _iubbw449.CachedSessionCount.fromJson(data) as T;
     }
@@ -406,6 +468,15 @@ class Protocol extends _is.DatabaseSerializationManager {
     }
     if (t == _i3zhwn74.ChatSession) {
       return _i3zhwn74.ChatSession.fromJson(data) as T;
+    }
+    if (t == _ikorg7qt.DocumentIndex) {
+      return _ikorg7qt.DocumentIndex.fromJson(data) as T;
+    }
+    if (t == _idhgvu66.DocumentIndexEntry) {
+      return _idhgvu66.DocumentIndexEntry.fromJson(data) as T;
+    }
+    if (t == _iliwdnyq.DocumentIndexGroup) {
+      return _iliwdnyq.DocumentIndexGroup.fromJson(data) as T;
     }
     if (t == _i3yrs0ae.GenerativeAiException) {
       return _i3yrs0ae.GenerativeAiException.fromJson(data) as T;
@@ -429,9 +500,6 @@ class Protocol extends _is.DatabaseSerializationManager {
     if (t == _i2oyqbrq.RecaptchaException) {
       return _i2oyqbrq.RecaptchaException.fromJson(data) as T;
     }
-    if (t == _ikwqo0g2.TableOfContents) {
-      return _ikwqo0g2.TableOfContents.fromJson(data) as T;
-    }
     if (t == _is.getType<_ivo4zckc.AdminChatSessionDetail?>()) {
       return (data != null
               ? _ivo4zckc.AdminChatSessionDetail.fromJson(data)
@@ -454,6 +522,10 @@ class Protocol extends _is.DatabaseSerializationManager {
       return (data != null
               ? _i7rng5on.AdminDocumentDetail.fromJson(data)
               : null)
+          as T;
+    }
+    if (t == _is.getType<_i3j081kx.AdminDocumentIndex?>()) {
+      return (data != null ? _i3j081kx.AdminDocumentIndex.fromJson(data) : null)
           as T;
     }
     if (t == _is.getType<_ip2h1oy2.AdminDocumentPage?>()) {
@@ -480,6 +552,10 @@ class Protocol extends _is.DatabaseSerializationManager {
     if (t == _is.getType<_in6jcx54.VoteStats?>()) {
       return (data != null ? _in6jcx54.VoteStats.fromJson(data) : null) as T;
     }
+    if (t == _is.getType<_i3g19xo2.AnswerOutcome?>()) {
+      return (data != null ? _i3g19xo2.AnswerOutcome.fromJson(data) : null)
+          as T;
+    }
     if (t == _is.getType<_iubbw449.CachedSessionCount?>()) {
       return (data != null ? _iubbw449.CachedSessionCount.fromJson(data) : null)
           as T;
@@ -493,6 +569,18 @@ class Protocol extends _is.DatabaseSerializationManager {
     }
     if (t == _is.getType<_i3zhwn74.ChatSession?>()) {
       return (data != null ? _i3zhwn74.ChatSession.fromJson(data) : null) as T;
+    }
+    if (t == _is.getType<_ikorg7qt.DocumentIndex?>()) {
+      return (data != null ? _ikorg7qt.DocumentIndex.fromJson(data) : null)
+          as T;
+    }
+    if (t == _is.getType<_idhgvu66.DocumentIndexEntry?>()) {
+      return (data != null ? _idhgvu66.DocumentIndexEntry.fromJson(data) : null)
+          as T;
+    }
+    if (t == _is.getType<_iliwdnyq.DocumentIndexGroup?>()) {
+      return (data != null ? _iliwdnyq.DocumentIndexGroup.fromJson(data) : null)
+          as T;
     }
     if (t == _is.getType<_i3yrs0ae.GenerativeAiException?>()) {
       return (data != null
@@ -532,10 +620,6 @@ class Protocol extends _is.DatabaseSerializationManager {
       return (data != null ? _i2oyqbrq.RecaptchaException.fromJson(data) : null)
           as T;
     }
-    if (t == _is.getType<_ikwqo0g2.TableOfContents?>()) {
-      return (data != null ? _ikwqo0g2.TableOfContents.fromJson(data) : null)
-          as T;
-    }
     if (t == List<_ivuncx2e.ChatMessage>) {
       return (data as List)
               .map((e) => deserialize<_ivuncx2e.ChatMessage>(e))
@@ -547,6 +631,9 @@ class Protocol extends _is.DatabaseSerializationManager {
               .map((e) => deserialize<_iv6n96x1.AdminChatSessionSummary>(e))
               .toList()
           as T;
+    }
+    if (t == List<String>) {
+      return (data as List).map((e) => deserialize<String>(e)).toList() as T;
     }
     if (t == List<_i71m5mgs.AdminDocumentSummary>) {
       return (data as List)
@@ -566,6 +653,18 @@ class Protocol extends _is.DatabaseSerializationManager {
               .toList()
           as T;
     }
+    if (t == List<_iliwdnyq.DocumentIndexGroup>) {
+      return (data as List)
+              .map((e) => deserialize<_iliwdnyq.DocumentIndexGroup>(e))
+              .toList()
+          as T;
+    }
+    if (t == List<_idhgvu66.DocumentIndexEntry>) {
+      return (data as List)
+              .map((e) => deserialize<_idhgvu66.DocumentIndexEntry>(e))
+              .toList()
+          as T;
+    }
     if (t == List<_i8dvauvz.MarkdownResourceInfo>) {
       return (data as List)
               .map((e) => deserialize<_i8dvauvz.MarkdownResourceInfo>(e))
@@ -574,6 +673,20 @@ class Protocol extends _is.DatabaseSerializationManager {
     }
     if (t == List<String>) {
       return (data as List).map((e) => deserialize<String>(e)).toList() as T;
+    }
+    if (t == List<_i5aaccr8.AnswerOutcome>) {
+      return (data as List)
+              .map((e) => deserialize<_i5aaccr8.AnswerOutcome>(e))
+              .toList()
+          as T;
+    }
+    if (t == _is.getType<List<_i5aaccr8.AnswerOutcome>?>()) {
+      return (data != null
+              ? (data as List)
+                    .map((e) => deserialize<_i5aaccr8.AnswerOutcome>(e))
+                    .toList()
+              : null)
+          as T;
     }
     if (t == List<_iwjynyqq.MarkdownResourceInfo>) {
       return (data as List)
@@ -599,16 +712,21 @@ class Protocol extends _is.DatabaseSerializationManager {
       _i3zfrlvg.AdminChatSessionPage => 'AdminChatSessionPage',
       _iv6n96x1.AdminChatSessionSummary => 'AdminChatSessionSummary',
       _i7rng5on.AdminDocumentDetail => 'AdminDocumentDetail',
+      _i3j081kx.AdminDocumentIndex => 'AdminDocumentIndex',
       _ip2h1oy2.AdminDocumentPage => 'AdminDocumentPage',
       _i71m5mgs.AdminDocumentSummary => 'AdminDocumentSummary',
       _ihz32ruq.AdminOverview => 'AdminOverview',
       _i9jun6dq.AdminSourceStatus => 'AdminSourceStatus',
       _i9f4s87t.DailyStats => 'DailyStats',
       _in6jcx54.VoteStats => 'VoteStats',
+      _i3g19xo2.AnswerOutcome => 'AnswerOutcome',
       _iubbw449.CachedSessionCount => 'CachedSessionCount',
       _ivuncx2e.ChatMessage => 'ChatMessage',
       _itrf31vi.ChatMessageType => 'ChatMessageType',
       _i3zhwn74.ChatSession => 'ChatSession',
+      _ikorg7qt.DocumentIndex => 'DocumentIndex',
+      _idhgvu66.DocumentIndexEntry => 'DocumentIndexEntry',
+      _iliwdnyq.DocumentIndexGroup => 'DocumentIndexGroup',
       _i3yrs0ae.GenerativeAiException => 'GenerativeAiException',
       _iz53h8dc.DataFetcherFutureCallFetchDataSourceModel =>
         'DataFetcherFutureCallFetchDataSourceModel',
@@ -617,7 +735,6 @@ class Protocol extends _is.DatabaseSerializationManager {
       _i8io6bl4.RAGDocument => 'RAGDocument',
       _i19rymhs.RAGDocumentType => 'RAGDocumentType',
       _i2oyqbrq.RecaptchaException => 'RecaptchaException',
-      _ikwqo0g2.TableOfContents => 'TableOfContents',
       _ => null,
     };
   }
@@ -640,6 +757,8 @@ class Protocol extends _is.DatabaseSerializationManager {
         return 'AdminChatSessionSummary';
       case _i7rng5on.AdminDocumentDetail():
         return 'AdminDocumentDetail';
+      case _i3j081kx.AdminDocumentIndex():
+        return 'AdminDocumentIndex';
       case _ip2h1oy2.AdminDocumentPage():
         return 'AdminDocumentPage';
       case _i71m5mgs.AdminDocumentSummary():
@@ -652,6 +771,8 @@ class Protocol extends _is.DatabaseSerializationManager {
         return 'DailyStats';
       case _in6jcx54.VoteStats():
         return 'VoteStats';
+      case _i3g19xo2.AnswerOutcome():
+        return 'AnswerOutcome';
       case _iubbw449.CachedSessionCount():
         return 'CachedSessionCount';
       case _ivuncx2e.ChatMessage():
@@ -660,6 +781,12 @@ class Protocol extends _is.DatabaseSerializationManager {
         return 'ChatMessageType';
       case _i3zhwn74.ChatSession():
         return 'ChatSession';
+      case _ikorg7qt.DocumentIndex():
+        return 'DocumentIndex';
+      case _idhgvu66.DocumentIndexEntry():
+        return 'DocumentIndexEntry';
+      case _iliwdnyq.DocumentIndexGroup():
+        return 'DocumentIndexGroup';
       case _i3yrs0ae.GenerativeAiException():
         return 'GenerativeAiException';
       case _iz53h8dc.DataFetcherFutureCallFetchDataSourceModel():
@@ -674,8 +801,6 @@ class Protocol extends _is.DatabaseSerializationManager {
         return 'RAGDocumentType';
       case _i2oyqbrq.RecaptchaException():
         return 'RecaptchaException';
-      case _ikwqo0g2.TableOfContents():
-        return 'TableOfContents';
     }
     className = _iacs.Protocol().getClassNameForObject(data);
     if (className != null) {
@@ -714,6 +839,9 @@ class Protocol extends _is.DatabaseSerializationManager {
     if (dataClassName == 'AdminDocumentDetail') {
       return deserialize<_i7rng5on.AdminDocumentDetail>(data['data']);
     }
+    if (dataClassName == 'AdminDocumentIndex') {
+      return deserialize<_i3j081kx.AdminDocumentIndex>(data['data']);
+    }
     if (dataClassName == 'AdminDocumentPage') {
       return deserialize<_ip2h1oy2.AdminDocumentPage>(data['data']);
     }
@@ -732,6 +860,9 @@ class Protocol extends _is.DatabaseSerializationManager {
     if (dataClassName == 'VoteStats') {
       return deserialize<_in6jcx54.VoteStats>(data['data']);
     }
+    if (dataClassName == 'AnswerOutcome') {
+      return deserialize<_i3g19xo2.AnswerOutcome>(data['data']);
+    }
     if (dataClassName == 'CachedSessionCount') {
       return deserialize<_iubbw449.CachedSessionCount>(data['data']);
     }
@@ -743,6 +874,15 @@ class Protocol extends _is.DatabaseSerializationManager {
     }
     if (dataClassName == 'ChatSession') {
       return deserialize<_i3zhwn74.ChatSession>(data['data']);
+    }
+    if (dataClassName == 'DocumentIndex') {
+      return deserialize<_ikorg7qt.DocumentIndex>(data['data']);
+    }
+    if (dataClassName == 'DocumentIndexEntry') {
+      return deserialize<_idhgvu66.DocumentIndexEntry>(data['data']);
+    }
+    if (dataClassName == 'DocumentIndexGroup') {
+      return deserialize<_iliwdnyq.DocumentIndexGroup>(data['data']);
     }
     if (dataClassName == 'GenerativeAiException') {
       return deserialize<_i3yrs0ae.GenerativeAiException>(data['data']);
@@ -766,9 +906,6 @@ class Protocol extends _is.DatabaseSerializationManager {
     }
     if (dataClassName == 'RecaptchaException') {
       return deserialize<_i2oyqbrq.RecaptchaException>(data['data']);
-    }
-    if (dataClassName == 'TableOfContents') {
-      return deserialize<_ikwqo0g2.TableOfContents>(data['data']);
     }
     if (dataClassName.startsWith('serverpod_auth_core.')) {
       data['className'] = dataClassName.substring(20);

@@ -24,10 +24,14 @@ import 'package:starguide_server/src/generated/admin/admin_chat_session_page.dar
     as _iwsqb2sk;
 import 'package:starguide_server/src/generated/admin/admin_document_detail.dart'
     as _irbn54lf;
+import 'package:starguide_server/src/generated/admin/admin_document_index.dart'
+    as _iws58ccl;
 import 'package:starguide_server/src/generated/admin/admin_document_page.dart'
     as _i69agvdg;
 import 'package:starguide_server/src/generated/admin/admin_overview.dart'
     as _ill1l5ed;
+import 'package:starguide_server/src/generated/answer_outcome.dart'
+    as _i5aaccr8;
 import 'package:starguide_server/src/generated/chat_session.dart' as _icpeorlm;
 import 'package:starguide_server/src/generated/future_calls.dart' as _inaozf8m;
 import 'package:starguide_server/src/generated/future_calls_generated_models/data_fetcher_future_call_fetch_data_source_model.dart'
@@ -338,12 +342,73 @@ class _AdminEndpoint {
     });
   }
 
+  _ida.Future<_iws58ccl.AdminDocumentIndex> getDocumentIndex(
+    _ist.TestSessionBuilder sessionBuilder,
+  ) async {
+    return _ist.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _ist.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'admin',
+            method: 'getDocumentIndex',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'admin',
+          methodName: 'getDocumentIndex',
+          parameters: _ist.testObjectToJson({}),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _ida.Future<_iws58ccl.AdminDocumentIndex>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+
+  _ida.Future<_iws58ccl.AdminDocumentIndex> rebuildDocumentIndex(
+    _ist.TestSessionBuilder sessionBuilder,
+  ) async {
+    return _ist.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _ist.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'admin',
+            method: 'rebuildDocumentIndex',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'admin',
+          methodName: 'rebuildDocumentIndex',
+          parameters: _ist.testObjectToJson({}),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _ida.Future<_iws58ccl.AdminDocumentIndex>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+
   _ida.Future<_iwsqb2sk.AdminChatSessionPage> listChatSessions(
     _ist.TestSessionBuilder sessionBuilder, {
     required int page,
     required int pageSize,
     bool? goodAnswer,
     required bool votedOnly,
+    List<_i5aaccr8.AnswerOutcome>? outcomes,
   }) async {
     return _ist.callAwaitableFunctionAndHandleExceptions(() async {
       var _localUniqueSession =
@@ -361,6 +426,7 @@ class _AdminEndpoint {
             'pageSize': pageSize,
             'goodAnswer': goodAnswer,
             'votedOnly': votedOnly,
+            'outcomes': outcomes,
           }),
           serializationManager: _serializationManager,
         );

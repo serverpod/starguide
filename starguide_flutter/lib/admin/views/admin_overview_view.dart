@@ -112,6 +112,18 @@ class _OverviewContent extends StatelessWidget {
               description: _voteDescription(month),
             ),
             AdminStatCard(
+              title: 'Unanswered, 7 days',
+              icon: LucideIcons.messageCircleQuestionMark,
+              value: formatCount(week.notAnsweredCount),
+              description: _outcomeDescription(week),
+            ),
+            AdminStatCard(
+              title: 'Unanswered, 30 days',
+              icon: LucideIcons.messageCircleQuestionMark,
+              value: formatCount(month.notAnsweredCount),
+              description: _outcomeDescription(month),
+            ),
+            AdminStatCard(
               title: 'Last fetch',
               icon: LucideIcons.download,
               value: overview.lastFetchTime == null
@@ -127,14 +139,24 @@ class _OverviewContent extends StatelessWidget {
           ],
         ),
         ShadCard(
-          title: const Text('Votes per day'),
+          title: const Text('Sessions per day'),
           description: const Text(
-            'Chat sessions created during the past 30 days, by how the '
-            'answer was rated.',
+            'Chat sessions created during the past 30 days, by whether Jev '
+            'judged the question answered and by how the answer was rated.',
           ),
           child: Padding(
             padding: const EdgeInsets.only(top: 16),
-            child: VoteHistoryChart(stats: overview.dailyStats),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              spacing: 8,
+              children: [
+                Text('Answered questions', style: theme.textTheme.small),
+                OutcomeHistoryChart(stats: overview.dailyStats),
+                const SizedBox(height: 8),
+                Text('Votes', style: theme.textTheme.small),
+                VoteHistoryChart(stats: overview.dailyStats),
+              ],
+            ),
           ),
         ),
         ShadCard(
@@ -204,6 +226,16 @@ class _OverviewContent extends StatelessWidget {
     return '${formatCount(stats.goodAnswerCount)} got help · '
         '${formatCount(stats.poorAnswerCount)} poor · '
         '${formatCount(noVote)} no vote';
+  }
+
+  /// How Jev judged the latest answers of the sessions.
+  static String _outcomeDescription(VoteStats stats) {
+    final judged =
+        stats.answeredCount + stats.notAnsweredCount + stats.unsureCount;
+    if (judged == 0) return 'No answers judged';
+    return '${formatCount(stats.answeredCount)} answered · '
+        '${formatCount(stats.unsureCount)} unsure · '
+        '${formatCount(judged)} judged';
   }
 
   /// A scheduled time in the past means the fetch is due but has not been

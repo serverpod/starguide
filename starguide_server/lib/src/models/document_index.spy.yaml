@@ -1,0 +1,7 @@
+### The table of contents of the documentation and website pages, in the
+### form it is handed to Jev: one choice question per group, where every
+### page is an option. Cached by `DocumentIndexCache`.
+class: DocumentIndex
+fields:
+  generatedAt: DateTime
+  groups: List<DocumentIndexGroup>

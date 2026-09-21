@@ -5,8 +5,14 @@ fields:
   keyToken: String
   goodAnswer: bool?
   createdAt: DateTime, default=now
+  ### Jev's judgement of whether the latest answer resolved the question.
+  answerOutcome: AnswerOutcome?
+  ### Jev's confidence in that judgement, 0–1.
+  answerOutcomeConfidence: double?
 
 indexes:
   createdAt:
     fields: createdAt
     unique: false
+  chat_session_answer_outcome:
+    fields: answerOutcome

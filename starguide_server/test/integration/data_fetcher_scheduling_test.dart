@@ -23,6 +23,9 @@ class _FakeDataSource implements DataSource {
   RAGDocumentType get documentType => RAGDocumentType.documentation;
 
   @override
+  String get description => 'Fake source';
+
+  @override
   Stream<RawRAGDocument> fetch(Session session, DataFetcher fetcher) =>
       const Stream.empty();
 }

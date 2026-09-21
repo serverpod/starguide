@@ -36,16 +36,36 @@ void main() {
     );
   });
 
+  test('formatBytes picks the largest unit', () {
+    expect(formatBytes(512), '512 B');
+    expect(formatBytes(15300), '15.3 kB');
+    expect(formatBytes(2500000), '2.5 MB');
+  });
+
   test('formatGotHelpRatio handles missing votes', () {
     expect(
       formatGotHelpRatio(
-        VoteStats(sessionCount: 10, goodAnswerCount: 0, poorAnswerCount: 0),
+        VoteStats(
+          sessionCount: 10,
+          goodAnswerCount: 0,
+          poorAnswerCount: 0,
+          answeredCount: 0,
+          notAnsweredCount: 0,
+          unsureCount: 0,
+        ),
       ),
       '–',
     );
     expect(
       formatGotHelpRatio(
-        VoteStats(sessionCount: 10, goodAnswerCount: 3, poorAnswerCount: 1),
+        VoteStats(
+          sessionCount: 10,
+          goodAnswerCount: 3,
+          poorAnswerCount: 1,
+          answeredCount: 0,
+          notAnsweredCount: 0,
+          unsureCount: 0,
+        ),
       ),
       '75%',
     );

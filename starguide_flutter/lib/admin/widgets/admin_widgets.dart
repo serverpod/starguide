@@ -178,6 +178,40 @@ class VoteBadge extends StatelessWidget {
   }
 }
 
+/// A badge showing Jev's judgement of the latest answer of a chat session.
+class AnswerOutcomeBadge extends StatelessWidget {
+  const AnswerOutcomeBadge({super.key, required this.outcome, this.confidence});
+
+  final AnswerOutcome? outcome;
+  final double? confidence;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = ShadTheme.of(context);
+    final badge = switch (outcome) {
+      AnswerOutcome.answered => ShadBadge.secondary(
+        child: Text(answerOutcomeLabel(outcome!)),
+      ),
+      AnswerOutcome.notAnswered => ShadBadge.destructive(
+        child: Text(answerOutcomeLabel(outcome!)),
+      ),
+      AnswerOutcome.unsure => ShadBadge(
+        child: Text(answerOutcomeLabel(outcome!)),
+      ),
+      null => const ShadBadge.outline(child: Text('Not judged')),
+    };
+    if (confidence == null) return badge;
+    return ShadTooltip(
+      builder: (context) => Text(
+        'Jev judged the latest answer with '
+        '${formatPercent(confidence!)} confidence.',
+        style: theme.textTheme.small,
+      ),
+      child: badge,
+    );
+  }
+}
+
 /// A badge showing the type of a document.
 class DocumentTypeBadge extends StatelessWidget {
   const DocumentTypeBadge({super.key, required this.type});

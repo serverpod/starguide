@@ -4,3 +4,7 @@ fields:
   sessionCount: int
   goodAnswerCount: int
   poorAnswerCount: int
+  ### Sessions whose latest answer Jev judged to have answered the question.
+  answeredCount: int
+  notAnsweredCount: int
+  unsureCount: int

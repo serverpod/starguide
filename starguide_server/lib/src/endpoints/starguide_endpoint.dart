@@ -4,6 +4,7 @@ import 'package:serverpod_auth_core_server/serverpod_auth_core_server.dart'
 import 'package:starguide_server/src/business/search.dart';
 import 'package:starguide_server/src/config/setup_data_fetcher.dart';
 import 'package:starguide_server/src/generative_ai/generative_ai.dart';
+import 'package:starguide_server/src/generative_ai/jev.dart';
 import 'package:starguide_server/src/util/random_string.dart';
 import 'package:starguide_server/src/generated/protocol.dart';
 import 'package:starguide_server/src/generative_ai/prompts.dart';
@@ -72,18 +73,18 @@ class StarguideEndpoint extends Endpoint {
     // Create a new chat session.
     return await ChatSession.db.insertRow(
       session,
-      ChatSession(
-        authUserId: authUserId,
-        keyToken: generateRandomString(16),
-      ),
+      ChatSession(authUserId: authUserId, keyToken: generateRandomString(16)),
     );
   }
 
   /// Asks a question and streams the generated answer as chunks.
   ///
-  /// Combines previous conversation context with searched RAG documents
-  /// from the docs, the website, discussions and blog posts to produce the
-  /// answer.
+  /// Jev picks the documentation and website pages most likely to answer
+  /// the question, and judges whether they do. Only if they may not, the
+  /// closest discussions and blog posts are found by embedding search as
+  /// well. The answer is generated from the found documents and the earlier
+  /// conversation. Finally, Jev judges whether the answer resolved the
+  /// question, which is stored on the chat session.
   Stream<String> ask(
     Session session,
     ChatSession chatSession,
@@ -113,16 +114,54 @@ class StarguideEndpoint extends Endpoint {
     }
 
     final genAi = GenerativeAi();
+    final jev = Jev.instance;
 
-    // Search RAG documents in parallel, using different methods.
+    // Let Jev pick pages from the document index.
     final searchStopwatch = Stopwatch()..start();
-    final results = await Future.wait([
-      searchDocumentation(session, conversation, question),
-      searchByEmbedding(session, conversation, question),
-    ]);
-    var documents = results.expand((list) => list).toList();
+    var documents = <RAGDocument>[];
+    try {
+      documents = await searchDocumentation(session, conversation, question);
+    } on GenerativeAiException catch (e) {
+      session.log(
+        'Picking documentation pages failed: ${e.message}',
+        level: LogLevel.warning,
+      );
+    }
     searchStopwatch.stop();
-    timings['searchDocuments'] = searchStopwatch.elapsed;
+    timings['searchDocumentation'] = searchStopwatch.elapsed;
+
+    // Ask Jev whether the picked pages answer the question. If they may
+    // not, or if that cannot be determined, search the discussions and blog
+    // posts as well.
+    final gateStopwatch = Stopwatch()..start();
+    var needsEmbeddingSearch = true;
+    if (jev != null && documents.isNotEmpty) {
+      try {
+        final probability = await jev.canAnswer(
+          session,
+          conversation,
+          question,
+          documents,
+        );
+        needsEmbeddingSearch = probability < Jev.answerGateThreshold;
+      } on GenerativeAiException catch (e) {
+        session.log(
+          'Judging the picked pages failed: ${e.message}',
+          level: LogLevel.warning,
+        );
+      }
+    }
+    gateStopwatch.stop();
+    timings['answerGate'] = gateStopwatch.elapsed;
+
+    if (needsEmbeddingSearch) {
+      final embeddingStopwatch = Stopwatch()..start();
+      documents.addAll(
+        await searchByEmbedding(session, conversation, question),
+      );
+      embeddingStopwatch.stop();
+      timings['searchByEmbedding'] = embeddingStopwatch.elapsed;
+    }
 
     // Generate the answer
     final generateStopwatch = Stopwatch()..start();
@@ -159,6 +198,22 @@ class StarguideEndpoint extends Endpoint {
     storeStopwatch.stop();
     timings['storeMessages'] = storeStopwatch.elapsed;
 
+    // Let Jev judge whether the answer resolved the question. The answer has
+    // been streamed already, so this does not delay it.
+    if (jev != null) {
+      final judgeStopwatch = Stopwatch()..start();
+      await _storeAnswerJudgement(
+        session,
+        jev,
+        chatSession,
+        conversation,
+        question,
+        answer,
+      );
+      judgeStopwatch.stop();
+      timings['judgeAnswer'] = judgeStopwatch.elapsed;
+    }
+
     totalStopwatch.stop();
     timings['total'] = totalStopwatch.elapsed;
 
@@ -181,6 +236,40 @@ class StarguideEndpoint extends Endpoint {
     // Update the chat session with the vote.
     chatSession.goodAnswer = goodAnswer;
     await ChatSession.db.updateRow(session, chatSession);
+  }
+
+  /// Asks Jev whether [answer] resolved [question] and stores the judgement
+  /// on the chat session, replacing the judgement of any earlier answer. A
+  /// failure is logged and leaves the session as it is.
+  Future<void> _storeAnswerJudgement(
+    Session session,
+    Jev jev,
+    ChatSession chatSession,
+    List<ChatMessage> conversation,
+    String question,
+    String answer,
+  ) async {
+    try {
+      final judgement = await jev.judgeAnswer(
+        session,
+        conversation,
+        question,
+        answer,
+      );
+      await ChatSession.db.updateRow(
+        session,
+        chatSession.copyWith(
+          answerOutcome: judgement.outcome,
+          answerOutcomeConfidence: judgement.confidence,
+        ),
+        columns: (t) => [t.answerOutcome, t.answerOutcomeConfidence],
+      );
+    } on GenerativeAiException catch (e) {
+      session.log(
+        'Judging the answer failed: ${e.message}',
+        level: LogLevel.warning,
+      );
+    }
   }
 
   /// Verifies that a provided chat session exists and has a matching key.

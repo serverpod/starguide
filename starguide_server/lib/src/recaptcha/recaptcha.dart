@@ -16,13 +16,8 @@ Future<double> verifyRecaptchaToken(
 
   final response = await http.post(
     uri,
-    headers: {
-      'Content-Type': 'application/x-www-form-urlencoded',
-    },
-    body: {
-      'secret': secret,
-      'response': token,
-    },
+    headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+    body: {'secret': secret, 'response': token},
   );
 
   if (response.statusCode != 200) {
