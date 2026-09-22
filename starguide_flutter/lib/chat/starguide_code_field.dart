@@ -2,12 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:starguide_flutter/config/theme.dart';
 import 'package:starguide_flutter/main.dart';
+import 'package:starguide_flutter/widgets/starguide_markdown.dart';
 
 /// A code block with syntax highlighting and a copy button.
 ///
 /// Drawn like a code block on the Serverpod website: a dark, rounded box
-/// with 24 px of padding around 14 px monospace text on a 1.6 line, in the
-/// colours of VS Code's Dark+ theme. The language and the copy button sit in
+/// with 24 px of padding around monospace text on a 1.6 line, in the colours
+/// of VS Code's Dark+ theme. The language and the copy button sit in
 /// the top right corner, where the website has nothing.
 class StarguideCodeField extends StatefulWidget {
   const StarguideCodeField({
@@ -58,7 +59,7 @@ class _StarguideCodeFieldState extends State<StarguideCodeField> {
         fontFamily: 'JetBrainsMono',
         color: _text,
         height: 1.6,
-        fontSize: 14,
+        fontSize: StarguideMarkdown.codeFontSize,
       ),
     );
 

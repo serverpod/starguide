@@ -412,255 +412,260 @@ class StarguideChatPageState extends State<StarguideChatPage> {
     }
 
     return Scaffold(
-      body: Column(
-        children: [
-          Expanded(
-            child: Chat(
-              theme: createChatTheme(context),
-              currentUserId: _userId,
-              chatController: _chatController,
-              builders: Builders(
-                chatAnimatedListBuilder: (context, itemBuilder) {
-                  return ChatAnimatedList(
-                    itemBuilder: itemBuilder,
-                    shouldScrollToEndWhenAtBottom: true,
-                    shouldScrollToEndWhenSendingMessage: true,
-                    bottomPadding: 16,
-                    topPadding: 16,
-                    removeAnimationDuration: Duration.zero,
-                    handleSafeArea: false,
-                    reversed: true,
-                  );
-                },
-                composerBuilder: (context) => Positioned(
-                  width: 0,
-                  height: 0,
-                  top: 0,
-                  left: 0,
-                  child: SizedBox(),
-                ),
-                textMessageBuilder:
-                    (
-                      context,
-                      message,
-                      index, {
-                      isSentByMe = true,
-                      groupStatus,
-                    }) {
-                      return StarguideTextMessage(
-                        message: message,
-                        index: index,
-                        onLinkTap: (url, title) {
-                          launchUrl(Uri.parse(url));
-                        },
+      body: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: kMaxContentWidth),
+          child: Column(
+            children: [
+              Expanded(
+                child: Chat(
+                  theme: createChatTheme(context),
+                  currentUserId: _userId,
+                  chatController: _chatController,
+                  builders: Builders(
+                    chatAnimatedListBuilder: (context, itemBuilder) {
+                      return ChatAnimatedList(
+                        itemBuilder: itemBuilder,
+                        shouldScrollToEndWhenAtBottom: true,
+                        shouldScrollToEndWhenSendingMessage: true,
+                        bottomPadding: 16,
+                        topPadding: 16,
+                        removeAnimationDuration: Duration.zero,
+                        handleSafeArea: false,
+                        reversed: true,
                       );
                     },
-                emptyChatListBuilder: (context) => StarguideEmptyChat(),
-              ),
-              resolveUser: (id) => Future.value(switch (id) {
-                _userId => _user,
-                _modelId => _model,
-                _ => null,
-              }),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.only(left: 16, right: 16, bottom: 8),
-            child: AnimatedGradientBorder(
-              enabled: _isInputFocused,
-              borderWidth: 2,
-              glowSize: 8,
-              borderRadius: BorderRadius.all(Radius.circular(10)),
-              gradientColors: [
-                Colors.blue.withAlpha(192),
-                Colors.purple.withAlpha(192),
-                Colors.red.withAlpha(192),
-              ],
-              child: Container(
-                decoration: BoxDecoration(
-                  color: theme.colorScheme.surface,
-                  border: Border.all(
-                    color: _isInputFocused
-                        ? theme.colorScheme.outline
-                        : theme.dividerColor,
-                    width: 1,
+                    composerBuilder: (context) => Positioned(
+                      width: 0,
+                      height: 0,
+                      top: 0,
+                      left: 0,
+                      child: SizedBox(),
+                    ),
+                    textMessageBuilder:
+                        (
+                          context,
+                          message,
+                          index, {
+                          isSentByMe = true,
+                          groupStatus,
+                        }) {
+                          return StarguideTextMessage(
+                            message: message,
+                            index: index,
+                            onLinkTap: (url, title) {
+                              launchUrl(Uri.parse(url));
+                            },
+                          );
+                        },
+                    emptyChatListBuilder: (context) => StarguideEmptyChat(),
                   ),
-                  borderRadius: BorderRadius.circular(8),
+                  resolveUser: (id) => Future.value(switch (id) {
+                    _userId => _user,
+                    _modelId => _model,
+                    _ => null,
+                  }),
                 ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    Container(
-                      decoration: BoxDecoration(
-                        color: theme.colorScheme.surfaceContainer,
-                        borderRadius: BorderRadius.only(
-                          topLeft: Radius.circular(7),
-                          topRight: Radius.circular(7),
-                        ),
-                      ),
-                      padding: const EdgeInsets.all(4),
-                      child: Row(
-                        spacing: 8,
-                        children: [
-                          TextButton.icon(
-                            onPressed: _handleClearChat,
-                            label: Text('Clear Chat'),
-                            icon: Icon(LucideIcons.refreshCw),
-                          ),
-                          Spacer(),
-                          TextButton.icon(
-                            onPressed: _chatSession != null
-                                ? _handleUpvote
-                                : null,
-                            label: Text('Got Help'),
-                            icon: Icon(
-                              LucideIcons.thumbsUp,
-                              color: _vote == true
-                                  ? Colors.blue.shade600
-                                  : null,
-                            ),
-                          ),
-                          TextButton.icon(
-                            onPressed: _chatSession != null
-                                ? _handleDownvote
-                                : null,
-                            label: Text('Poor Answer'),
-                            icon: Icon(
-                              LucideIcons.thumbsDown,
-                              color: _vote == false
-                                  ? Colors.blue.shade600
-                                  : null,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    Divider(
-                      height: 1,
-                      color: _isInputFocused
-                          ? theme.colorScheme.outline
-                          : theme.dividerColor,
-                    ),
-                    StarguideChatInput(
-                      textController: _inputTextController,
-                      focusNode: _inputFocusNode,
-                      onSend: _handleMessageSend,
-                      enabled:
-                          _hasInputText &&
-                          !_isGeneratingResponse &&
-                          _numChatRequests < kMaxChatRequests,
-                      isGeneratingResponse: _isGeneratingResponse,
-                      numChatRequests: _numChatRequests,
-                    ),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(left: 16, right: 16, bottom: 8),
+                child: AnimatedGradientBorder(
+                  enabled: _isInputFocused,
+                  borderWidth: 2,
+                  glowSize: 8,
+                  borderRadius: BorderRadius.all(Radius.circular(10)),
+                  gradientColors: [
+                    Colors.blue.withAlpha(192),
+                    Colors.purple.withAlpha(192),
+                    Colors.red.withAlpha(192),
                   ],
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: theme.colorScheme.surface,
+                      border: Border.all(
+                        color: _isInputFocused
+                            ? theme.colorScheme.outline
+                            : theme.dividerColor,
+                        width: 1,
+                      ),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        Container(
+                          decoration: BoxDecoration(
+                            color: theme.colorScheme.surfaceContainer,
+                            borderRadius: BorderRadius.only(
+                              topLeft: Radius.circular(7),
+                              topRight: Radius.circular(7),
+                            ),
+                          ),
+                          padding: const EdgeInsets.all(4),
+                          child: Row(
+                            spacing: 8,
+                            children: [
+                              TextButton.icon(
+                                onPressed: _handleClearChat,
+                                label: Text('Clear Chat'),
+                                icon: Icon(LucideIcons.refreshCw),
+                              ),
+                              Spacer(),
+                              TextButton.icon(
+                                onPressed: _chatSession != null
+                                    ? _handleUpvote
+                                    : null,
+                                label: Text('Got Help'),
+                                icon: Icon(
+                                  LucideIcons.thumbsUp,
+                                  color: _vote == true
+                                      ? Colors.blue.shade600
+                                      : null,
+                                ),
+                              ),
+                              TextButton.icon(
+                                onPressed: _chatSession != null
+                                    ? _handleDownvote
+                                    : null,
+                                label: Text('Poor Answer'),
+                                icon: Icon(
+                                  LucideIcons.thumbsDown,
+                                  color: _vote == false
+                                      ? Colors.blue.shade600
+                                      : null,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Divider(
+                          height: 1,
+                          color: _isInputFocused
+                              ? theme.colorScheme.outline
+                              : theme.dividerColor,
+                        ),
+                        StarguideChatInput(
+                          textController: _inputTextController,
+                          focusNode: _inputFocusNode,
+                          onSend: _handleMessageSend,
+                          enabled:
+                              _hasInputText &&
+                              !_isGeneratingResponse &&
+                              _numChatRequests < kMaxChatRequests,
+                          isGeneratingResponse: _isGeneratingResponse,
+                          numChatRequests: _numChatRequests,
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
               ),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.only(
-              left: 18.0,
-              right: 18.0,
-              bottom: 8.0,
-            ),
-            child: Row(
-              children: [
-                Text(
-                  'Version $starguideVersion',
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    color: theme.disabledColor,
-                  ),
+              Padding(
+                padding: const EdgeInsets.only(
+                  left: 18.0,
+                  right: 18.0,
+                  bottom: 8.0,
                 ),
-                const SizedBox(width: 8),
-                TextButton(
-                  onPressed: () {
-                    launchUrl(
-                      Uri.parse('https://github.com/serverpod/starguide'),
-                    );
-                  },
-                  child: Text(
-                    'View Source',
-                    style: theme.textTheme.bodySmall?.copyWith(
-                      color: Colors.blue.shade600,
-                    ),
-                  ),
-                ),
-                if (_isAdmin)
-                  TextButton(
-                    onPressed: () => setState(() => _showAdmin = true),
-                    child: Text(
-                      'Admin',
+                child: Row(
+                  children: [
+                    Text(
+                      'Version $starguideVersion',
                       style: theme.textTheme.bodySmall?.copyWith(
-                        color: Colors.blue.shade600,
+                        color: theme.disabledColor,
                       ),
                     ),
-                  ),
-                if (!sessionManager.isAuthenticated)
-                  ListenableBuilder(
-                    listenable: _googleAuthController,
-                    builder: (context, _) => TextButton(
-                      onPressed: _googleAuthController.isLoading
-                          ? null
-                          : _handleSignIn,
+                    const SizedBox(width: 8),
+                    TextButton(
+                      onPressed: () {
+                        launchUrl(
+                          Uri.parse('https://github.com/serverpod/starguide'),
+                        );
+                      },
                       child: Text(
-                        'Sign In',
+                        'View Source',
                         style: theme.textTheme.bodySmall?.copyWith(
                           color: Colors.blue.shade600,
                         ),
                       ),
                     ),
-                  ),
-                Spacer(),
-                if (!sessionManager.isAuthenticated)
-                  Text(
-                    'Protected by ',
-                    style: theme.textTheme.bodySmall?.copyWith(
-                      color: theme.disabledColor,
-                    ),
-                  ),
-                if (!sessionManager.isAuthenticated)
-                  PopupMenuButton<String>(
-                    tooltip: '',
-                    color: Colors.white,
-                    offset: const Offset(0, -8),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    itemBuilder: (context) => [
-                      PopupMenuItem<String>(
-                        enabled: false,
-                        child: Container(
-                          constraints: const BoxConstraints(maxWidth: 500),
-                          child: StarguideMarkdown(
-                            'This site is protected by reCAPTCHA and the Google [Privacy Policy](https://policies.google.com/privacy) and [Terms of Service](https://policies.google.com/terms) apply.',
-                            style: theme.textTheme.bodySmall,
+                    if (_isAdmin)
+                      TextButton(
+                        onPressed: () => setState(() => _showAdmin = true),
+                        child: Text(
+                          'Admin',
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color: Colors.blue.shade600,
                           ),
                         ),
                       ),
-                    ],
-                    child: Text(
-                      'reCAPTCHA',
-                      style: theme.textTheme.bodySmall?.copyWith(
-                        color: Colors.blue.shade600,
+                    if (!sessionManager.isAuthenticated)
+                      ListenableBuilder(
+                        listenable: _googleAuthController,
+                        builder: (context, _) => TextButton(
+                          onPressed: _googleAuthController.isLoading
+                              ? null
+                              : _handleSignIn,
+                          child: Text(
+                            'Sign In',
+                            style: theme.textTheme.bodySmall?.copyWith(
+                              color: Colors.blue.shade600,
+                            ),
+                          ),
+                        ),
                       ),
-                    ),
-                  ),
-                if (sessionManager.isAuthenticated)
-                  TextButton(
-                    onPressed: () {
-                      sessionManager.signOutDevice();
-                    },
-                    child: Text(
-                      'Sign out',
-                      style: theme.textTheme.bodySmall?.copyWith(
-                        color: Colors.blue.shade600,
+                    Spacer(),
+                    if (!sessionManager.isAuthenticated)
+                      Text(
+                        'Protected by ',
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: theme.disabledColor,
+                        ),
                       ),
-                    ),
-                  ),
-              ],
-            ),
+                    if (!sessionManager.isAuthenticated)
+                      PopupMenuButton<String>(
+                        tooltip: '',
+                        color: Colors.white,
+                        offset: const Offset(0, -8),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        itemBuilder: (context) => [
+                          PopupMenuItem<String>(
+                            enabled: false,
+                            child: Container(
+                              constraints: const BoxConstraints(maxWidth: 500),
+                              child: StarguideMarkdown(
+                                'This site is protected by reCAPTCHA and the Google [Privacy Policy](https://policies.google.com/privacy) and [Terms of Service](https://policies.google.com/terms) apply.',
+                                style: theme.textTheme.bodySmall,
+                              ),
+                            ),
+                          ),
+                        ],
+                        child: Text(
+                          'reCAPTCHA',
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color: Colors.blue.shade600,
+                          ),
+                        ),
+                      ),
+                    if (sessionManager.isAuthenticated)
+                      TextButton(
+                        onPressed: () {
+                          sessionManager.signOutDevice();
+                        },
+                        child: Text(
+                          'Sign out',
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color: Colors.blue.shade600,
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
+              ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }
