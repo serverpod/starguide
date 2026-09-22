@@ -181,6 +181,11 @@ class StarguideChatPageState extends State<StarguideChatPage> {
 
   bool _isInputFocused = false;
 
+  /// Whether the input takes focus when the app opens. A question passed in
+  /// the URL means the app is embedded in another page, such as an iframe,
+  /// where the browser refuses to focus it until the user taps the app.
+  bool _autofocusInput = true;
+
   bool _connectionError = false;
   String? _connectionErrorMessage;
   bool _recaptchaError = false;
@@ -227,6 +232,7 @@ class StarguideChatPageState extends State<StarguideChatPage> {
     final uri = Uri.base;
     final query = uri.queryParameters;
     if (query.containsKey('q')) {
+      _autofocusInput = false;
       _inputTextController.text = query['q']!;
       _handleMessageSend(_inputTextController.text);
       _inputTextController.clear();
@@ -548,6 +554,7 @@ class StarguideChatPageState extends State<StarguideChatPage> {
                         StarguideChatInput(
                           textController: _inputTextController,
                           focusNode: _inputFocusNode,
+                          autofocus: _autofocusInput,
                           onSend: _handleMessageSend,
                           enabled:
                               _hasInputText &&

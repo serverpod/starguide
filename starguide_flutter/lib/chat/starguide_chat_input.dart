@@ -11,6 +11,7 @@ class StarguideChatInput extends StatefulWidget {
     required this.isGeneratingResponse,
     required this.numChatRequests,
     required this.focusNode,
+    this.autofocus = true,
   });
 
   final void Function(String message) onSend;
@@ -19,6 +20,10 @@ class StarguideChatInput extends StatefulWidget {
   final bool isGeneratingResponse;
   final int numChatRequests;
   final FocusNode focusNode;
+
+  /// Whether the field takes focus when it is first shown. Off when the app
+  /// is embedded, where focus can only be given by tapping the app.
+  final bool autofocus;
 
   @override
   State<StarguideChatInput> createState() => _StarguideChatInputState();
@@ -53,7 +58,7 @@ class _StarguideChatInputState extends State<StarguideChatInput> {
               Expanded(
                 child: TextField(
                   focusNode: widget.focusNode,
-                  autofocus: true,
+                  autofocus: widget.autofocus,
                   enabled: widget.numChatRequests < kMaxChatRequests,
                   buildCounter:
                       (
