@@ -15,3 +15,4 @@ main.exe
 # Serverpod Cloud CLI
 .scloud/
 starguide_flutter/packages/gpt_markdown/build
+blog
