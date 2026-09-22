@@ -389,6 +389,7 @@ class StarguideChatPageState extends State<StarguideChatPage> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final isNarrow = MediaQuery.sizeOf(context).width < kNarrowScreenWidth;
 
     // The admin interface replaces the chat. Signing out drops the scope,
     // which brings the chat back.
@@ -507,7 +508,7 @@ class StarguideChatPageState extends State<StarguideChatPage> {
                             children: [
                               TextButton.icon(
                                 onPressed: _handleClearChat,
-                                label: Text('Clear Chat'),
+                                label: Text(isNarrow ? 'Clear' : 'Clear Chat'),
                                 icon: Icon(LucideIcons.refreshCw),
                               ),
                               Spacer(),
@@ -515,7 +516,7 @@ class StarguideChatPageState extends State<StarguideChatPage> {
                                 onPressed: _chatSession != null
                                     ? _handleUpvote
                                     : null,
-                                label: Text('Got Help'),
+                                label: Text(isNarrow ? 'Good' : 'Got Help'),
                                 icon: Icon(
                                   LucideIcons.thumbsUp,
                                   color: _vote == true
@@ -527,7 +528,7 @@ class StarguideChatPageState extends State<StarguideChatPage> {
                                 onPressed: _chatSession != null
                                     ? _handleDownvote
                                     : null,
-                                label: Text('Poor Answer'),
+                                label: Text(isNarrow ? 'Bad' : 'Poor Answer'),
                                 icon: Icon(
                                   LucideIcons.thumbsDown,
                                   color: _vote == false
@@ -569,25 +570,26 @@ class StarguideChatPageState extends State<StarguideChatPage> {
                 child: Row(
                   children: [
                     Text(
-                      'Version $starguideVersion',
+                      isNarrow ? starguideVersion : 'Version $starguideVersion',
                       style: theme.textTheme.bodySmall?.copyWith(
                         color: theme.disabledColor,
                       ),
                     ),
                     const SizedBox(width: 8),
-                    TextButton(
-                      onPressed: () {
-                        launchUrl(
-                          Uri.parse('https://github.com/serverpod/starguide'),
-                        );
-                      },
-                      child: Text(
-                        'View Source',
-                        style: theme.textTheme.bodySmall?.copyWith(
-                          color: Colors.blue.shade600,
+                    if (!isNarrow)
+                      TextButton(
+                        onPressed: () {
+                          launchUrl(
+                            Uri.parse('https://github.com/serverpod/starguide'),
+                          );
+                        },
+                        child: Text(
+                          'View Source',
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color: Colors.blue.shade600,
+                          ),
                         ),
                       ),
-                    ),
                     if (_isAdmin)
                       TextButton(
                         onPressed: () => setState(() => _showAdmin = true),

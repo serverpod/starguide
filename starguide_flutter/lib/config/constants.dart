@@ -9,3 +9,7 @@ const kAdminScopeName = 'serverpod.admin';
 /// text much longer than this is hard to follow, and the input and footer
 /// stay directly under the messages.
 const kMaxContentWidth = 800.0;
+
+/// Below this width, the chat is laid out for a phone: the button labels are
+/// shortened and the footer only shows what fits.
+const kNarrowScreenWidth = 600.0;
