@@ -42,7 +42,7 @@ serverpod:
         && xcopy /E /I /Y build\web ..\starguide_server\web\app
       posix: |
         cd ../starguide_flutter
-        flutter build web --no-tree-shake-icons --base-href / --output ../starguide_server/web/app
+        flutter build web --base-href / --output ../starguide_server/web/app
   flutter_apps:
     starguide:
       path: ../starguide_flutter

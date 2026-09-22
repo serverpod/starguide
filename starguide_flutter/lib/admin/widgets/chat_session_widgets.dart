@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:markdown_widget/markdown_widget.dart';
 import 'package:shad/shad.dart';
 import 'package:starguide_client/starguide_client.dart';
 import 'package:starguide_flutter/admin/admin_format.dart';
 import 'package:starguide_flutter/admin/widgets/admin_widgets.dart';
 import 'package:starguide_flutter/main.dart';
+import 'package:starguide_flutter/widgets/starguide_markdown.dart';
 
 /// Opens a side sheet with the full conversation of a chat session.
 void showConversationSheet(
@@ -218,24 +218,7 @@ class _MessageBubble extends StatelessWidget {
           ),
           child: isUser
               ? SelectableText(message.message, style: theme.textTheme.p)
-              : MarkdownBlock(
-                  data: message.message,
-                  selectable: true,
-                  config: MarkdownConfig(
-                    configs: [
-                      PConfig(textStyle: theme.textTheme.p),
-                      PreConfig(
-                        textStyle: theme.textTheme.small.copyWith(
-                          fontFamily: 'JetBrainsMono',
-                        ),
-                        decoration: BoxDecoration(
-                          color: theme.colorScheme.muted,
-                          borderRadius: theme.radii.md,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
+              : SelectionArea(child: StarguideMarkdown(message.message)),
         ),
       ],
     );

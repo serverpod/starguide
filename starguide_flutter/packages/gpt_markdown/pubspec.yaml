@@ -1,0 +1,33 @@
+name: gpt_markdown
+description: "Starguide's fork of gpt_markdown 1.2.1, adding block spacing, table and list options."
+version: 1.2.1+starguide.1
+publish_to: none
+homepage: https://gptmarkdown.com
+repository: https://github.com/Infinitix-LLC/gpt_markdown
+issue_tracker: https://github.com/Infinitix-LLC/gpt_markdown/issues
+
+resolution: workspace
+
+environment:
+  sdk: '>=3.7.0 <4.0.0'
+  # RadioGroup, used by the radio list marker, was added in 3.32.
+  flutter: ">=3.32.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ">=3.0.0 <7.0.0"
+
+flutter:
+
+topics:
+  - markdown
+  - latex
+  - selectable
+  - chatgpt
+  - gemini
+

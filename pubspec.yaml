@@ -8,6 +8,7 @@ workspace:
   - starguide_client
   - starguide_server
   - starguide_flutter
+  - starguide_flutter/packages/gpt_markdown
 
 # jev_dart depends on crimson ^0.4.0+1, which pins analyzer to ^6.0.0.
 # Crimson's JSON parser does not import the analyzer; only its code generator

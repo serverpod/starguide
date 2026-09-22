@@ -2,15 +2,18 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_chat_core/flutter_chat_core.dart';
 import 'package:flutter_chat_ui/flutter_chat_ui.dart';
 import 'package:g_recaptcha_v3/g_recaptcha_v3.dart';
-import 'package:flutter_lucide/flutter_lucide.dart';
-import 'package:markdown_widget/markdown_widget.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:serverpod_auth_idp_flutter/serverpod_auth_idp_flutter.dart';
 import 'package:starguide_client/starguide_client.dart';
 import 'package:flutter/material.dart';
 import 'package:serverpod_flutter/serverpod_flutter.dart';
 import 'package:shad/shad.dart'
-    show GlobalShadLocalizations, ShadApp, ShadAppBuilder, ShadThemeData;
+    show
+        GlobalShadLocalizations,
+        LucideIcons,
+        ShadApp,
+        ShadAppBuilder,
+        ShadThemeData;
 import 'package:starguide_flutter/admin/admin_page.dart';
 import 'package:starguide_flutter/chat/starguide_chat_input.dart';
 import 'package:starguide_flutter/chat/starguide_disconnected.dart';
@@ -20,7 +23,9 @@ import 'package:starguide_flutter/config/app_config.dart';
 import 'package:starguide_flutter/config/chat_theme.dart';
 import 'package:starguide_flutter/config/constants.dart';
 import 'package:starguide_flutter/config/theme.dart';
+import 'package:starguide_flutter/config/tree_shaken_fonts.dart';
 import 'package:starguide_flutter/widgets/animated_gradient_border.dart';
+import 'package:starguide_flutter/widgets/starguide_markdown.dart';
 import 'package:syntax_highlight/syntax_highlight.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -100,6 +105,8 @@ void main() async {
     await GRecaptchaV3.hideBadge();
     await GRecaptchaV3.ready('6LcWhFMrAAAAAHvRY6kr9oc9B_KPeOT0T2SxFGJE');
   }
+  // Only referenced so the constants reach the compiler; see the list.
+  assert(kTreeShakenFonts.isNotEmpty);
   runApp(const StarguideApp());
 }
 
@@ -498,7 +505,7 @@ class StarguideChatPageState extends State<StarguideChatPage> {
                           TextButton.icon(
                             onPressed: _handleClearChat,
                             label: Text('Clear Chat'),
-                            icon: Icon(LucideIcons.refresh_cw),
+                            icon: Icon(LucideIcons.refreshCw),
                           ),
                           Spacer(),
                           TextButton.icon(
@@ -507,7 +514,7 @@ class StarguideChatPageState extends State<StarguideChatPage> {
                                 : null,
                             label: Text('Got Help'),
                             icon: Icon(
-                              LucideIcons.thumbs_up,
+                              LucideIcons.thumbsUp,
                               color: _vote == true
                                   ? Colors.blue.shade600
                                   : null,
@@ -519,7 +526,7 @@ class StarguideChatPageState extends State<StarguideChatPage> {
                                 : null,
                             label: Text('Poor Answer'),
                             icon: Icon(
-                              LucideIcons.thumbs_down,
+                              LucideIcons.thumbsDown,
                               color: _vote == false
                                   ? Colors.blue.shade600
                                   : null,
@@ -624,14 +631,9 @@ class StarguideChatPageState extends State<StarguideChatPage> {
                         enabled: false,
                         child: Container(
                           constraints: const BoxConstraints(maxWidth: 500),
-                          child: MarkdownBlock(
-                            config: MarkdownConfig(
-                              configs: [
-                                PConfig(textStyle: theme.textTheme.bodySmall!),
-                              ],
-                            ),
-                            data:
-                                'This site is protected by reCAPTCHA and the Google [Privacy Policy](https://policies.google.com/privacy) and [Terms of Service](https://policies.google.com/terms) apply.',
+                          child: StarguideMarkdown(
+                            'This site is protected by reCAPTCHA and the Google [Privacy Policy](https://policies.google.com/privacy) and [Terms of Service](https://policies.google.com/terms) apply.',
+                            style: theme.textTheme.bodySmall,
                           ),
                         ),
                       ),

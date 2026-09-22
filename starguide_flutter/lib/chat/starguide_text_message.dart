@@ -1,14 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_chat_core/flutter_chat_core.dart';
-import 'package:gpt_markdown/gpt_markdown.dart';
 import 'package:provider/provider.dart';
 import 'package:shad/shad.dart' show LucideIcons;
-import 'package:starguide_flutter/chat/starguide_code_field.dart';
+import 'package:starguide_flutter/widgets/starguide_markdown.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 /// A widget that displays a regular text message.
 ///
-/// Supports markdown rendering via [GptMarkdown].
+/// Supports markdown rendering via [StarguideMarkdown].
 class StarguideTextMessage extends StatelessWidget {
   /// The text message data model.
   final TextMessage message;
@@ -120,22 +119,12 @@ class StarguideTextMessage extends StatelessWidget {
           SelectableRegion(
             focusNode: FocusNode(),
             selectionControls: MaterialTextSelectionControls(),
-            child: GptMarkdown(
+            child: StarguideMarkdown(
               gptResponse.text,
               style: _isOnlyEmoji
                   ? paragraphStyle?.copyWith(fontSize: onlyEmojiFontSize)
                   : paragraphStyle,
               onLinkTap: onLinkTap,
-              codeBuilder: (context, name, codes, closed) =>
-                  StarguideCodeField(name: name, codes: codes),
-              inlineCodeStyle: InlineCodeStyle(
-                fontFamily: 'JetBrainsMono',
-                fontSizeFactor: 0.9,
-                backgroundColor: Colors.grey.shade500.withAlpha(64),
-                borderColor: Colors.transparent,
-                borderRadius: const Radius.circular(4),
-                padding: const EdgeInsets.symmetric(horizontal: 2),
-              ),
             ),
           ),
           if (gptResponse.links.isNotEmpty)
@@ -247,13 +236,14 @@ class StarguideTextMessage extends StatelessWidget {
     return receivedBackgroundColor ?? theme.colors.surfaceContainer;
   }
 
+  /// Both sides are set like the body text of the Serverpod website, so a
+  /// question reads at the same size as its answer.
   TextStyle? _resolveParagraphStyle(bool isSentByMe, ChatTheme theme) {
     if (isSentByMe) {
       return sentTextStyle ??
-          theme.typography.bodyMedium.copyWith(color: theme.colors.onPrimary);
+          StarguideMarkdown.bodyStyle.copyWith(color: theme.colors.onPrimary);
     }
-    return receivedTextStyle ??
-        theme.typography.bodyMedium.copyWith(color: theme.colors.onSurface);
+    return receivedTextStyle ?? StarguideMarkdown.bodyStyle;
   }
 
   TextStyle? _resolveTimeStyle(bool isSentByMe, ChatTheme theme) {

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_lucide/flutter_lucide.dart';
+import 'package:shad/shad.dart' show LucideIcons;
 import 'package:starguide_flutter/config/constants.dart';
 
 class StarguideChatInput extends StatefulWidget {
@@ -40,8 +40,12 @@ class _StarguideChatInputState extends State<StarguideChatInput> {
     }
 
     return Container(
-      padding:
-          const EdgeInsets.only(left: 12.0, right: 8.0, top: 8.0, bottom: 8.0),
+      padding: const EdgeInsets.only(
+        left: 12.0,
+        right: 8.0,
+        top: 8.0,
+        bottom: 8.0,
+      ),
       child: Column(
         children: [
           Row(
@@ -51,14 +55,15 @@ class _StarguideChatInputState extends State<StarguideChatInput> {
                   focusNode: widget.focusNode,
                   autofocus: true,
                   enabled: widget.numChatRequests < kMaxChatRequests,
-                  buildCounter: (
-                    context, {
-                    required currentLength,
-                    required isFocused,
-                    required maxLength,
-                  }) {
-                    return const SizedBox();
-                  },
+                  buildCounter:
+                      (
+                        context, {
+                        required currentLength,
+                        required isFocused,
+                        required maxLength,
+                      }) {
+                        return const SizedBox();
+                      },
                   maxLength: kMaxChatRequestLength,
                   maxLines: 1,
                   decoration: InputDecoration.collapsed(
